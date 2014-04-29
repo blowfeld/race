@@ -1,6 +1,7 @@
 package thomasb.web.clocking;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -22,18 +23,38 @@ import javax.servlet.http.HttpServletResponse;
 @SuppressWarnings("serial")
 public class ClockedServlet extends HttpServlet {
 	private final ClockedSubmissionThread submissionThread;
+	private final CountDownLatch startLatch;
+	private boolean init = true;
 	
 	public ClockedServlet(int participants,
 			ClockedRequestProcessor requestProcessor,
 			int interval) {
 		this.submissionThread = new ClockedSubmissionThread(participants, interval, requestProcessor);
 		this.submissionThread.start();
+		this.startLatch = new CountDownLatch(participants);
 	}
 	
 	@Override
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
+		if (init) {
+			try {
+				awaitParticipants();
+			} catch (InterruptedException e) {
+				return;
+			} finally {
+				Thread.currentThread().interrupt();
+			}
+			init = false;
+		}
+		
 		AsyncContext async = request.startAsync(request, response);
 		submissionThread.addRequest(async);
+	}
+
+	private void awaitParticipants() throws InterruptedException {
+		startLatch.countDown();
+		startLatch.await();
+		submissionThread.launch();
 	}
 }
