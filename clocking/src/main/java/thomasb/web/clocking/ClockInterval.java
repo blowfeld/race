@@ -10,26 +10,29 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 final class ClockInterval {
-	private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-	
 	private final int count;
 	private final int duration;
 	private final CountDownLatch latch;
 	private final ScheduledFuture<?> termination;
+	private final ScheduledExecutorService executor;
 	
 	ClockInterval(int count, int duration) {
-		this(count, duration, new CountDownLatch(1));
+		this(count, duration, Executors.newSingleThreadScheduledExecutor());
 	}
 	
-	ClockInterval(int count, int duration, CountDownLatch latch) {
-		checkArgument(count >= -1, "count must be non-negative");
+	private ClockInterval(int count, int duration, ScheduledExecutorService executor) {
+		this(count, duration, new CountDownLatch(1), executor);
+	}
+	
+	private ClockInterval(int count, int duration, CountDownLatch latch, ScheduledExecutorService executor) {
 		checkArgument(duration > 0, "duration must be positive");
 		this.count = count;
 		this.duration = duration;
 		this.latch = latch;
+		this.executor = executor;
 		this.termination = executor.schedule(new TerminationTask(latch), duration, TimeUnit.MILLISECONDS);
 	}
-	
+
 	void await() {
 		try {
 			latch.await();
@@ -44,7 +47,7 @@ final class ClockInterval {
 	}
 	
 	ClockInterval next() {
-		return new ClockInterval(count + 1, duration);
+		return new ClockInterval(count + 1, duration, executor);
 	}
 	
 	int getCount() {
