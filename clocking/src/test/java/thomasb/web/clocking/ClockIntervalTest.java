@@ -25,7 +25,6 @@ public class ClockIntervalTest {
 				actualDuration = (int)duration;
 			};
 		};
-		
 	}
 	
 	@Test
