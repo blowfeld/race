@@ -109,13 +109,13 @@ class ClockedSubmissionThread extends Thread {
 		requestProcessor.timeoutResponse(clockInterval.getCount(), httpResponse);
 	}
 	
-	private boolean scheduleRequest(AsyncContext request, int intervalCount) {
+	private void scheduleRequest(AsyncContext request, int intervalCount) {
 		checkArgument(clockInterval.getCount() >= intervalCount, "Request with illegal timing was received: expected %s, was %s", clockInterval.getCount(), intervalCount);
 		if (clockInterval.getCount() > intervalCount) {
 			timeout(request);
 			DISPATCHER.submit(request);
-			
-			return false;
+
+			return;
 		}
 		
 		requests.add(request);
@@ -125,8 +125,6 @@ class ClockedSubmissionThread extends Thread {
 			// the next time interval after they received the current submission
 			clockInterval.finish();
 		}
-		
-		return true;
 	}
 
 	int getIntervalCount() {
