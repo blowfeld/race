@@ -22,33 +22,18 @@ import javax.servlet.http.HttpServletResponse;
 @SuppressWarnings("serial")
 public class ClockedServlet extends HttpServlet {
 	private final ClockedSubmissionThread submissionThread;
-	private final ClockedRequestProcessor requestProcessor;
 	
 	public ClockedServlet(int participants,
 			ClockedRequestProcessor requestProcessor,
 			int interval) {
-		this.requestProcessor = requestProcessor;
-		this.submissionThread = new ClockedSubmissionThread(participants, interval);
+		this.submissionThread = new ClockedSubmissionThread(participants, interval, requestProcessor);
 		this.submissionThread.start();
 	}
 	
 	@Override
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		int requestTime = readTime(request);
-		if (submissionThread.getIntervalCount() > requestTime) {
-			requestProcessor.timeoutResponse(requestTime, response);
-			return;
-		}
-		
-		requestProcessor.service(requestTime, request, response);
-
 		AsyncContext async = request.startAsync(request, response);
-		submissionThread.addRequest(async, requestTime);
-	}
-
-	private int readTime(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return 0;
+		submissionThread.addRequest(async);
 	}
 }

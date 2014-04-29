@@ -1,7 +1,7 @@
 package thomasb.web.clocking;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public interface ClockedRequestProcessor {
 
@@ -12,7 +12,7 @@ public interface ClockedRequestProcessor {
 	 * @param request the client request to be processed
 	 * @param response the response object to be written
 	 */
-	void service(int requestTime, ServletRequest request, ServletResponse response);
+	void service(int requestTime, HttpServletRequest request, HttpServletResponse response);
 	
 	/**
 	 * Processes the response in case it is not received in time.
@@ -20,5 +20,5 @@ public interface ClockedRequestProcessor {
 	 * @param requestTime the time interval count the request was intended for
 	 * @param response the response object to be written to
 	 */
-	void timeoutResponse(int requestTime, ServletResponse response);
+	void timeoutResponse(int requestTime, HttpServletResponse response);
 }

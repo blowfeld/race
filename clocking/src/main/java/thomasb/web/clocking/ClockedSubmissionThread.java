@@ -5,31 +5,52 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import net.jcip.annotations.GuardedBy;
 
 class ClockedSubmissionThread extends Thread {
-	private static final ExecutorService DISPATCHER = Executors
-			.newCachedThreadPool();
+	private static final Dispatcher DISPATCHER = new Dispatcher();
 
 	@GuardedBy("requests")
 	private final List<AsyncContext> requests = new ArrayList<>();
 	private final int participants;
 	private final int submissionInterval;
+	private final ClockedRequestProcessor requestProcessor;
 	private final CountDownLatch startLatch;
 
 	@GuardedBy("requests")
 	private volatile ClockInterval clockInterval;
 	private volatile boolean stop = false;
 
-	ClockedSubmissionThread(int participants, int submissionInterval) {
+
+	ClockedSubmissionThread(int participants,
+			int submissionInterval,
+			ClockedRequestProcessor requestProcessor) {
 		this.participants = participants;
 		this.submissionInterval = submissionInterval;
+		this.requestProcessor = requestProcessor;
 		this.startLatch = new CountDownLatch(1);
+	}
+	
+	void launch() {
+		startLatch.countDown();
+	}
+	
+	private void awaitStart() {
+		try {
+			startLatch.await();
+		} catch (InterruptedException e) {
+			finish();
+			launch();
+		}
+	}
+	
+	void finish() {
+		stop = true;
 	}
 
 	@Override
@@ -40,61 +61,72 @@ class ClockedSubmissionThread extends Thread {
 		awaitStart();
 
 		while (!stop) {
-			clockInterval.await();
+			try {
+				clockInterval.await();
+			} catch (InterruptedException e) {
+				finish();
+			}
+			
 			synchronized (requests) {
-				clockInterval = clockInterval.next();
-				submit(requests);
-				requests.clear();
+				submitInterval();
 			}
-		}
-	}
-
-	private void awaitStart() {
-		try {
-			startLatch.await();
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	void launch() {
-		startLatch.countDown();
-	}
-
-	void finish() {
-		stop = true;
-	}
-
-	boolean addRequest(AsyncContext request, int intervalCount) {
-		synchronized (requests) {
-			checkArgument(clockInterval.getCount() >= intervalCount, "Request with illegal timing was received: expected %s, was %s", clockInterval.getCount(), intervalCount);
-			if (clockInterval.getCount() > intervalCount) {
-				return false;
-			}
-
-			requests.add(request);
-
-			if (requests.size() == this.participants) {
-				clockInterval.finish();
-			}
-		}
-
-		return true;
-	}
-
-	private void submit(List<AsyncContext> requests) {
-		for (AsyncContext asyncRequest : requests) {
-			DISPATCHER.execute(createSubmission(asyncRequest));
 		}
 	}
 	
-	private static Runnable createSubmission(final AsyncContext request) {
-		return new Runnable() {
-			@Override
-			public void run() {
-				request.complete();
-			}
-		};
+	private void submitInterval() {
+		clockInterval = clockInterval.next();
+		DISPATCHER.submit(requests);
+		requests.clear();
+	}
+
+	void addRequest(AsyncContext request) {
+		int intervalCount = readTime(request);
+		serviceRequest(request, intervalCount);
+		
+		synchronized (requests) {
+			scheduleRequest(request, intervalCount);
+		}
+	}
+	
+	private int readTime(AsyncContext request) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	private void serviceRequest(AsyncContext request, int intervalCount) {
+		if (clockInterval.getCount() > intervalCount) {
+			return;
+		}
+		
+		HttpServletRequest httpRequest = (HttpServletRequest)request.getRequest();
+		HttpServletResponse httpResponse = (HttpServletResponse)request.getResponse();
+		requestProcessor.service(intervalCount, httpRequest, httpResponse);
+	}
+
+	private void timeout(AsyncContext request) {
+		HttpServletResponse httpResponse = (HttpServletResponse)request.getResponse();
+		httpResponse.reset();
+		requestProcessor.timeoutResponse(clockInterval.getCount(), httpResponse);
+	}
+	
+	private boolean scheduleRequest(AsyncContext request, int intervalCount) {
+		checkArgument(clockInterval.getCount() >= intervalCount, "Request with illegal timing was received: expected %s, was %s", clockInterval.getCount(), intervalCount);
+		if (clockInterval.getCount() > intervalCount) {
+			timeout(request);
+			DISPATCHER.submit(request);
+			
+			return false;
+		}
+		
+		requests.add(request);
+		
+		if (requests.size() == this.participants) {
+			// This is save as clients are only allowed to send a request for
+			// the next time interval after they received the current submission
+			clockInterval.finish();
+		}
+		
+		return true;
 	}
 
 	int getIntervalCount() {

@@ -33,12 +33,8 @@ final class ClockInterval {
 		this.termination = executor.schedule(new TerminationTask(latch), duration, TimeUnit.MILLISECONDS);
 	}
 
-	void await() {
-		try {
-			latch.await();
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
+	void await() throws InterruptedException {
+		latch.await();
 	}
 	
 	void finish() {
