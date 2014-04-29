@@ -15,6 +15,8 @@ import net.jcip.annotations.GuardedBy;
 class ClockedSubmissionThread extends Thread {
 	private static final Dispatcher DISPATCHER = new Dispatcher();
 
+	public static final String TIME_PARAMETER = "timeCount";
+
 	@GuardedBy("requests")
 	private final List<AsyncContext> requests = new ArrayList<>();
 	private final int participants;
@@ -34,6 +36,7 @@ class ClockedSubmissionThread extends Thread {
 		this.submissionInterval = submissionInterval;
 		this.requestProcessor = requestProcessor;
 		this.startLatch = new CountDownLatch(1);
+		this.clockInterval = new ClockInterval(-1, submissionInterval);
 	}
 	
 	void launch() {
@@ -46,7 +49,6 @@ class ClockedSubmissionThread extends Thread {
 
 	@Override
 	public void run() {
-		clockInterval = new ClockInterval(-1, submissionInterval);
 		clockInterval.finish();
 
 		awaitStart();
@@ -93,8 +95,9 @@ class ClockedSubmissionThread extends Thread {
 	}
 	
 	private int readTime(AsyncContext request) {
-		// TODO Auto-generated method stub
-		return 0;
+		HttpServletRequest httpRequest = (HttpServletRequest)request.getRequest();
+
+		return Integer.valueOf(httpRequest.getParameter(TIME_PARAMETER));
 	}
 
 	private void serviceRequest(AsyncContext request, int intervalCount) {

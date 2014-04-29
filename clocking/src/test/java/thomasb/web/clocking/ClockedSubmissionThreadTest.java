@@ -5,27 +5,32 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
 public class ClockedSubmissionThreadTest {
+	private static final ClockedRequestProcessor DUMMY_PROCESSOR = createProcessorMock();
+
 	private ClockedSubmissionThread submissionThread;
 	
-	TestAsyncContext request_0_0;
-	TestAsyncContext request_0_1;
-	TestAsyncContext request_1_0;
-	TestAsyncContext request_1_1;
-	TestAsyncContext request_2_0;
-	TestAsyncContext request_2_1;
+	private TestAsyncContext request_0_0;
+	private TestAsyncContext request_0_1;
+	private TestAsyncContext request_1_0;
+	private TestAsyncContext request_1_1;
+	private TestAsyncContext request_2_0;
+	private TestAsyncContext request_2_1;
 	
 	private void setupRequestsWithSchedule(int delay) {
-		submissionThread = new ClockedSubmissionThread(2, 50);
-		request_2_0 = new TestAsyncContext();
-		request_2_1 = new TestAsyncContext();
-		request_1_0 = new TestAsyncContext(submissionThread, 2, delay, request_2_0);
-		request_1_1 = new TestAsyncContext(submissionThread, 2, delay, request_2_1);
-		request_0_0 = new TestAsyncContext(submissionThread, 1, delay, request_1_0);
-		request_0_1 = new TestAsyncContext(submissionThread, 1, delay, request_1_1);
+		submissionThread = new ClockedSubmissionThread(2, 50, DUMMY_PROCESSOR);
+		request_2_0 = new TestAsyncContext(2);
+		request_2_1 = new TestAsyncContext(2);
+		request_1_0 = new TestAsyncContext(submissionThread, 1, delay, request_2_0);
+		request_1_1 = new TestAsyncContext(submissionThread, 1, delay, request_2_1);
+		request_0_0 = new TestAsyncContext(submissionThread, 0, delay, request_1_0);
+		request_0_1 = new TestAsyncContext(submissionThread, 0, delay, request_1_1);
 	}
 	
 	@Test
@@ -38,7 +43,7 @@ public class ClockedSubmissionThreadTest {
 		long start = System.currentTimeMillis();
 		
 		sleep(25);
-		submissionThread.addRequest(request_0_0, 0);
+		submissionThread.addRequest(request_0_0);
 
 		int firstCount = submissionThread.getIntervalCount();
 		sleep(50);
@@ -79,8 +84,8 @@ public class ClockedSubmissionThreadTest {
 		submissionThread.launch();
 		
 		sleep(25);
-		submissionThread.addRequest(request_0_0, 0);
-		submissionThread.addRequest(request_0_1, 0);
+		submissionThread.addRequest(request_0_0);
+		submissionThread.addRequest(request_0_1);
 		sleep(50);
 		
 		submissionThread.finish();
@@ -98,8 +103,8 @@ public class ClockedSubmissionThreadTest {
 		
 		sleep(25);
 		int firstCount = submissionThread.getIntervalCount();
-		submissionThread.addRequest(request_0_0, 0);
-		submissionThread.addRequest(request_0_1, 0);
+		submissionThread.addRequest(request_0_0);
+		submissionThread.addRequest(request_0_1);
 		sleep(5);
 		int secondCount = submissionThread.getIntervalCount();
 		sleep(25);
@@ -130,20 +135,37 @@ public class ClockedSubmissionThreadTest {
 		submissionThread.launch();
 		
 		sleep(25);
-		submissionThread.addRequest(request_0_0, 0);
+		submissionThread.addRequest(request_0_0);
 		
 		int firstCount = submissionThread.getIntervalCount();
 		sleep(50);
 		int secondCount = submissionThread.getIntervalCount();
-		submissionThread.addRequest(request_0_1, 0);
+		submissionThread.addRequest(request_0_1);
 		sleep(50);
 		
 		submissionThread.finish();
 		submissionThread.join();
 		
-		assertEquals(0, request_0_1.getInvocationTime());
+		int responseStatus = ((HttpServletResponse)request_0_1.getResponse()).getStatus();
+		assertEquals(408, responseStatus);
 		
 		assertEquals(0, firstCount);
 		assertEquals(1, secondCount);
+	}
+	
+	private static ClockedRequestProcessor createProcessorMock() {
+		return new ClockedRequestProcessor() {
+			@Override
+			public void service(int requestTime, HttpServletRequest request,
+					HttpServletResponse response) {
+				// do nothing
+			}
+			
+			@Override
+			public void timeoutResponse(int requestTime,
+					HttpServletResponse response) {
+				response.setStatus(408);
+			}
+		};
 	}
 }

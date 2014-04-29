@@ -1,6 +1,9 @@
 package thomasb.web.clocking;
 
 import static java.lang.Thread.sleep;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncListener;
@@ -8,6 +11,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 class TestAsyncContext implements AsyncContext {
 	private long invocationTime;
@@ -15,8 +20,9 @@ class TestAsyncContext implements AsyncContext {
 	private final AsyncContext request;
 	private final int intervalCount;
 	private final int delay;
+	private final HttpServletResponse response;
 	
-	public TestAsyncContext(ClockedSubmissionThread submissionThread,
+	TestAsyncContext(ClockedSubmissionThread submissionThread,
 			int intervalCount,
 			int delay,
 			AsyncContext request) {
@@ -24,10 +30,11 @@ class TestAsyncContext implements AsyncContext {
 		this.intervalCount = intervalCount;
 		this.delay = delay;
 		this.request = request;
+		this.response = createResponseMock();
 	}
 	
-	public TestAsyncContext() {
-		this(null, 0, 0, null);
+	TestAsyncContext(int intervalCount) {
+		this(null, intervalCount, 0, null);
 	}
 
 	@Override
@@ -39,7 +46,7 @@ class TestAsyncContext implements AsyncContext {
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
-			submissionThread.addRequest(request, intervalCount);
+			submissionThread.addRequest(request);
 		}
 	}
 
@@ -49,14 +56,44 @@ class TestAsyncContext implements AsyncContext {
 
 	@Override
 	public ServletRequest getRequest() {
-		throw new UnsupportedOperationException();
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		doReturn(String.valueOf(intervalCount))
+				.when(request).getParameter(ClockedServlet.TIME_PARAMETER);
+		
+		return request;
 	}
 
 	@Override
 	public ServletResponse getResponse() {
-		throw new UnsupportedOperationException();
+		return response;
+	}
+	
+	private HttpServletResponse createResponseMock() {
+		HttpServletResponse mock = mock(TestHttpServletResponse.class);
+		doCallRealMethod().when(mock).setStatus(408);
+		doCallRealMethod().when(mock).getStatus();
+		
+		return mock;
 	}
 
+	private static abstract class TestHttpServletResponse implements HttpServletResponse {
+		private int status;
+		
+		@Override
+		public void setStatus(int status) {
+			this.status = status;
+		}
+		
+		@Override
+		public int getStatus() {
+			return status;
+		}
+	}
+	
+	
+	// ---------- unused ------------------
+	
+	
 	@Override
 	public boolean hasOriginalRequestAndResponse() {
 		throw new UnsupportedOperationException();
@@ -103,10 +140,9 @@ class TestAsyncContext implements AsyncContext {
 	public void setTimeout(long timeout) {
 		throw new UnsupportedOperationException();
 	}
-
+	
 	@Override
 	public long getTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 }

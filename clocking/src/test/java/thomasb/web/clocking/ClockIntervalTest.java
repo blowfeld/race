@@ -20,7 +20,11 @@ public class ClockIntervalTest {
 			@Override
 			public void run() {
 				long start = System.currentTimeMillis();
-				interval.await();
+				try {
+					interval.await();
+				} catch (InterruptedException e) {
+					return;
+				}
 				long duration = System.currentTimeMillis() - start;
 				actualDuration = (int)duration;
 			};

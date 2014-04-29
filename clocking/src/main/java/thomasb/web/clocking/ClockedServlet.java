@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 @SuppressWarnings("serial")
 public class ClockedServlet extends HttpServlet {
+	public static final String TIME_PARAMETER = ClockedSubmissionThread.TIME_PARAMETER;
+	
 	private final ClockedSubmissionThread submissionThread;
 	private final CountDownLatch startLatch;
 	private boolean init = true;
