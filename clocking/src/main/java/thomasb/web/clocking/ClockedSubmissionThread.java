@@ -40,15 +40,6 @@ class ClockedSubmissionThread extends Thread {
 		startLatch.countDown();
 	}
 	
-	private void awaitStart() {
-		try {
-			startLatch.await();
-		} catch (InterruptedException e) {
-			finish();
-			launch();
-		}
-	}
-	
 	void finish() {
 		stop = true;
 	}
@@ -61,15 +52,28 @@ class ClockedSubmissionThread extends Thread {
 		awaitStart();
 
 		while (!stop) {
-			try {
-				clockInterval.await();
-			} catch (InterruptedException e) {
-				finish();
-			}
+			awaitClockInterval();
 			
 			synchronized (requests) {
 				submitInterval();
 			}
+		}
+	}
+	
+	private void awaitStart() {
+		try {
+			startLatch.await();
+		} catch (InterruptedException e) {
+			finish();
+			launch();
+		}
+	}
+
+	private void awaitClockInterval() {
+		try {
+			clockInterval.await();
+		} catch (InterruptedException e) {
+			finish();
 		}
 	}
 	
