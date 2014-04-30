@@ -27,8 +27,8 @@ public class ClockedRequestHandler {
 	private boolean init = true;
 	
 	public ClockedRequestHandler(int participants,
-			ClockedRequestProcessor requestProcessor,
-			int interval) {
+			int interval,
+			ClockedRequestProcessor requestProcessor) {
 		this.submissionThread = new ClockedSubmissionThread(participants, interval, requestProcessor);
 		this.startLatch = new CountDownLatch(participants);
 		this.submissionThread.start();
