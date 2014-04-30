@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>thomasb.race</groupId>
+		<artifactId>race-parent</artifactId>
+		<version>0.1-SNAPSHOT</version>
+		<relativePath>../race-parent</relativePath>
+	</parent>
+
+	<artifactId>race-testpages</artifactId>
+
+	<name>race testpages</name>
+
+	<packaging>war</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>thomasb.race</groupId>
+			<artifactId>clocking</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${project.servlet-api.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.json</groupId>
+			<artifactId>javax.json-api</artifactId>
+			<version>${project.json-api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.json</artifactId>
+			<version>${project.json.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>race-testpages</finalName>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-maven-plugin</artifactId>
+					<configuration>
+						<contextPath>/</contextPath>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>

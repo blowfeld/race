@@ -4,12 +4,4 @@
 
 <web-app>
     <display-name>Race Web Application</display-name>
-    <servlet>
-        <servlet-name>practice</servlet-name>
-        <servlet-class>thomasb.race.web.PracticeSession</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>practice</servlet-name>
-        <url-pattern>/practice</url-pattern>
-    </servlet-mapping>
 </web-app>

@@ -13,8 +13,9 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>../race-webapp</module>
 		<module>../clocking</module>
+		<module>../race-testpages</module>
+		<module>../race-webapp</module>
 	</modules>
 
 	<properties>
