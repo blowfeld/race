@@ -1,5 +1,7 @@
 package thomasb.web.clocking;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,8 +13,9 @@ public interface ClockedRequestProcessor {
 	 * @param requestTime the time interval count the request belongs to
 	 * @param request the client request to be processed
 	 * @param response the response object to be written
+	 * @throws IOException 
 	 */
-	void service(int requestTime, HttpServletRequest request, HttpServletResponse response);
+	void service(int requestTime, HttpServletRequest request, HttpServletResponse response) throws IOException;
 	
 	/**
 	 * Processes the response in case it is not received in time.

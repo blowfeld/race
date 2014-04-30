@@ -2,6 +2,7 @@ package thomasb.web.clocking;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -14,26 +15,23 @@ import net.jcip.annotations.GuardedBy;
 
 class ClockedSubmissionThread extends Thread {
 	private static final Dispatcher DISPATCHER = new Dispatcher();
-
-	public static final String TIME_PARAMETER = "timeCount";
-
+	
+	public static final String TIME_PARAMETER = "time_count";
+	
 	@GuardedBy("requests")
 	private final List<AsyncContext> requests = new ArrayList<>();
 	private final int participants;
-	private final int submissionInterval;
 	private final ClockedRequestProcessor requestProcessor;
 	private final CountDownLatch startLatch;
-
+	
 	@GuardedBy("requests")
 	private volatile ClockInterval clockInterval;
 	private volatile boolean stop = false;
-
-
+	
 	ClockedSubmissionThread(int participants,
 			int submissionInterval,
 			ClockedRequestProcessor requestProcessor) {
 		this.participants = participants;
-		this.submissionInterval = submissionInterval;
 		this.requestProcessor = requestProcessor;
 		this.startLatch = new CountDownLatch(1);
 		this.clockInterval = new ClockInterval(-1, submissionInterval);
@@ -46,13 +44,13 @@ class ClockedSubmissionThread extends Thread {
 	void finish() {
 		stop = true;
 	}
-
+	
 	@Override
 	public void run() {
 		clockInterval.finish();
-
+		
 		awaitStart();
-
+		
 		while (!stop) {
 			awaitClockInterval();
 			
@@ -70,7 +68,7 @@ class ClockedSubmissionThread extends Thread {
 			launch();
 		}
 	}
-
+	
 	private void awaitClockInterval() {
 		try {
 			clockInterval.await();
@@ -84,8 +82,8 @@ class ClockedSubmissionThread extends Thread {
 		DISPATCHER.submit(requests);
 		requests.clear();
 	}
-
-	void addRequest(AsyncContext request) {
+	
+	void addRequest(AsyncContext request) throws IOException {
 		int intervalCount = readTime(request);
 		serviceRequest(request, intervalCount);
 		
@@ -96,11 +94,11 @@ class ClockedSubmissionThread extends Thread {
 	
 	private int readTime(AsyncContext request) {
 		HttpServletRequest httpRequest = (HttpServletRequest)request.getRequest();
-
+		
 		return Integer.valueOf(httpRequest.getParameter(TIME_PARAMETER));
 	}
-
-	private void serviceRequest(AsyncContext request, int intervalCount) {
+	
+	private void serviceRequest(AsyncContext request, int intervalCount) throws IOException {
 		if (clockInterval.getCount() > intervalCount) {
 			return;
 		}
@@ -109,7 +107,7 @@ class ClockedSubmissionThread extends Thread {
 		HttpServletResponse httpResponse = (HttpServletResponse)request.getResponse();
 		requestProcessor.service(intervalCount, httpRequest, httpResponse);
 	}
-
+	
 	private void timeout(AsyncContext request) {
 		HttpServletResponse httpResponse = (HttpServletResponse)request.getResponse();
 		httpResponse.reset();
@@ -121,7 +119,7 @@ class ClockedSubmissionThread extends Thread {
 		if (clockInterval.getCount() > intervalCount) {
 			timeout(request);
 			DISPATCHER.submit(request);
-
+			
 			return;
 		}
 		
@@ -133,7 +131,7 @@ class ClockedSubmissionThread extends Thread {
 			clockInterval.finish();
 		}
 	}
-
+	
 	int getIntervalCount() {
 		return clockInterval.getCount();
 	}

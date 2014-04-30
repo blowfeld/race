@@ -5,12 +5,11 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * A {@code ClockedServlet} synchronizes between request of its participants.
+ * A {@code ClockedRequestHandler} synchronizes between request of its participants.
  * 
  * The participants are supposed to send requests in fixed time intervals. For
  * each time interval the responses to the participants are delayed until the
@@ -20,25 +19,23 @@ import javax.servlet.http.HttpServletResponse;
  * request and must not send a request to the succeeding interval before they
  * received the response from the server or a given timeout is reached.
  */
-@SuppressWarnings("serial")
-public class ClockedServlet extends HttpServlet {
+public class ClockedRequestHandler {
 	public static final String TIME_PARAMETER = ClockedSubmissionThread.TIME_PARAMETER;
 	
 	private final ClockedSubmissionThread submissionThread;
 	private final CountDownLatch startLatch;
 	private boolean init = true;
 	
-	public ClockedServlet(int participants,
+	public ClockedRequestHandler(int participants,
 			ClockedRequestProcessor requestProcessor,
 			int interval) {
 		this.submissionThread = new ClockedSubmissionThread(participants, interval, requestProcessor);
-		this.submissionThread.start();
 		this.startLatch = new CountDownLatch(participants);
+		this.submissionThread.start();
 	}
 	
-	@Override
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	public void handle(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		if (init) {
 			try {
 				awaitParticipants();

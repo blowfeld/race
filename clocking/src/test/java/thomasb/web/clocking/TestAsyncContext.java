@@ -5,6 +5,8 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
+import java.io.IOException;
+
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncListener;
 import javax.servlet.ServletContext;
@@ -43,10 +45,12 @@ class TestAsyncContext implements AsyncContext {
 		if (submissionThread != null) {
 			try {
 				sleep(delay);
+				submissionThread.addRequest(request);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
-			submissionThread.addRequest(request);
 		}
 	}
 
@@ -58,7 +62,7 @@ class TestAsyncContext implements AsyncContext {
 	public ServletRequest getRequest() {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		doReturn(String.valueOf(intervalCount))
-				.when(request).getParameter(ClockedServlet.TIME_PARAMETER);
+				.when(request).getParameter(ClockedRequestHandler.TIME_PARAMETER);
 		
 		return request;
 	}

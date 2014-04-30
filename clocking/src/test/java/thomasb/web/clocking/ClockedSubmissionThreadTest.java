@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,7 +36,7 @@ public class ClockedSubmissionThreadTest {
 	}
 	
 	@Test
-	public void intervalLengthWithinBounds() throws InterruptedException {
+	public void intervalLengthWithinBounds() throws InterruptedException, IOException {
 		setupRequestsWithSchedule(0);
 		
 		submissionThread.start();
@@ -76,7 +78,7 @@ public class ClockedSubmissionThreadTest {
 	}
 	
 	@Test
-	public void clockIsIncreasedBeforeSubmission() throws InterruptedException {
+	public void clockIsIncreasedBeforeSubmission() throws InterruptedException, IOException {
 		setupRequestsWithSchedule(0);
 
 		submissionThread.start();
@@ -93,7 +95,7 @@ public class ClockedSubmissionThreadTest {
 	}
 	
 	@Test
-	public void intervalFinishesWhenAllParticipantsReached() throws InterruptedException {
+	public void intervalFinishesWhenAllParticipantsReached() throws InterruptedException, IOException {
 		setupRequestsWithSchedule(25);
 
 		submissionThread.start();
@@ -128,7 +130,7 @@ public class ClockedSubmissionThreadTest {
 	}
 	
 	@Test
-	public void pastRequestsIgnored() throws InterruptedException {
+	public void pastRequestsIgnored() throws InterruptedException, IOException {
 		setupRequestsWithSchedule(0);
 		
 		submissionThread.start();
