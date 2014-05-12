@@ -1,4 +1,10 @@
-var clocking = function() {
+if(clocking === undefined) {
+  var clocking = {};
+}
+
+clocking.clocks = function() {
+	
+	
 	var clock = function(interval, clockActions, dataProvider) {
 		var terminate = false;
 		
@@ -18,9 +24,9 @@ var clocking = function() {
 			
 			var start = currentTime();
 			
-			var process = function(data) {
+			var process = function(response) {
 				var nextTick = function() {
-					clockActions.onTick(data, count, currentTime() - start);
+					clockActions.onTick(response.data, count, currentTime() - start);
 					tick(count + 1);
 				};
 				setTimeout(nextTick, interval);
@@ -37,6 +43,7 @@ var clocking = function() {
 			stop : stop
 		};
 	};
+	
 	
 	var ajaxData = function(timeout, clockActions, submissionData, url) {
 		var fetchData = function(count, callback) {
@@ -69,6 +76,7 @@ var clocking = function() {
 		};
 	};
 	
+	
 	var serverClock = function(interval, timeout, clockActions, submissionData, url) {
 		if (timeout < interval) {
 			throw new Error("timeout must be larger than then interval: " + timeout + "<" + interval);
@@ -79,6 +87,7 @@ var clocking = function() {
 		
 		return clock(interval, clockActions, dataProvider);
 	};
+	
 	
 	return {
 		clock : clock,
