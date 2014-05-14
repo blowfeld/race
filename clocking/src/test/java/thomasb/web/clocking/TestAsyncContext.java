@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 class TestAsyncContext implements AsyncContext {
 	private long invocationTime;
 	private final ClockedSubmissionThread<?> submissionThread;
-	private final AsyncContext request;
+	private final AsyncContext followUpRequest;
 	private final int intervalCount;
 	private final int delay;
 	private final HttpServletResponse response;
@@ -27,11 +27,11 @@ class TestAsyncContext implements AsyncContext {
 	TestAsyncContext(ClockedSubmissionThread<?> submissionThread,
 			int intervalCount,
 			int delay,
-			AsyncContext request) throws IOException {
+			AsyncContext followUpRequest) throws IOException {
 		this.submissionThread = submissionThread;
 		this.intervalCount = intervalCount;
 		this.delay = delay;
-		this.request = request;
+		this.followUpRequest = followUpRequest;
 		this.response = createResponseMock();
 	}
 	
@@ -45,7 +45,7 @@ class TestAsyncContext implements AsyncContext {
 		if (submissionThread != null) {
 			try {
 				sleep(delay);
-				submissionThread.addRequest(request);
+				submissionThread.addRequest(followUpRequest);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

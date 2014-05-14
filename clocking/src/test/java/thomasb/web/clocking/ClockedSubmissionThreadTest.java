@@ -216,13 +216,13 @@ public class ClockedSubmissionThreadTest {
 	private static ClockedRequestProcessor<?> createProcessorMock() {
 		return new ClockedRequestProcessor<Void>() {
 			@Override
-			public ClockedRequest<Void> service(int requestTime, AsyncContext request)
+			public ClockedRequest<Void> preprocess(AsyncContext request, int requestTime)
 					throws IOException {
 				return new ClockedRequest<Void>(request, null, requestTime);
 			}
 			
 			@Override
-			public ClockedRequest<Void> timeoutResponse(int requestTime, AsyncContext request) {
+			public ClockedRequest<Void> timeoutResponse(AsyncContext request, int requestTime) {
 				HttpServletResponse response = (HttpServletResponse) request.getResponse();
 				response.setStatus(408);
 				

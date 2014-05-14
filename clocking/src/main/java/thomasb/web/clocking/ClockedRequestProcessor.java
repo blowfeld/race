@@ -9,14 +9,13 @@ import javax.servlet.ServletException;
 public interface ClockedRequestProcessor<T> {
 	
 	/**
-	 * Pre-processes the request for the given time interval count and creates
-	 * a new {@link ClockedRequest} from the pre-processed request and
+	 * Preprocesses the request for the given time interval count and creates
+	 * a new {@link ClockedRequest} from the preprocessed request and
 	 * intermediate data.
 	 * <p>
 	 * This method may be called from different threads.
-	 * 
-	 * @param requestTime the time interval count the request belongs to
 	 * @param request the client request to be processed
+	 * @param requestTime the time interval count the request belongs to
 	 * 
 	 * @return a {@link ClockedRequest} with the processed request
 	 * 
@@ -26,14 +25,14 @@ public interface ClockedRequestProcessor<T> {
      * @throws IOException if an input or output exception occurs
      */
 
-	ClockedRequest<T> service(int requestTime, AsyncContext request)
+	ClockedRequest<T> preprocess(AsyncContext request, int requestTime)
     		throws ServletException, IOException;
 	
 	/**
 	 * Processes the response in case it is not received in time.
-	 * 
-	 * @param requestTime the time interval count the request was intended for
 	 * @param request the client request to be processed
+	 * @param requestTime the time interval count the request was intended for
+	 * 
 	 * @return a {@link ClockedRequest} with the processed request
 	 * 
 	 * @throws ServletException if an exception occurs that interferes
@@ -41,13 +40,13 @@ public interface ClockedRequestProcessor<T> {
 	 *
 	 * @throws IOException if an input or output exception occurs
 	 */
-	ClockedRequest<T> timeoutResponse(int requestTime, AsyncContext request)
+	ClockedRequest<T> timeoutResponse(AsyncContext request, int requestTime)
 			throws ServletException, IOException;
 	
 	/**
 	 * Processes the provided {@link ClockedRequest}s.
 	 * <p>
-	 * This method performs the final processing of the pre-processed client
+	 * This method performs the final processing of the preprocessed client
 	 * request, The responses can incorporate dependencies between the requests.
 	 * <p>
 	 * Exceptions occurring during processing must be handled by this method by

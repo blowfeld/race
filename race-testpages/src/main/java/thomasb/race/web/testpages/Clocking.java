@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 public class Clocking extends HttpServlet {
 	private static final ClockedRequestProcessor<Void> REQUEST_PROCESSOR = new ClockedRequestProcessor<Void>() {
 			@Override
-			public ClockedRequest<Void> service(int requestTime, AsyncContext request)
+			public ClockedRequest<Void> preprocess(AsyncContext request, int requestTime)
 					throws IOException {
 				HttpServletResponse response = (HttpServletResponse) request.getResponse();
 				response.setContentType("application/json");
@@ -37,7 +37,7 @@ public class Clocking extends HttpServlet {
 			}
 			
 			@Override
-			public ClockedRequest<Void> timeoutResponse(int requestTime, AsyncContext request) {
+			public ClockedRequest<Void> timeoutResponse(AsyncContext request, int requestTime) {
 				return new ClockedRequest<Void>(request, null, requestTime);
 			}
 			

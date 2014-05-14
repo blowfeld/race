@@ -104,7 +104,7 @@ class ClockedSubmissionThread<T> extends Thread {
 			return timeout(request, intervalCount);
 		}
 		
-		return requestProcessor.service(intervalCount, request);
+		return requestProcessor.preprocess(request, intervalCount);
 	}
 	
 	private void scheduleRequest(ClockedRequest<T> request, int intervalCount)
@@ -132,7 +132,7 @@ class ClockedSubmissionThread<T> extends Thread {
 	
 	private ClockedRequest<T> timeout(ClockedRequest<T> request)
 			throws ServletException, IOException {
-		return requestProcessor.timeoutResponse(clockInterval.getCount(), request.getContext());
+		return requestProcessor.timeoutResponse(request.getContext(), clockInterval.getCount());
 	}
 	
 	int getIntervalCount() {
