@@ -8,20 +8,20 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import net.jcip.annotations.GuardedBy;
 
-class ClockedSubmissionThread extends Thread {
+class ClockedSubmissionThread<T> extends Thread {
 	private static final Dispatcher DISPATCHER = new Dispatcher();
 	
 	public static final String TIME_PARAMETER = "time_count";
 	
 	@GuardedBy("requests")
-	private final List<AsyncContext> requests = new ArrayList<>();
+	private final List<ClockedRequest<T>> requests = new ArrayList<>();
 	private final int participants;
-	private final ClockedRequestProcessor requestProcessor;
+	private final ClockedRequestProcessor<T> requestProcessor;
 	private final CountDownLatch startLatch;
 	
 	@GuardedBy("requests")
@@ -30,7 +30,7 @@ class ClockedSubmissionThread extends Thread {
 	
 	ClockedSubmissionThread(int participants,
 			int submissionInterval,
-			ClockedRequestProcessor requestProcessor) {
+			ClockedRequestProcessor<T> requestProcessor) {
 		this.participants = participants;
 		this.requestProcessor = requestProcessor;
 		this.startLatch = new CountDownLatch(1);
@@ -79,16 +79,16 @@ class ClockedSubmissionThread extends Thread {
 	
 	private void submitInterval() {
 		clockInterval = clockInterval.next();
-		DISPATCHER.submit(requests);
+		DISPATCHER.submit(requestProcessor.process(requests));
 		requests.clear();
 	}
 	
-	void addRequest(AsyncContext request) throws IOException {
+	void addRequest(AsyncContext request) throws IOException, ServletException {
 		int intervalCount = readTime(request);
-		serviceRequest(request, intervalCount);
+		ClockedRequest<T> preprocessed = preprocess(request, intervalCount);
 		
-		synchronized (requests) {
-			scheduleRequest(request, intervalCount);
+		synchronized(requests) {
+			scheduleRequest(preprocessed, intervalCount);
 		}
 	}
 	
@@ -98,27 +98,20 @@ class ClockedSubmissionThread extends Thread {
 		return Integer.valueOf(httpRequest.getParameter(TIME_PARAMETER));
 	}
 	
-	private void serviceRequest(AsyncContext request, int intervalCount) throws IOException {
+	private ClockedRequest<T> preprocess(AsyncContext request, int intervalCount)
+			throws IOException, ServletException {
 		if (clockInterval.getCount() > intervalCount) {
-			return;
+			return timeout(request, intervalCount);
 		}
 		
-		HttpServletRequest httpRequest = (HttpServletRequest)request.getRequest();
-		HttpServletResponse httpResponse = (HttpServletResponse)request.getResponse();
-		requestProcessor.service(intervalCount, httpRequest, httpResponse);
+		return requestProcessor.service(intervalCount, request);
 	}
 	
-	private void timeout(AsyncContext request) {
-		HttpServletResponse httpResponse = (HttpServletResponse)request.getResponse();
-		httpResponse.reset();
-		requestProcessor.timeoutResponse(clockInterval.getCount(), httpResponse);
-	}
-	
-	private void scheduleRequest(AsyncContext request, int intervalCount) {
+	private void scheduleRequest(ClockedRequest<T> request, int intervalCount)
+			throws ServletException, IOException {
 		checkArgument(clockInterval.getCount() >= intervalCount, "Request with illegal timing was received: expected %s, was %s", clockInterval.getCount(), intervalCount);
 		if (clockInterval.getCount() > intervalCount) {
-			timeout(request);
-			DISPATCHER.submit(request);
+			DISPATCHER.submit(timeout(request).getContext());
 			
 			return;
 		}
@@ -130,6 +123,16 @@ class ClockedSubmissionThread extends Thread {
 			// the next time interval after they received the current submission
 			clockInterval.finish();
 		}
+	}
+	
+	private ClockedRequest<T> timeout(AsyncContext request, int intervalCount)
+			throws ServletException, IOException {
+		return timeout(new ClockedRequest<T>(request, null, intervalCount));
+	}
+	
+	private ClockedRequest<T> timeout(ClockedRequest<T> request)
+			throws ServletException, IOException {
+		return requestProcessor.timeoutResponse(clockInterval.getCount(), request.getContext());
 	}
 	
 	int getIntervalCount() {

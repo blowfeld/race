@@ -1,5 +1,7 @@
 package thomasb.web.clocking;
 
+import static java.lang.Thread.currentThread;
+
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
@@ -22,14 +24,14 @@ import javax.servlet.http.HttpServletResponse;
 public class ClockedRequestHandler {
 	public static final String TIME_PARAMETER = ClockedSubmissionThread.TIME_PARAMETER;
 	
-	private final ClockedSubmissionThread submissionThread;
+	private final ClockedSubmissionThread<?> submissionThread;
 	private final CountDownLatch startLatch;
 	private boolean init = true;
 	
 	public ClockedRequestHandler(int participants,
 			int interval,
-			ClockedRequestProcessor requestProcessor) {
-		this.submissionThread = new ClockedSubmissionThread(participants, interval, requestProcessor);
+			ClockedRequestProcessor<?> requestProcessor) {
+		this.submissionThread = new ClockedSubmissionThread<>(participants,interval, requestProcessor);
 		this.startLatch = new CountDownLatch(participants);
 		this.submissionThread.start();
 	}
@@ -42,7 +44,7 @@ public class ClockedRequestHandler {
 			} catch (InterruptedException e) {
 				return;
 			} finally {
-				Thread.currentThread().interrupt();
+				currentThread().interrupt();
 			}
 			init = false;
 		}

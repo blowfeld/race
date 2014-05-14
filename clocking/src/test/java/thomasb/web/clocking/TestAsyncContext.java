@@ -1,11 +1,11 @@
 package thomasb.web.clocking;
 
 import static java.lang.Thread.sleep;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncListener;
@@ -18,16 +18,16 @@ import javax.servlet.http.HttpServletResponse;
 
 class TestAsyncContext implements AsyncContext {
 	private long invocationTime;
-	private final ClockedSubmissionThread submissionThread;
+	private final ClockedSubmissionThread<?> submissionThread;
 	private final AsyncContext request;
 	private final int intervalCount;
 	private final int delay;
 	private final HttpServletResponse response;
 	
-	TestAsyncContext(ClockedSubmissionThread submissionThread,
+	TestAsyncContext(ClockedSubmissionThread<?> submissionThread,
 			int intervalCount,
 			int delay,
-			AsyncContext request) {
+			AsyncContext request) throws IOException {
 		this.submissionThread = submissionThread;
 		this.intervalCount = intervalCount;
 		this.delay = delay;
@@ -35,7 +35,7 @@ class TestAsyncContext implements AsyncContext {
 		this.response = createResponseMock();
 	}
 	
-	TestAsyncContext(int intervalCount) {
+	TestAsyncContext(int intervalCount) throws IOException {
 		this(null, intervalCount, 0, null);
 	}
 
@@ -46,9 +46,7 @@ class TestAsyncContext implements AsyncContext {
 			try {
 				sleep(delay);
 				submissionThread.addRequest(request);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -72,28 +70,15 @@ class TestAsyncContext implements AsyncContext {
 		return response;
 	}
 	
-	private HttpServletResponse createResponseMock() {
-		HttpServletResponse mock = mock(TestHttpServletResponse.class);
-		doCallRealMethod().when(mock).setStatus(408);
-		doCallRealMethod().when(mock).getStatus();
+	private HttpServletResponse createResponseMock() throws IOException {
+		HttpServletResponse mock = mock(HttpServletResponse.class);
+		
+		PrintWriter writerMock = mock(PrintWriter.class);
+		doReturn(writerMock ).when(mock).getWriter();
 		
 		return mock;
 	}
 
-	private static abstract class TestHttpServletResponse implements HttpServletResponse {
-		private int status;
-		
-		@Override
-		public void setStatus(int status) {
-			this.status = status;
-		}
-		
-		@Override
-		public int getStatus() {
-			return status;
-		}
-	}
-	
 	
 	// ---------- unused ------------------
 	
