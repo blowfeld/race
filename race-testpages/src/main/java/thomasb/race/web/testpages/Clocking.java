@@ -1,7 +1,8 @@
 package thomasb.race.web.testpages;
 
+import static java.util.Collections.nCopies;
+
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import javax.json.Json;
@@ -35,7 +36,7 @@ public class Clocking extends HttpServlet {
 			
 			@Override
 			public List<? extends JsonStructure> process(List<ClockedRequest<Void>> requests) {
-				return Collections.nCopies(requests.size(), EMPTY_ARRAY);
+				return nCopies(requests.size(), EMPTY_ARRAY);
 			}
 		};
 	
