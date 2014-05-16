@@ -38,8 +38,13 @@ public final class ClockedRequest<T> {
 		return Integer.valueOf(httpRequest.getParameter(TIME_PARAMETER));
 	}
 	
-	public AsyncContext getContext() {
-		return context;
+	public HttpServletRequest getRequest() {
+		return (HttpServletRequest) context.getRequest();
+	}
+	
+	
+	public HttpServletResponse getResponse() {
+		return (HttpServletResponse) context.getResponse();
 	}
 	
 	public T getData() {
@@ -48,6 +53,10 @@ public final class ClockedRequest<T> {
 	
 	public int getTime() {
 		return requestTime;
+	}
+	
+	AsyncContext getContext() {
+		return context;
 	}
 	
 	ClockedRequest<T> withData(T data) {
