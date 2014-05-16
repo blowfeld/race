@@ -50,6 +50,10 @@ public final class ClockedRequest<T> {
 		return requestTime;
 	}
 	
+	ClockedRequest<T> withData(T data) {
+		return new ClockedRequest<T>(context, data, requestTime);
+	}
+	
 	void writeResponse(JsonStructure data) throws IOException {
 		HttpServletResponse response = (HttpServletResponse) context.getResponse();
 		response.setContentType("application/json");

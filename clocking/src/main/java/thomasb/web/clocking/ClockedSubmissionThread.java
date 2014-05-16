@@ -92,7 +92,7 @@ class ClockedSubmissionThread<T> extends Thread {
 		
 		T preprocessData = requestProcessor.preprocess(context, requestTime);
 		
-		return new ClockedRequest<T>(context, preprocessData, requestTime);
+		return request.withData(preprocessData);
 	}
 	
 	private void scheduleRequest(ClockedRequest<T> request)
