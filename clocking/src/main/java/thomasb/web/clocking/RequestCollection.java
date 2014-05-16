@@ -1,9 +1,9 @@
 package thomasb.web.clocking;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.json.JsonStructure;
@@ -21,7 +21,7 @@ final class RequestCollection<T> {
 		}
 	};
 	
-	private final List<ClockedRequest<T>> requests = new ArrayList<>();
+	private final List<ClockedRequest<T>> requests = newArrayList();
 	private final ClockedRequestProcessor<T> requestProcessor;
 	private final int participants;
 	
@@ -31,8 +31,8 @@ final class RequestCollection<T> {
 		this.participants = participants;
 	}
 	
-	boolean add(ClockedRequest<T> request, int intervalCount) throws IOException, ServletException {
-		if (intervalCount > request.getTime()) {
+	boolean add(ClockedRequest<T> request, int currentTime) throws IOException, ServletException {
+		if (currentTime > request.getTime()) {
 			DISPATCHER.submit(timeout(request).getContext());
 			return false;
 		}
