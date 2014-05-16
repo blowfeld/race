@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
  * received the response from the server or a given timeout is reached.
  */
 public class ClockedRequestHandler {
-	public static final String TIME_PARAMETER = ClockedSubmissionThread.TIME_PARAMETER;
+	public static final String TIME_PARAMETER = ClockedRequest.TIME_PARAMETER;
 	
 	private final ClockedSubmissionThread<?> submissionThread;
 	private final CountDownLatch startLatch;

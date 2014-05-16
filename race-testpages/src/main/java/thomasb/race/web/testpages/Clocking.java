@@ -1,11 +1,12 @@
 package thomasb.race.web.testpages;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import javax.json.JsonArray;
+import javax.json.JsonStructure;
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,39 +17,25 @@ import thomasb.web.clocking.ClockedRequest;
 import thomasb.web.clocking.ClockedRequestHandler;
 import thomasb.web.clocking.ClockedRequestProcessor;
 
-import com.google.common.collect.Lists;
-
 @SuppressWarnings("serial")
 public class Clocking extends HttpServlet {
+	private static final JsonArray EMPTY_ARRAY = Json.createArrayBuilder().build();
+
 	private static final ClockedRequestProcessor<Void> REQUEST_PROCESSOR = new ClockedRequestProcessor<Void>() {
 			@Override
-			public ClockedRequest<Void> preprocess(AsyncContext request, int requestTime)
+			public Void preprocess(AsyncContext request, int requestTime)
 					throws IOException {
-				HttpServletResponse response = (HttpServletResponse) request.getResponse();
-				response.setContentType("application/json");
-				
-				JsonObjectBuilder jsonBuilder = Json.createObjectBuilder();
-				jsonBuilder.add(ClockedRequestHandler.TIME_PARAMETER, requestTime);
-				JsonObject jsonObject = jsonBuilder.build();
-				
-				Json.createWriter(response.getWriter()).writeObject(jsonObject);
-				
-				return new ClockedRequest<Void>(request, null, requestTime);
+				return null;
 			}
 			
 			@Override
-			public ClockedRequest<Void> timeoutResponse(AsyncContext request, int requestTime) {
-				return new ClockedRequest<Void>(request, null, requestTime);
+			public JsonStructure timeoutResponse(AsyncContext request, int requestTime) {
+				return null;
 			}
 			
 			@Override
-			public List<AsyncContext> process(List<ClockedRequest<Void>> requests) {
-				List<AsyncContext> result = Lists.newArrayList();
-				for (ClockedRequest<Void> request : requests) {
-					result.add(request.getContext());
-				}
-				
-				return result;
+			public List<? extends JsonStructure> process(List<ClockedRequest<Void>> requests) {
+				return Collections.nCopies(requests.size(), EMPTY_ARRAY);
 			}
 		};
 	

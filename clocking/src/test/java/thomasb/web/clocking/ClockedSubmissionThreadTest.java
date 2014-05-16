@@ -1,16 +1,19 @@
 package thomasb.web.clocking;
 
 import static java.lang.Thread.sleep;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.util.List;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonStructure;
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -140,11 +143,11 @@ public class ClockedSubmissionThreadTest {
 		
 		ArgumentCaptor<String> responseCaptor_0 = ArgumentCaptor.forClass(String.class);
 		ArgumentCaptor<String> responseCaptor_1 = ArgumentCaptor.forClass(String.class);
-		verify(request_0_0.getResponse().getWriter(), times(1)).write(responseCaptor_0.capture());
-		verify(request_0_0.getResponse().getWriter(), times(1)).write(responseCaptor_1.capture());
+		verify(request_0_0.getResponse().getWriter()).write(responseCaptor_0.capture());
+		verify(request_0_0.getResponse().getWriter()).write(responseCaptor_1.capture());
 		
-		assertEquals("2", responseCaptor_0.getValue());
-		assertEquals("2", responseCaptor_1.getValue());
+		assertThat(responseCaptor_0.getValue(), containsString("\"data\":[2]"));
+		assertThat(responseCaptor_1.getValue(), containsString("\"data\":[2]"));
 	}
 	
 	@Test
@@ -216,38 +219,28 @@ public class ClockedSubmissionThreadTest {
 	private static ClockedRequestProcessor<?> createProcessorMock() {
 		return new ClockedRequestProcessor<Void>() {
 			@Override
-			public ClockedRequest<Void> preprocess(AsyncContext request, int requestTime)
+			public Void preprocess(AsyncContext request, int requestTime)
 					throws IOException {
-				return new ClockedRequest<Void>(request, null, requestTime);
+				return null;
 			}
 			
 			@Override
-			public ClockedRequest<Void> timeoutResponse(AsyncContext request, int requestTime) {
+			public JsonStructure timeoutResponse(AsyncContext request, int requestTime) {
 				HttpServletResponse response = (HttpServletResponse) request.getResponse();
 				response.setStatus(408);
 				
-				return new ClockedRequest<>(request, null, requestTime);
+				return Json.createArrayBuilder().build();
 			}
 			
 			@Override
-			public List<AsyncContext> process(List<ClockedRequest<Void>> requests) {
-				List<AsyncContext> result = Lists.newArrayList();
-				for (ClockedRequest<Void> request : requests) {
-					AsyncContext asyncContext = request.getContext();
-					setCount(asyncContext, requests.size());
-					result.add(asyncContext);
+			public List<JsonStructure> process(List<ClockedRequest<Void>> requests) {
+				List<JsonStructure> result = Lists.newArrayList();
+				for (@SuppressWarnings("unused") ClockedRequest<Void> request : requests) {
+					JsonArray jsonArray = Json.createArrayBuilder().add(requests.size()).build();
+					result.add(jsonArray);
 				}
 				
 				return result;
-			}
-			
-			private void setCount(AsyncContext context, int count) {
-				HttpServletResponse response = (HttpServletResponse) context.getResponse();
-				try {
-					response.getWriter().write(String.valueOf(count));
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
 			}
 		};
 	}

@@ -3,24 +3,16 @@ package thomasb.web.clocking;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 
 import net.jcip.annotations.GuardedBy;
 
 class ClockedSubmissionThread<T> extends Thread {
-	private static final Dispatcher DISPATCHER = new Dispatcher();
-	
-	public static final String TIME_PARAMETER = "time_count";
-	
 	@GuardedBy("requests")
-	private final List<ClockedRequest<T>> requests = new ArrayList<>();
-	private final int participants;
+	private final RequestCollection<T> requests;
 	private final ClockedRequestProcessor<T> requestProcessor;
 	private final CountDownLatch startLatch;
 	
@@ -31,10 +23,10 @@ class ClockedSubmissionThread<T> extends Thread {
 	ClockedSubmissionThread(int participants,
 			int submissionInterval,
 			ClockedRequestProcessor<T> requestProcessor) {
-		this.participants = participants;
 		this.requestProcessor = requestProcessor;
 		this.startLatch = new CountDownLatch(1);
 		this.clockInterval = new ClockInterval(-1, submissionInterval);
+		this.requests = new RequestCollection<>(requestProcessor, participants);
 	}
 	
 	void launch() {
@@ -79,60 +71,37 @@ class ClockedSubmissionThread<T> extends Thread {
 	
 	private void submitInterval() {
 		clockInterval = clockInterval.next();
-		DISPATCHER.submit(requestProcessor.process(requests));
-		requests.clear();
+		requests.submit();
 	}
-	
-	void addRequest(AsyncContext request) throws IOException, ServletException {
-		int intervalCount = readTime(request);
-		ClockedRequest<T> preprocessed = preprocess(request, intervalCount);
+
+	void addRequest(AsyncContext context) throws IOException, ServletException {
+		ClockedRequest<T> request = new ClockedRequest<>(context);
+		checkArgument(clockInterval.getCount() >= request.getTime(), "Request with illegal timing was received: expected %s, was %s", clockInterval.getCount(), request.getTime());
+
+		ClockedRequest<T> preprocessed = preprocess(request);
 		
 		synchronized(requests) {
-			scheduleRequest(preprocessed, intervalCount);
+			scheduleRequest(preprocessed);
 		}
 	}
 	
-	private int readTime(AsyncContext request) {
-		HttpServletRequest httpRequest = (HttpServletRequest)request.getRequest();
-		
-		return Integer.valueOf(httpRequest.getParameter(TIME_PARAMETER));
-	}
-	
-	private ClockedRequest<T> preprocess(AsyncContext request, int intervalCount)
+	private ClockedRequest<T> preprocess(ClockedRequest<T> request)
 			throws IOException, ServletException {
-		if (clockInterval.getCount() > intervalCount) {
-			return timeout(request, intervalCount);
-		}
+		AsyncContext context = request.getContext();
+		int requestTime = request.getTime();
 		
-		return requestProcessor.preprocess(request, intervalCount);
+		T preprocessData = requestProcessor.preprocess(context, requestTime);
+		
+		return new ClockedRequest<T>(context, preprocessData, requestTime);
 	}
 	
-	private void scheduleRequest(ClockedRequest<T> request, int intervalCount)
+	private void scheduleRequest(ClockedRequest<T> request)
 			throws ServletException, IOException {
-		checkArgument(clockInterval.getCount() >= intervalCount, "Request with illegal timing was received: expected %s, was %s", clockInterval.getCount(), intervalCount);
-		if (clockInterval.getCount() > intervalCount) {
-			DISPATCHER.submit(timeout(request).getContext());
-			
-			return;
-		}
+		boolean submit = requests.add(request, clockInterval.getCount());
 		
-		requests.add(request);
-		
-		if (requests.size() == this.participants) {
-			// This is save as clients are only allowed to send a request for
-			// the next time interval after they received the current submission
+		if (submit) {
 			clockInterval.finish();
 		}
-	}
-	
-	private ClockedRequest<T> timeout(AsyncContext request, int intervalCount)
-			throws ServletException, IOException {
-		return timeout(new ClockedRequest<T>(request, null, intervalCount));
-	}
-	
-	private ClockedRequest<T> timeout(ClockedRequest<T> request)
-			throws ServletException, IOException {
-		return requestProcessor.timeoutResponse(request.getContext(), clockInterval.getCount());
 	}
 	
 	int getIntervalCount() {
