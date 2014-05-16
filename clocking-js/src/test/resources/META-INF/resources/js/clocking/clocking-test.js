@@ -30,11 +30,14 @@ test( "clock counts and registers duration", function() {
 	
 	var dummyProvider = {
 		fetchData : function(count, callback) {
-			setTimeout(callback, 100);
+			var respond = function() {
+				callback({"data":[]});
+			}
+			setTimeout(respond, 100);
 		}
 	};
 	
-	var clock = clocking.clock(800, testActions, dummyProvider);
+	var clock = clocking.clocks.clock(800, testActions, dummyProvider);
 	clock.run();
 	
 	stop();

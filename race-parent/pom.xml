@@ -14,6 +14,7 @@
 
 	<modules>
 		<module>../clocking</module>
+		<module>../clocking-js</module>
 		<module>../race-testpages</module>
 		<module>../race-webapp</module>
 	</modules>

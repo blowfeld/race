@@ -3,8 +3,6 @@ if(clocking === undefined) {
 }
 
 clocking.clocks = function() {
-	
-	
 	var clock = function(interval, clockActions, dataProvider) {
 		var terminate = false;
 		
