@@ -2,6 +2,8 @@ package thomasb.web.clocking;
 
 import static java.lang.Thread.sleep;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
@@ -18,7 +20,6 @@ import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
-import org.hamcrest.Matchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -39,7 +40,7 @@ public class ClockedSubmissionThreadTest {
 	private TestAsyncContext request_2_1;
 	
 	// The first execution of the thread is much slower than consecutive ones.
-	// Thus somee tests fail if executed individually.
+	// Thus some tests fail if executed individually.
 	@BeforeClass
 	public static void initThread() throws InterruptedException, IOException, ServletException {
 		ClockedSubmissionThread<?> submissionThread = new ClockedSubmissionThread<>(2, 50, DUMMY_PROCESSOR);
@@ -95,11 +96,11 @@ public class ClockedSubmissionThreadTest {
 		assertNotEquals(0, submissionTime_1_0);
 		assertNotEquals(0, submissionTime_2_0);
 
-		assertThat(50, Matchers.lessThanOrEqualTo((int)submissionTime_0_0));
-		assertThat(100, Matchers.lessThanOrEqualTo((int)submissionTime_1_0));
+		assertThat(50, lessThan((int)submissionTime_0_0));
+		assertThat(100, lessThan((int)submissionTime_1_0));
 		
-		assertThat(45, Matchers.lessThan(submissionDiff));
-		assertThat(55, Matchers.greaterThan(submissionDiff));
+		assertThat(45, lessThan(submissionDiff));
+		assertThat(55, greaterThan(submissionDiff));
 		
 		assertEquals(0, firstCount);
 		assertEquals(1, secondCount);
@@ -166,7 +167,7 @@ public class ClockedSubmissionThreadTest {
 		submissionThread.addRequest(request_0_1);
 		sleep(5);
 		int secondCount = submissionThread.getIntervalCount();
-		sleep(25);
+		sleep(30);
 		int thirdCount = submissionThread.getIntervalCount();
 		
 		submissionThread.finish();
@@ -180,10 +181,10 @@ public class ClockedSubmissionThreadTest {
 		assertEquals(1, secondCount);
 		assertEquals(2, thirdCount);
 		
-		assertThat(50, Matchers.greaterThan((int)submissionTime_0_0));
-		assertThat(100, Matchers.greaterThan((int)submissionTime_1_0));
+		assertThat(50, greaterThan((int)submissionTime_0_0));
+		assertThat(100, greaterThan((int)submissionTime_1_0));
 		
-		assertThat(30, Matchers.greaterThan(submissionDiff));
+		assertThat(35, greaterThan(submissionDiff));
 	}
 	
 	@Test
