@@ -4,11 +4,15 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.json.JsonStructure;
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.base.Function;
 
@@ -48,26 +52,37 @@ final class RequestCollection<T> {
 		requests.clear();
 	}
 	
-	private void writeResponseData() {
-		List<? extends JsonStructure> responseData = requestProcessor.process(requests);
-		for (int i = 0; i < requests.size(); i++) {
-			ClockedRequest<T> request = requests.get(i);
-			try {
-				request.writeResponse(responseData.get(i));
-			} catch (IOException e) {
-				//ignore or log
-			}
-		}
-	}
-	
 	private ClockedRequest<T> timeout(ClockedRequest<T> request)
 			throws ServletException, IOException {
 		AsyncContext context = request.getContext();
 		int requestTime = request.getTime();
 		
 		JsonStructure timeoutData = requestProcessor.timeoutResponse(context, requestTime);
-		request.writeResponse(timeoutData);
+		writeResponse(request, timeoutData);
 		
 		return request;
+	}
+	
+	private void writeResponseData() {
+		List<? extends JsonStructure> responseData = requestProcessor.process(requests);
+		for (int i = 0; i < requests.size(); i++) {
+			ClockedRequest<T> request = requests.get(i);
+			try {
+				writeResponse(request, responseData.get(i));
+			} catch (IOException e) {
+				//ignore or log
+			}
+		}
+	}
+	
+	private void writeResponse(ClockedRequest<T> request, JsonStructure data) throws IOException {
+		HttpServletResponse response = request.getResponse();
+		response.setContentType("application/json");
+		PrintWriter responseWriter = response.getWriter();
+		
+		JsonObjectBuilder responseObject = Json.createObjectBuilder();
+		responseObject.add(ClockedRequest.TIME_PARAMETER, request.getTime());
+		responseObject.add(ClockedRequest.DATA_PARAMETER, data);
+		responseWriter.write(responseObject.build().toString());
 	}
 }

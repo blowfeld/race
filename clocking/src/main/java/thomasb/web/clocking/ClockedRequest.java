@@ -1,11 +1,5 @@
 package thomasb.web.clocking;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.json.Json;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonStructure;
 import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,16 +55,5 @@ public final class ClockedRequest<T> {
 	
 	ClockedRequest<T> withData(T data) {
 		return new ClockedRequest<T>(context, data, requestTime);
-	}
-	
-	void writeResponse(JsonStructure data) throws IOException {
-		HttpServletResponse response = (HttpServletResponse) context.getResponse();
-		response.setContentType("application/json");
-		PrintWriter responseWriter = response.getWriter();
-		
-		JsonObjectBuilder responseObject = Json.createObjectBuilder();
-		responseObject.add(TIME_PARAMETER, requestTime);
-		responseObject.add(DATA_PARAMETER, data);
-		responseWriter.write(responseObject.build().toString());
 	}
 }
