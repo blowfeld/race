@@ -53,7 +53,20 @@
 					<artifactId>jetty-maven-plugin</artifactId>
 					<configuration>
 						<contextPath>/</contextPath>
+						<systemProperties>
+							<systemProperty>
+								<name>logback.configurationFile</name>
+								<value>./src/etc/logback.xml</value>
+							</systemProperty>
+						</systemProperties>
 					</configuration>
+					<dependencies>
+						<dependency>
+							<groupId>ch.qos.logback</groupId>
+							<artifactId>logback-classic</artifactId>
+							<version>0.9.15</version>
+						</dependency>
+					</dependencies>
 				</plugin>
 			</plugins>
 		</pluginManagement>
