@@ -6,63 +6,61 @@ clocking.events = function() {
 
 	
 	var timedEvent = function(event, start, end) {
-		var reschedule = function(newStart, newEnd) {
+		var that = Object.create(event);
+
+		that.reschedule = function(newStart, newEnd) {
 			return timedEvent(event, newStart, newEnd);
 		};
 		
-		var getStart = function() {
+		that.getStart = function() {
 			return start;
 		};
 		
-		var getEnd = function() {
+		that.getEnd = function() {
 			return end;
 		};
 		
-		var getDuration = function() {
+		that.getDuration = function() {
 			return end - start;
 		};
 		
-		return {
-			prototype : event,
-			reschedule : reschedule,
-			shift : shift
-			getStart : getStart,
-			getEnd : getEnd,
-			getDuration : getDuration,
-		};
+		return that;
 	};
 	
 	
-	var rescheduleToClient = function(serverEvent, startCount, clientStart, clientDuration) {
-		if (serverEvent.getStart() < startCount || serverEvent.getEnd() >= startCount + 1) {
-			throw Error("Server time out of bounds: " + serverEvent.getTime());
+	var rescheduleToClient = function(serverEvent, serverStart, intervalStart, intervalEnd) {
+		if (serverEvent.getStart() < serverStart || serverEvent.getEnd() > serverStart + 1) {
+			throw Error("Server time out of bounds: " + serverStart + " not in [" + serverEvent.getStart() + ", " + serverEvent.getEnd() + "]");
 		}
 		
 		var clientTime = function(serverTime) {
-			return clientStart + clientDuration * (serverTime - startCount);
+			var clientDuration = intervalEnd - intervalStart;
+			
+			return intervalStart + clientDuration * (serverTime - serverStart);
 		};
 		
-		var newStart = clientTime(timedEvent.getStart());
-		var newEnd = clientTime(timedEvent.getEnd());
+		var newStart = clientTime(serverEvent.getStart());
+		var newEnd = clientTime(serverEvent.getEnd());
 		
-		return timedEvent.reschedule(newStart, newEnd);
+		return serverEvent.reschedule(newStart, newEnd);
 	};
 	
 	
 	var eventQueue = function(eventProcessor) {
-		events = [];
+		var events = [];
 		
-		var schedule = function(newEvents) {
-			events = newEvents.concat(events);
+		var schedule = function(newEvent) {
+			events.unshift(newEvent);
 		};
 		
 		var execute = function() {
-			if (!events) {
+			if (events.length === 0) {
 				setTimeout(execute, 0);
+				return;
 			}
 			
-			event = events.pop();
-			eventProcessor(event, execute);
+			var event = events.pop();
+			eventProcessor.process(event, execute);
 		};
 		
 		return {

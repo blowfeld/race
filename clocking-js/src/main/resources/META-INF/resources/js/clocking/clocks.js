@@ -24,7 +24,7 @@ clocking.clocks = function() {
 			
 			var process = function(response) {
 				var nextTick = function() {
-					clockActions.onTick(response.data, count, currentTime() - start);
+					clockActions.onTick(response.data, count, start, currentTime());
 					tick(count + 1);
 				};
 				setTimeout(nextTick, interval);
@@ -43,7 +43,7 @@ clocking.clocks = function() {
 	};
 	
 	
-	var ajaxData = function(timeout, clockActions, submissionData, url) {
+	var ajaxData = function(timeout, clockActions, url) {
 		var fetchData = function(count, callback) {
 			var request = ajaxRequest(count);
 			request.done(callback);
@@ -51,7 +51,7 @@ clocking.clocks = function() {
 				if (textStatus === 'timeout' || jqXHR.status === 408) {
 					clockActions.onTimeout();
 				} else {
-					window.location.href = '/ErrorPage';
+//					window.location.href = '/ErrorPage';
 				}
 			});
 		};
@@ -62,7 +62,7 @@ clocking.clocks = function() {
 				type : "POST",
 				data : {
 					time_count : count,
-					data : submissionData(count)
+					data : JSON.stringify(clockActions.submissionData(count))
 				},
 				dataType : "json",
 				timeout : timeout
@@ -75,13 +75,13 @@ clocking.clocks = function() {
 	};
 	
 	
-	var serverClock = function(interval, timeout, clockActions, submissionData, url) {
+	var serverClock = function(interval, timeout, clockActions, url) {
 		if (timeout < interval) {
 			throw new Error("timeout must be larger than then interval: " + timeout + "<" + interval);
 		}
 		
 		url = url || 'clocking';
-		var dataProvider = ajaxData(timeout - interval, clockActions, submissionData);
+		var dataProvider = ajaxData(timeout - interval, clockActions, url);
 		
 		return clock(interval, clockActions, dataProvider);
 	};
