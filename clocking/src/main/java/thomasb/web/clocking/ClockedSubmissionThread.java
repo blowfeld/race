@@ -1,86 +1,56 @@
 package thomasb.web.clocking;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 
 import net.jcip.annotations.GuardedBy;
 
-class ClockedSubmissionThread<T> extends Thread {
-	@GuardedBy("requests")
+class ClockedSubmissionThread<T> {
+	@GuardedBy("submissionExecutor")
 	private final RequestCollection<T> requests;
 	private final ClockedRequestProcessor<T> requestProcessor;
-	private final CountDownLatch startLatch;
+	private final int submissionInterval;
 	
-	@GuardedBy("requests")
-	private volatile ClockInterval clockInterval;
-	private volatile boolean stop = false;
+	@GuardedBy("submissionExecutor")
+	private volatile ClockedExecutorThread submissionExecutor;
 	
 	ClockedSubmissionThread(int participants,
 			int submissionInterval,
 			ClockedRequestProcessor<T> requestProcessor) {
+		this.submissionInterval = submissionInterval;
 		this.requestProcessor = requestProcessor;
-		this.startLatch = new CountDownLatch(1);
-		this.clockInterval = new ClockInterval(-1, submissionInterval);
 		this.requests = new RequestCollection<>(requestProcessor, participants);
 	}
 	
-	void launch() {
-		startLatch.countDown();
+	synchronized void init() {
+		checkState(submissionExecutor == null, "clocked submission is already initialized");
+		submissionExecutor = new ClockedExecutorThread(submissionInterval, new SubmitAction(requests));
+		submissionExecutor.start();
 	}
 	
-	void finish() {
-		stop = true;
+	synchronized void launch() {
+		checkState(submissionExecutor != null, "Not initialized, call init first.");
+		submissionExecutor.launch();
 	}
 	
-	@Override
-	public void run() {
-		clockInterval.finish();
-		
-		awaitStart();
-		
-		while (!stop) {
-			awaitClockInterval();
-			
-			synchronized (requests) {
-				submitInterval();
-			}
-		}
+	synchronized void finish() throws InterruptedException {
+		checkState(submissionExecutor != null, "Not initialized, call init first.");
+		submissionExecutor.finish();
+		submissionExecutor.join();
 	}
 	
-	private void awaitStart() {
-		try {
-			startLatch.await();
-		} catch (InterruptedException e) {
-			finish();
-			launch();
-		}
-	}
-	
-	private void awaitClockInterval() {
-		try {
-			clockInterval.await();
-		} catch (InterruptedException e) {
-			finish();
-		}
-	}
-	
-	private void submitInterval() {
-		clockInterval = clockInterval.next();
-		requests.submit();
-	}
-
 	void addRequest(AsyncContext context) throws IOException, ServletException {
 		ClockedRequest<T> request = new ClockedRequest<>(context);
-		checkArgument(clockInterval.getCount() >= request.getTime(), "Request with illegal timing was received: expected %s, was %s", clockInterval.getCount(), request.getTime());
+		checkArgument(submissionExecutor.getIntervalCount() >= request.getTime(), "Request with illegal timing was received: expected %s, was %s", submissionExecutor.getIntervalCount(), request.getTime());
 
 		ClockedRequest<T> preprocessed = preprocess(request);
 		
-		synchronized(requests) {
+		synchronized(submissionExecutor) {
 			scheduleRequest(preprocessed);
 		}
 	}
@@ -95,16 +65,28 @@ class ClockedSubmissionThread<T> extends Thread {
 		return request.withData(preprocessData);
 	}
 	
-	private void scheduleRequest(ClockedRequest<T> request)
-			throws ServletException, IOException {
-		boolean submit = requests.add(request, clockInterval.getCount());
+	private void scheduleRequest(ClockedRequest<T> request) throws ServletException, IOException {
+		boolean submit = requests.add(request, submissionExecutor.getIntervalCount());
 		
 		if (submit) {
-			clockInterval.finish();
+			submissionExecutor.step();
 		}
 	}
 	
 	int getIntervalCount() {
-		return clockInterval.getCount();
+		return submissionExecutor.getIntervalCount();
+	}
+	
+	private class SubmitAction implements Runnable {
+		private RequestCollection<T> requests;
+		
+		SubmitAction(RequestCollection<T> requests) {
+			this.requests = requests;
+		}
+		
+		@Override
+		public void run() {
+			requests.submit();
+		}
 	}
 }

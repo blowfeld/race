@@ -18,17 +18,17 @@ import javax.servlet.http.HttpServletResponse;
 
 class TestAsyncContext implements AsyncContext {
 	private long invocationTime;
-	private final ClockedSubmissionThread<?> submissionThread;
+	private final ClockedSubmissionThread<?> clockedSubmission;
 	private final AsyncContext followUpRequest;
 	private final int intervalCount;
 	private final int delay;
 	private final HttpServletResponse response;
 	
-	TestAsyncContext(ClockedSubmissionThread<?> submissionThread,
+	TestAsyncContext(ClockedSubmissionThread<?> clockedSubmission,
 			int intervalCount,
 			int delay,
 			AsyncContext followUpRequest) throws IOException {
-		this.submissionThread = submissionThread;
+		this.clockedSubmission = clockedSubmission;
 		this.intervalCount = intervalCount;
 		this.delay = delay;
 		this.followUpRequest = followUpRequest;
@@ -42,10 +42,10 @@ class TestAsyncContext implements AsyncContext {
 	@Override
 	public void complete() {
 		invocationTime = System.currentTimeMillis();
-		if (submissionThread != null) {
+		if (clockedSubmission != null) {
 			try {
 				sleep(delay);
-				submissionThread.addRequest(followUpRequest);
+				clockedSubmission.addRequest(followUpRequest);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

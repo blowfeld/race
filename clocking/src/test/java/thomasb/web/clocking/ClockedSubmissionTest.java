@@ -27,10 +27,10 @@ import org.mockito.ArgumentCaptor;
 import com.google.common.collect.Lists;
 
 //TODO Rewrite this unit test, as the timings are not really deterministic
-public class ClockedSubmissionThreadTest {
+public class ClockedSubmissionTest {
 	private static final ClockedRequestProcessor<?> DUMMY_PROCESSOR = createProcessorMock();
 
-	private ClockedSubmissionThread<?> submissionThread;
+	private ClockedSubmissionThread<?> clockedSubmission;
 	
 	private TestAsyncContext request_0_0;
 	private TestAsyncContext request_0_1;
@@ -44,24 +44,23 @@ public class ClockedSubmissionThreadTest {
 	@BeforeClass
 	public static void initThread() throws InterruptedException, IOException, ServletException {
 		ClockedSubmissionThread<?> submissionThread = new ClockedSubmissionThread<>(2, 50, DUMMY_PROCESSOR);
-		submissionThread.start();
+		submissionThread.init();
 		submissionThread.launch();
 		submissionThread.addRequest(new TestAsyncContext(0));
 		
 		sleep(10);
 		
 		submissionThread.finish();
-		submissionThread.join();
 	}
 	
 	private void setupRequestsWithSchedule(int delay) throws IOException {
-		submissionThread = new ClockedSubmissionThread<>(2, 50, DUMMY_PROCESSOR);
+		clockedSubmission = new ClockedSubmissionThread<>(2, 50, DUMMY_PROCESSOR);
 		request_2_0 = new TestAsyncContext(2);
 		request_2_1 = new TestAsyncContext(2);
-		request_1_0 = new TestAsyncContext(submissionThread, 1, delay, request_2_0);
-		request_1_1 = new TestAsyncContext(submissionThread, 1, delay, request_2_1);
-		request_0_0 = new TestAsyncContext(submissionThread, 0, delay, request_1_0);
-		request_0_1 = new TestAsyncContext(submissionThread, 0, delay, request_1_1);
+		request_1_0 = new TestAsyncContext(clockedSubmission, 1, delay, request_2_0);
+		request_1_1 = new TestAsyncContext(clockedSubmission, 1, delay, request_2_1);
+		request_0_0 = new TestAsyncContext(clockedSubmission, 0, delay, request_1_0);
+		request_0_1 = new TestAsyncContext(clockedSubmission, 0, delay, request_1_1);
 	}
 	
 	@Test
@@ -69,23 +68,22 @@ public class ClockedSubmissionThreadTest {
 			throws InterruptedException, IOException, ServletException {
 		setupRequestsWithSchedule(0);
 		
-		submissionThread.start();
+		clockedSubmission.init();
 		
-		submissionThread.launch();
+		clockedSubmission.launch();
 		long start = System.currentTimeMillis();
 		
 		sleep(25);
-		submissionThread.addRequest(request_0_0);
+		clockedSubmission.addRequest(request_0_0);
 
-		int firstCount = submissionThread.getIntervalCount();
+		int firstCount = clockedSubmission.getIntervalCount();
 		sleep(50);
-		int secondCount = submissionThread.getIntervalCount();
+		int secondCount = clockedSubmission.getIntervalCount();
 		sleep(50);
-		int thirdCount = submissionThread.getIntervalCount();
+		int thirdCount = clockedSubmission.getIntervalCount();
 		sleep(50);
 
-		submissionThread.finish();
-		submissionThread.join();
+		clockedSubmission.finish();
 
 		long submissionTime_0_0 = request_0_0.getInvocationTime() - start;	
 		long submissionTime_1_0 = request_1_0.getInvocationTime() - start;
@@ -112,17 +110,16 @@ public class ClockedSubmissionThreadTest {
 			throws InterruptedException, IOException, ServletException {
 		setupRequestsWithSchedule(0);
 
-		submissionThread.start();
+		clockedSubmission.init();
 		
-		submissionThread.launch();
+		clockedSubmission.launch();
 		
 		sleep(25);
-		submissionThread.addRequest(request_0_0);
-		submissionThread.addRequest(request_0_1);
+		clockedSubmission.addRequest(request_0_0);
+		clockedSubmission.addRequest(request_0_1);
 		sleep(50);
 		
-		submissionThread.finish();
-		submissionThread.join();
+		clockedSubmission.finish();
 	}
 	
 	@Test
@@ -130,17 +127,16 @@ public class ClockedSubmissionThreadTest {
 			throws InterruptedException, IOException, ServletException {
 		setupRequestsWithSchedule(0);
 		
-		submissionThread.start();
+		clockedSubmission.init();
 		
-		submissionThread.launch();
+		clockedSubmission.launch();
 		
 		sleep(25);
-		submissionThread.addRequest(request_0_0);
-		submissionThread.addRequest(request_0_1);
+		clockedSubmission.addRequest(request_0_0);
+		clockedSubmission.addRequest(request_0_1);
 		sleep(50);
 		
-		submissionThread.finish();
-		submissionThread.join();
+		clockedSubmission.finish();
 		
 		ArgumentCaptor<String> responseCaptor_0 = ArgumentCaptor.forClass(String.class);
 		ArgumentCaptor<String> responseCaptor_1 = ArgumentCaptor.forClass(String.class);
@@ -156,22 +152,21 @@ public class ClockedSubmissionThreadTest {
 			throws InterruptedException, IOException, ServletException {
 		setupRequestsWithSchedule(25);
 
-		submissionThread.start();
+		clockedSubmission.init();
 		
 		long start = System.currentTimeMillis();
-		submissionThread.launch();
+		clockedSubmission.launch();
 		
 		sleep(25);
-		int firstCount = submissionThread.getIntervalCount();
-		submissionThread.addRequest(request_0_0);
-		submissionThread.addRequest(request_0_1);
+		int firstCount = clockedSubmission.getIntervalCount();
+		clockedSubmission.addRequest(request_0_0);
+		clockedSubmission.addRequest(request_0_1);
 		sleep(5);
-		int secondCount = submissionThread.getIntervalCount();
+		int secondCount = clockedSubmission.getIntervalCount();
 		sleep(30);
-		int thirdCount = submissionThread.getIntervalCount();
+		int thirdCount = clockedSubmission.getIntervalCount();
 		
-		submissionThread.finish();
-		submissionThread.join();
+		clockedSubmission.finish();
 		
 		long submissionTime_0_0 = request_0_0.getInvocationTime() - start;	
 		long submissionTime_1_0 = request_1_0.getInvocationTime() - start;
@@ -192,20 +187,19 @@ public class ClockedSubmissionThreadTest {
 			throws InterruptedException, IOException, ServletException {
 		setupRequestsWithSchedule(0);
 		
-		submissionThread.start();
-		submissionThread.launch();
+		clockedSubmission.init();
+		clockedSubmission.launch();
 		
 		sleep(25);
-		submissionThread.addRequest(request_0_0);
+		clockedSubmission.addRequest(request_0_0);
 		
-		int firstCount = submissionThread.getIntervalCount();
+		int firstCount = clockedSubmission.getIntervalCount();
 		sleep(50);
-		int secondCount = submissionThread.getIntervalCount();
-		submissionThread.addRequest(request_0_1);
+		int secondCount = clockedSubmission.getIntervalCount();
+		clockedSubmission.addRequest(request_0_1);
 		sleep(50);
 		
-		submissionThread.finish();
-		submissionThread.join();
+		clockedSubmission.finish();
 		
 		HttpServletResponse response = (HttpServletResponse)request_0_1.getResponse();
 		ArgumentCaptor<Integer> statusCaptor = ArgumentCaptor.forClass(Integer.class);

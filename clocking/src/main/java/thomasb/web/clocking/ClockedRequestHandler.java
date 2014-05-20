@@ -24,16 +24,16 @@ import javax.servlet.http.HttpServletResponse;
 public class ClockedRequestHandler {
 	public static final String TIME_PARAMETER = ClockedRequest.TIME_PARAMETER;
 	
-	private final ClockedSubmissionThread<?> submissionThread;
+	private final ClockedSubmissionThread<?> clockedSubmission;
 	private final CountDownLatch startLatch;
 	private boolean init = true;
 	
 	public ClockedRequestHandler(int participants,
 			int interval,
 			ClockedRequestProcessor<?> requestProcessor) {
-		this.submissionThread = new ClockedSubmissionThread<>(participants,interval, requestProcessor);
+		this.clockedSubmission = new ClockedSubmissionThread<>(participants, interval, requestProcessor);
 		this.startLatch = new CountDownLatch(participants);
-		this.submissionThread.start();
+		this.clockedSubmission.init();
 	}
 	
 	public void handle(HttpServletRequest request, HttpServletResponse response)
@@ -50,12 +50,12 @@ public class ClockedRequestHandler {
 		}
 		
 		AsyncContext async = request.startAsync(request, response);
-		submissionThread.addRequest(async);
+		clockedSubmission.addRequest(async);
 	}
 
 	private void awaitParticipants() throws InterruptedException {
 		startLatch.countDown();
 		startLatch.await();
-		submissionThread.launch();
+		clockedSubmission.launch();
 	}
 }
