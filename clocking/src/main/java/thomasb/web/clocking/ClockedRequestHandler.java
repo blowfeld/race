@@ -24,14 +24,14 @@ import javax.servlet.http.HttpServletResponse;
 public class ClockedRequestHandler {
 	public static final String TIME_PARAMETER = ClockedRequest.TIME_PARAMETER;
 	
-	private final ClockedSubmissionThread<?> clockedSubmission;
+	private final ClockedSubmission<?> clockedSubmission;
 	private final CountDownLatch startLatch;
 	private boolean init = true;
 	
 	public ClockedRequestHandler(int participants,
 			int interval,
 			ClockedRequestProcessor<?> requestProcessor) {
-		this.clockedSubmission = new ClockedSubmissionThread<>(participants, interval, requestProcessor);
+		this.clockedSubmission = new ClockedSubmission<>(participants, interval, requestProcessor);
 		this.startLatch = new CountDownLatch(participants);
 		this.clockedSubmission.init();
 	}

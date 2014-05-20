@@ -10,7 +10,7 @@ import javax.servlet.ServletException;
 
 import net.jcip.annotations.GuardedBy;
 
-class ClockedSubmissionThread<T> {
+class ClockedSubmission<T> {
 	@GuardedBy("submissionExecutor")
 	private final RequestCollection<T> requests;
 	private final ClockedRequestProcessor<T> requestProcessor;
@@ -19,7 +19,7 @@ class ClockedSubmissionThread<T> {
 	@GuardedBy("submissionExecutor")
 	private volatile ClockedExecutorThread submissionExecutor;
 	
-	ClockedSubmissionThread(int participants,
+	ClockedSubmission(int participants,
 			int submissionInterval,
 			ClockedRequestProcessor<T> requestProcessor) {
 		this.submissionInterval = submissionInterval;

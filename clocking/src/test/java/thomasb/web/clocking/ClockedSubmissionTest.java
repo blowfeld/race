@@ -30,7 +30,7 @@ import com.google.common.collect.Lists;
 public class ClockedSubmissionTest {
 	private static final ClockedRequestProcessor<?> DUMMY_PROCESSOR = createProcessorMock();
 
-	private ClockedSubmissionThread<?> clockedSubmission;
+	private ClockedSubmission<?> clockedSubmission;
 	
 	private TestAsyncContext request_0_0;
 	private TestAsyncContext request_0_1;
@@ -43,7 +43,7 @@ public class ClockedSubmissionTest {
 	// Thus some tests fail if executed individually.
 	@BeforeClass
 	public static void initThread() throws InterruptedException, IOException, ServletException {
-		ClockedSubmissionThread<?> submissionThread = new ClockedSubmissionThread<>(2, 50, DUMMY_PROCESSOR);
+		ClockedSubmission<?> submissionThread = new ClockedSubmission<>(2, 50, DUMMY_PROCESSOR);
 		submissionThread.init();
 		submissionThread.launch();
 		submissionThread.addRequest(new TestAsyncContext(0));
@@ -54,7 +54,7 @@ public class ClockedSubmissionTest {
 	}
 	
 	private void setupRequestsWithSchedule(int delay) throws IOException {
-		clockedSubmission = new ClockedSubmissionThread<>(2, 50, DUMMY_PROCESSOR);
+		clockedSubmission = new ClockedSubmission<>(2, 50, DUMMY_PROCESSOR);
 		request_2_0 = new TestAsyncContext(2);
 		request_2_1 = new TestAsyncContext(2);
 		request_1_0 = new TestAsyncContext(clockedSubmission, 1, delay, request_2_0);

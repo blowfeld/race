@@ -18,13 +18,13 @@ import javax.servlet.http.HttpServletResponse;
 
 class TestAsyncContext implements AsyncContext {
 	private long invocationTime;
-	private final ClockedSubmissionThread<?> clockedSubmission;
+	private final ClockedSubmission<?> clockedSubmission;
 	private final AsyncContext followUpRequest;
 	private final int intervalCount;
 	private final int delay;
 	private final HttpServletResponse response;
 	
-	TestAsyncContext(ClockedSubmissionThread<?> clockedSubmission,
+	TestAsyncContext(ClockedSubmission<?> clockedSubmission,
 			int intervalCount,
 			int delay,
 			AsyncContext followUpRequest) throws IOException {
