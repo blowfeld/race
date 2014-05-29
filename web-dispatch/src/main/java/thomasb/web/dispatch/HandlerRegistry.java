@@ -9,8 +9,6 @@ public interface HandlerRegistry {
 	
 	RequestHandler get(Object id);
 	
-	RequestHandler put(UUID id, RequestHandler handler);
-	
 	RequestHandler putIfAbsent(UUID id, RequestHandler handler);
 	
 	boolean replace(UUID id, RequestHandler oldHandler, RequestHandler newHandler);
