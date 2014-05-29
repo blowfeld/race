@@ -1,14 +1,19 @@
 package thomasb.web.dispatch;
 
 import java.lang.ref.WeakReference;
+import java.util.UUID;
 
 public abstract class RegistrationListener {
-	private final String id;
+	private final UUID id;
 	private final WeakReference<HandlerRegistry> registry;
 	
-	public RegistrationListener(String id, HandlerRegistry registry) {
+	public RegistrationListener(UUID id, HandlerRegistry registry) {
 		this.id = id;
 		this.registry = new WeakReference<>(registry);
+	}
+	
+	public RequestHandler putIfAbsent(RequestHandler handler) {
+		return registry.get().putIfAbsent(id, handler);
 	}
 
 	public abstract boolean replace(RequestHandler oldHandler);
@@ -21,7 +26,7 @@ public abstract class RegistrationListener {
 		return registry.get().remove(getId());
 	}
 
-	public final String getId() {
+	public final UUID getId() {
 		return id;
 	}
 }

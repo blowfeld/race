@@ -1,5 +1,7 @@
 package thomasb.web.dispatch;
 
+import java.util.UUID;
+
 
 public interface HandlerRegistry {
 
@@ -7,11 +9,11 @@ public interface HandlerRegistry {
 	
 	RequestHandler get(Object id);
 	
-	RequestHandler put(String id, RequestHandler handler);
+	RequestHandler put(UUID id, RequestHandler handler);
 	
-	RequestHandler putIfAbsent(String id, RequestHandler handler);
+	RequestHandler putIfAbsent(UUID id, RequestHandler handler);
 	
-	boolean replace(String id, RequestHandler oldHandler, RequestHandler newHandler);
+	boolean replace(UUID id, RequestHandler oldHandler, RequestHandler newHandler);
 	
 	RequestHandler remove(Object id);
 }
