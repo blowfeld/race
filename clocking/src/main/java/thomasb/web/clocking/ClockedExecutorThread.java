@@ -2,28 +2,28 @@ package thomasb.web.clocking;
 
 import java.util.concurrent.CountDownLatch;
 
-public class ClockedExecutorThread extends Thread {
+public final class ClockedExecutorThread extends Thread {
 	private final Runnable action;
 	private final CountDownLatch startLatch;
 
 	private volatile boolean stop = false;
 	private volatile ClockInterval clockInterval;
 	
-	ClockedExecutorThread(int interval, Runnable action) {
+	public ClockedExecutorThread(int interval, Runnable action) {
 		this.action = action;
 		this.startLatch = new CountDownLatch(1);
 		this.clockInterval = new ClockInterval(-1, interval);
 	}
 	
-	void launch() {
+	public void launch() {
 		startLatch.countDown();
 	}
 	
-	void finish() {
+	public void finish() {
 		stop = true;
 	}
 	
-	void step() {
+	public void step() {
 		clockInterval.finish();
 	}
 	
@@ -59,7 +59,7 @@ public class ClockedExecutorThread extends Thread {
 		}
 	}
 	
-	int getIntervalCount() {
+	public int getIntervalCount() {
 		return clockInterval.getCount();
 	}
 }

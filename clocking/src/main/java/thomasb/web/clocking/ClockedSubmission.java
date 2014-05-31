@@ -10,7 +10,7 @@ import javax.servlet.ServletException;
 
 import net.jcip.annotations.GuardedBy;
 
-class ClockedSubmission<T> {
+final class ClockedSubmission<T> {
 	@GuardedBy("submissionExecutor")
 	private final RequestCollection<T> requests;
 	private final ClockedRequestProcessor<T> requestProcessor;

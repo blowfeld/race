@@ -1,7 +1,5 @@
 package thomasb.web.clocking;
 
-import static java.lang.Thread.currentThread;
-
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
@@ -21,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
  * request and must not send a request to the succeeding interval before they
  * received the response from the server or a given timeout is reached.
  */
-public class ClockedRequestHandler {
+public final class ClockedRequestHandler {
 	public static final String TIME_PARAMETER = ClockedRequest.TIME_PARAMETER;
 	
 	private final ClockedSubmission<?> clockedSubmission;
@@ -43,8 +41,6 @@ public class ClockedRequestHandler {
 				awaitParticipants();
 			} catch (InterruptedException e) {
 				return;
-			} finally {
-				currentThread().interrupt();
 			}
 			init = false;
 		}
