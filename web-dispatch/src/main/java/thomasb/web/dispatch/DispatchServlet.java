@@ -54,7 +54,7 @@ public abstract class DispatchServlet extends HttpServlet {
 			throws ServletException, IOException {
 		UUID id = null;
 		try {
-			id = readId(request);
+			id = readHandlerId(request);
 		} catch (HandlerIdException e) {
 			response.sendError(400, "url path is invalid: " + request.getPathInfo());
 			return;
@@ -103,7 +103,7 @@ public abstract class DispatchServlet extends HttpServlet {
 		return registry;
 	}
 	
-	protected final UUID readId(HttpServletRequest request) {
+	protected final UUID readHandlerId(HttpServletRequest request) {
 		String pathInfo = request.getPathInfo();
 		if (pathInfo == null) {
 			return null;

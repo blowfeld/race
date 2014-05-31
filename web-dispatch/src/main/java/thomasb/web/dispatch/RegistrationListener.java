@@ -12,8 +12,8 @@ public abstract class RegistrationListener {
 		this.registry = new WeakReference<>(registry);
 	}
 	
-	public RequestHandler putIfAbsent(RequestHandler handler) {
-		return registry.get().putIfAbsent(id, handler);
+	public RequestHandler putIfAbsent(UUID handlerId, RequestHandler handler) {
+		return registry.get().putIfAbsent(handlerId, handler);
 	}
 
 	public abstract boolean replace(RequestHandler oldHandler);
