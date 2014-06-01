@@ -12,6 +12,9 @@ public interface RequestHandler {
 	void handle(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException;
 	
+	void handle(HandlerContext context)
+			throws ServletException, IOException;
+	
 	UUID getId();
 	
 }

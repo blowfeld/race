@@ -27,6 +27,11 @@
 			<version>${project.guava.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>javax.json</groupId>
+			<artifactId>javax.json-api</artifactId>
+			<version>${project.json-api.version}</version>
+		</dependency>
 	</dependencies>
 	
 </project>
