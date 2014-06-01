@@ -20,4 +20,13 @@
 		<servlet-name>steps</servlet-name>
 		<url-pattern>/steps</url-pattern>
 	</servlet-mapping>
+	<servlet>
+		<servlet-name>dispatch</servlet-name>
+		<servlet-class>thomasb.race.web.dispatch.testpages.TestDispatcherServlet</servlet-class>
+		<async-supported>true</async-supported>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>dispatch</servlet-name>
+		<url-pattern>/dispatch/*</url-pattern>
+	</servlet-mapping>
 </web-app>

@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="js/latch/latches.js"></script>
+<script src="js/dispatch.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		dispatch('dispatch').run();
+	});
+ </script>
+<title>Dispatch test page</title>
+</head>
+<body>
+
+<h1>Dispatch test page</h1>
+If this page is accessed from several windows/browsers, it forwards to the next page 30 seconds
+after the last access to this page.
+
+<h2>Remaining until dispatch</h2>
+<div id='remaining'></div>
+
+</body>
+
+</body>
+</html>
