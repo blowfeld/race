@@ -17,6 +17,7 @@
 		<module>../clocking-js</module>
 		<module>../race-testpages</module>
 		<module>../race-webapp</module>
+		<module>../web-dispatch</module>
 	</modules>
 
 	<properties>
