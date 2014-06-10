@@ -8,10 +8,10 @@
 		<relativePath>../race-parent</relativePath>
 	</parent>
 
-	<artifactId>clocking</artifactId>
+	<artifactId>web-utils</artifactId>
 
-	<name>Clocking</name>
-	<description>Clocked servlet for requests from different clients</description>
+	<name>Web utils</name>
+	<description>Utilities for request handling</description>
 
 	<packaging>jar</packaging>
 

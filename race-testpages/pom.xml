@@ -18,12 +18,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>thomasb.race</groupId>
-			<artifactId>clocking</artifactId>
+			<artifactId>web-utils</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>thomasb.race</groupId>
-			<artifactId>clocking-js</artifactId>
+			<artifactId>web-utils-js</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

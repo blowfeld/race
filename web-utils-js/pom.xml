@@ -8,10 +8,10 @@
 		<relativePath>../race-parent</relativePath>
 	</parent>
 
-	<artifactId>clocking-js</artifactId>
+	<artifactId>web-utils-js</artifactId>
 
-	<name>Clocking JS</name>
-	<description>Javascript to be used with the clocking library</description>
+	<name>Web utils JS</name>
+	<description>Javascript to be used with the web-utils library</description>
 
 	<packaging>jar</packaging>
 </project>
