@@ -60,7 +60,7 @@ class TestAsyncContext implements AsyncContext {
 	public ServletRequest getRequest() {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		doReturn(String.valueOf(intervalCount))
-				.when(request).getParameter(ClockedRequestHandler.TIME_PARAMETER);
+				.when(request).getParameter(ClockedRequestHandlerImp.TIME_PARAMETER);
 		
 		return request;
 	}

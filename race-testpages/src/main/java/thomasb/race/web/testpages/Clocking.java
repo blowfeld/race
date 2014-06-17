@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import thomasb.web.clocking.ClockedRequest;
 import thomasb.web.clocking.ClockedRequestHandler;
+import thomasb.web.clocking.ClockedRequestHandlerImp;
 import thomasb.web.clocking.ClockedRequestProcessor;
 
 @SuppressWarnings("serial")
@@ -43,7 +44,7 @@ public class Clocking extends HttpServlet {
 	private ClockedRequestHandler clockedRequestHandler;
 	
 	public Clocking() {
-		clockedRequestHandler = new ClockedRequestHandler(2, 1000, REQUEST_PROCESSOR);
+		clockedRequestHandler = new ClockedRequestHandlerImp(2, 1000, REQUEST_PROCESSOR);
 	}
 	
 	public void doPost(HttpServletRequest request, HttpServletResponse response)

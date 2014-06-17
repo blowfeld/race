@@ -11,12 +11,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import thomasb.web.dispatch.HandlerContext;
 import thomasb.web.dispatch.HandlerRegistry;
 import thomasb.web.dispatch.JsonHandlerContext;
 import thomasb.web.dispatch.RegistrationListener;
-import thomasb.web.dispatch.RequestHandler;
+import thomasb.web.handler.HandlerContext;
+import thomasb.web.handler.RequestHandler;
 import thomasb.web.latch.TimeLatchHandler;
+import thomasb.web.latch.TimeLatchHandlerImp;
 
 public class CountDownHandler implements RequestHandler {
 	private final DispatchListener listener;
@@ -28,7 +29,7 @@ public class CountDownHandler implements RequestHandler {
 	
 	public static CountDownHandler create(HandlerRegistry registry) {
 		UUID id = UUID.randomUUID();
-		DispatchListener listener = new DispatchListener(id, registry);
+		DispatchListener listener = new DispatchListener(registry);
 		
 		return new CountDownHandler(id, listener);
 	}
@@ -36,7 +37,7 @@ public class CountDownHandler implements RequestHandler {
 	private CountDownHandler(UUID id, DispatchListener listener) {
 		this.id = id;
 		this.listener = listener;
-		this.timeLatch = new TimeLatchHandler(10000, 1000);
+		this.timeLatch = new TimeLatchHandlerImp(10000, 1000);
 	}
 	
 	@Override
@@ -68,7 +69,7 @@ public class CountDownHandler implements RequestHandler {
 		if (timeLatch.isExpired()) {
 			participants.remove(participant);
 			if (participants.isEmpty()) {
-				listener.remove();
+				listener.remove(this);
 			}
 		}
 	}
@@ -100,20 +101,13 @@ public class CountDownHandler implements RequestHandler {
 	private static class DispatchListener extends RegistrationListener {
 		private final HandlerRegistry handlerRegistry;
 		
-		DispatchListener(UUID id, HandlerRegistry handlerRegistry) {
-			super(id, handlerRegistry);
+		DispatchListener(HandlerRegistry handlerRegistry) {
+			super(handlerRegistry);
 			this.handlerRegistry = handlerRegistry;
 		}
 		
 		public HandlerRegistry getRegistry() {
 			return handlerRegistry;
-		}
-		
-		@Override
-		public boolean replace(RequestHandler oldHandler) {
-			CountDownHandler newHandler = CountDownHandler.create(handlerRegistry);
-			
-			return replaceHandler(oldHandler, newHandler);
 		}
 	}
 }

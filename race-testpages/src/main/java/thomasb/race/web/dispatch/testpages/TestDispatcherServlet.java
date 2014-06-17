@@ -1,7 +1,7 @@
 package thomasb.race.web.dispatch.testpages;
 
 import thomasb.web.dispatch.DispatchServlet;
-import thomasb.web.dispatch.RequestHandler;
+import thomasb.web.handler.RequestHandler;
 
 
 public class TestDispatcherServlet extends DispatchServlet {

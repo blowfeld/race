@@ -2,7 +2,7 @@ package thomasb.web.clocking;
 
 import java.util.concurrent.CountDownLatch;
 
-public final class ClockedExecutorThread extends Thread {
+public final class ClockedExecutorThread extends Thread implements ClockedExecutor {
 	private final Runnable action;
 	private final CountDownLatch startLatch;
 

@@ -11,6 +11,8 @@ import javax.json.stream.JsonGenerator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import thomasb.web.handler.HandlerContext;
+
 public class JsonHandlerContext implements HandlerContext {
 	private final HttpServletRequest request;
 	private final HttpServletResponse response;

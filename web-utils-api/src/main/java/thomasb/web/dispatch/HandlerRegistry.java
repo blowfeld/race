@@ -2,6 +2,8 @@ package thomasb.web.dispatch;
 
 import java.util.UUID;
 
+import thomasb.web.handler.RequestHandler;
+
 
 public interface HandlerRegistry {
 

@@ -1,4 +1,4 @@
-package thomasb.web.dispatch;
+package thomasb.web.handler;
 
 import java.io.IOException;
 import java.util.UUID;

@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import thomasb.web.handler.RequestHandler;
+
 /**
  * A {@code DispatchHandler} dispatches requests based on their handler id.
  * <p>

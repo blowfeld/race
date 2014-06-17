@@ -8,19 +8,14 @@
 		<relativePath>../race-parent</relativePath>
 	</parent>
 
-	<artifactId>web-utils</artifactId>
+	<artifactId>web-utils-api</artifactId>
 
-	<name>Web utils</name>
+	<name>Web utils API</name>
 	<description>Utilities for request handling</description>
 
 	<packaging>jar</packaging>
 
 	<dependencies>
-		<dependency>
-			<groupId>thomasb.race</groupId>
-			<artifactId>web-utils-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>

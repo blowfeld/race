@@ -12,11 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import thomasb.web.clocking.ClockedExecutorThread;
-import thomasb.web.dispatch.HandlerContext;
 import thomasb.web.dispatch.JsonHandlerContext;
-import thomasb.web.dispatch.RequestHandler;
+import thomasb.web.handler.HandlerContext;
 
-public final class TimeLatchHandler implements RequestHandler {
+public final class TimeLatchHandlerImp implements TimeLatchHandler {
 	public static final String REMAINING_PARAMETER = "remaining";
 	
 	private static final Runnable VOID_ACTION = new Runnable() {
@@ -36,11 +35,11 @@ public final class TimeLatchHandler implements RequestHandler {
 	private volatile int count;
 	private volatile boolean isExpired = false;
 	
-	public TimeLatchHandler(int time) {
+	public TimeLatchHandlerImp(int time) {
 		this(time, DEFAULT_RESOLUTION);
 	}
 	
-	public TimeLatchHandler(int time, int resolution) {
+	public TimeLatchHandlerImp(int time, int resolution) {
 		this.resolution = resolution;
 		this.count = time / resolution;
 		this.clock = new ClockedExecutorThread(resolution, VOID_ACTION);
