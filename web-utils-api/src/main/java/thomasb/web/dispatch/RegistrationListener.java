@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import thomasb.web.handler.RequestHandler;
 
-public class RegistrationListener implements HandlerRegistry {
+public final class RegistrationListener implements HandlerRegistry {
 	private final WeakReference<HandlerRegistry> registry;
 	
 	public RegistrationListener(HandlerRegistry registry) {
@@ -34,5 +34,9 @@ public class RegistrationListener implements HandlerRegistry {
 	@Override
 	public RequestHandler get(Object id) {
 		return registry.get().get(id);
+	}
+	
+	public HandlerRegistry getRegistry() {
+		return registry.get();
 	}
 }

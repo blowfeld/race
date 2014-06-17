@@ -20,7 +20,7 @@ import thomasb.web.latch.TimeLatchHandler;
 import thomasb.web.latch.TimeLatchHandlerImp;
 
 public class CountDownHandler implements RequestHandler {
-	private final DispatchListener listener;
+	private final RegistrationListener listener;
 	private final UUID id;
 	
 	private final Set<String> participants = new HashSet<>();
@@ -29,12 +29,12 @@ public class CountDownHandler implements RequestHandler {
 	
 	public static CountDownHandler create(HandlerRegistry registry) {
 		UUID id = UUID.randomUUID();
-		DispatchListener listener = new DispatchListener(registry);
+		RegistrationListener listener = new RegistrationListener(registry);
 		
 		return new CountDownHandler(id, listener);
 	}
 	
-	private CountDownHandler(UUID id, DispatchListener listener) {
+	private CountDownHandler(UUID id, RegistrationListener listener) {
 		this.id = id;
 		this.listener = listener;
 		this.timeLatch = new TimeLatchHandlerImp(10000, 1000);
@@ -96,18 +96,5 @@ public class CountDownHandler implements RequestHandler {
 	@Override
 	public UUID getId() {
 		return id;
-	}
-	
-	private static class DispatchListener extends RegistrationListener {
-		private final HandlerRegistry handlerRegistry;
-		
-		DispatchListener(HandlerRegistry handlerRegistry) {
-			super(handlerRegistry);
-			this.handlerRegistry = handlerRegistry;
-		}
-		
-		public HandlerRegistry getRegistry() {
-			return handlerRegistry;
-		}
 	}
 }
