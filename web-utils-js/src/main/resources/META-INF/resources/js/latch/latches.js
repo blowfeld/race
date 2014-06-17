@@ -14,10 +14,8 @@ clocking.latches = function() {
 			var callback = function (response) {
 				var remaining = response.remaining;
 				if (remaining < 0) {
-					console.log("exp resp: " + JSON.stringify(response));
 					expire(response);
 				} else {
-					console.log("wait resp: " + JSON.stringify(response));
 					latchActions.wait(remaining, response);
 				}
 			};
@@ -26,7 +24,6 @@ clocking.latches = function() {
 		};
 		
 		var expire = function(response) {
-			console.log("exp2 resp: " + JSON.stringify(response));
 			clearInterval(intervalId);
 			latchActions.expire(response);
 		};
