@@ -17,10 +17,25 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>thomasb.race</groupId>
+			<artifactId>web-utils</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>thomasb.race</groupId>
+			<artifactId>web-utils-js</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>${project.servlet-api.version}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.json</artifactId>
+			<version>${project.json.version}</version>
 		</dependency>
 	</dependencies>
 	

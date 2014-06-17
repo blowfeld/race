@@ -19,22 +19,22 @@ import thomasb.web.handler.RequestHandler;
 import thomasb.web.latch.TimeLatchHandler;
 import thomasb.web.latch.TimeLatchHandlerImp;
 
-public class CountDownHandler implements RequestHandler {
+public class TestCountDownHandler implements RequestHandler {
 	private final RegistrationListener listener;
 	private final UUID id;
 	
 	private final Set<String> participants = new HashSet<>();
 	private final TimeLatchHandler timeLatch;
-	private volatile CountDownHandler successor;
+	private volatile TestCountDownHandler successor;
 	
-	public static CountDownHandler create(HandlerRegistry registry) {
+	public static TestCountDownHandler create(HandlerRegistry registry) {
 		UUID id = UUID.randomUUID();
 		RegistrationListener listener = new RegistrationListener(registry);
 		
-		return new CountDownHandler(id, listener);
+		return new TestCountDownHandler(id, listener);
 	}
 	
-	private CountDownHandler(UUID id, RegistrationListener listener) {
+	private TestCountDownHandler(UUID id, RegistrationListener listener) {
 		this.id = id;
 		this.listener = listener;
 		this.timeLatch = new TimeLatchHandlerImp(10000, 1000);

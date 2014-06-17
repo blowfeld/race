@@ -1,13 +1,13 @@
-package thomasb.race.web.dispatch.testpages;
+package thomasb.race.app.dispatch;
 
 import thomasb.web.dispatch.DispatchServlet;
 import thomasb.web.handler.RequestHandler;
 
 
-public class TestDispatcherServlet extends DispatchServlet {
+public class RaceDispatcherServlet extends DispatchServlet {
 	private static final long serialVersionUID = 1L;
 
-	private TestCountDownHandler current = TestCountDownHandler.create(getRegistry());
+	private CountDownHandler current = new CountDownHandler(getRegistry());
 
 	@Override
 	protected synchronized RequestHandler assignHandler(String id) {
@@ -16,7 +16,7 @@ public class TestDispatcherServlet extends DispatchServlet {
 		}
 		
 		if (current.closed() && !current.contains(id)) {
-			current = TestCountDownHandler.create(getRegistry());
+			current = new CountDownHandler(getRegistry());
 		}
 		
 		current.register(id);

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="js/latch/latches.js"></script>
+<script src="js/redirect.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		var setDisplay = function(displayValue) {
+			$('#remaining').text(displayValue);
+		}
+		
+		redirectLatch('core', 'race.html', setDisplay).run();
+	});
+</script>
+
+<title>Race 2000 - Launch</title>
+
+</head>
+
+<body>
+	<h1>Launch</h1>
+
+	<h2>Prepare for launch!</h2>
+	<div id='remaining'></div>seconds
+	
+
+</body>
+
+</html>
