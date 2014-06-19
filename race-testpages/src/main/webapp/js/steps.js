@@ -15,7 +15,8 @@
 		var lastEvent = {id:id, pos:{x:0,y:0}};
 		var input = keyInput(id);
 		
-		var onTick = function(data, count, intervalStart, intervalEnd) {
+		var onTick = function(response, count, intervalStart, intervalEnd) {
+			var data = response.data;
 			var events = data.map(eventParser(count));
 			var rescheduleToClient = reschedule(count, intervalStart, intervalEnd);
 			var rescheduledEvents = events.map(rescheduleToClient);

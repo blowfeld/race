@@ -24,7 +24,7 @@ clocking.clocks = function() {
 			
 			var process = function(response) {
 				var nextTick = function() {
-					clockActions.onTick(response.data, count, start, currentTime());
+					clockActions.onTick(response, count, start, currentTime());
 					tick(count + 1);
 				};
 				setTimeout(nextTick, interval);
