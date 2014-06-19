@@ -3,7 +3,6 @@ if(clocking === undefined) {
 }
 
 clocking.events = function() {
-
 	
 	var timedEvent = function(event, start, end) {
 		var that = Object.create(event);
@@ -60,7 +59,8 @@ clocking.events = function() {
 			}
 			
 			var event = events.pop();
-			eventProcessor.process(event, execute);
+			eventProcessor.process(event);
+			setTimeout(execute, 0);
 		};
 		
 		return {

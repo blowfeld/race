@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
+import javax.json.Json;
+import javax.json.stream.JsonGenerator;
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -30,11 +32,22 @@ public final class ClockedRequestHandlerImp implements ClockedRequestHandler {
 	
 	private final ClockedSubmission<?> clockedSubmission;
 	private final CountDownLatch startLatch;
+	
+	private final ClockedRequestProcessor<?> requestProcessor;
+	private final int interval;
+	private final int timeout;
+	
 	private boolean init = true;
+
 	
 	public ClockedRequestHandlerImp(Collection<String> participants,
 			int interval,
+			int timeout,
 			ClockedRequestProcessor<?> requestProcessor) {
+		this.interval = interval;
+		this.timeout = timeout;
+		this.requestProcessor = requestProcessor;
+		
 		this.clockedSubmission = new ClockedSubmission<>(participants, interval, requestProcessor);
 		this.startLatch = new CountDownLatch(participants.size());
 		this.clockedSubmission.init();
@@ -55,9 +68,13 @@ public final class ClockedRequestHandlerImp implements ClockedRequestHandler {
 			} catch (InterruptedException e) {
 				return;
 			}
+			writeInitialData(request, response);
 			init = false;
+			
+			return;
 		}
 		
+		System.err.println("Started: " + request.getSession().getId());
 		AsyncContext async = request.startAsync(request, response);
 		clockedSubmission.addRequest(async);
 	}
@@ -66,6 +83,15 @@ public final class ClockedRequestHandlerImp implements ClockedRequestHandler {
 		startLatch.countDown();
 		startLatch.await();
 		clockedSubmission.launch();
+	}
+	
+	private void writeInitialData(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		JsonGenerator responseGenerator = Json.createGenerator(response.getWriter());
+		responseGenerator.writeStartObject()
+				.write("interval", interval)
+				.write("timeout", timeout)
+				.write("data", requestProcessor.initalData(request))
+			.writeEnd();
 	}
 	
 	@Override

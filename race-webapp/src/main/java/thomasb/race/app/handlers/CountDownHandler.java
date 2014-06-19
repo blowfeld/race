@@ -1,88 +1,76 @@
-package thomasb.race.app.dispatch;
+package thomasb.race.app.handlers;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-import javax.json.Json;
-import javax.json.JsonValue;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import thomasb.web.dispatch.HandlerRegistry;
 import thomasb.web.dispatch.JsonHandlerContext;
-import thomasb.web.dispatch.RegistrationListener;
 import thomasb.web.handler.HandlerContext;
 import thomasb.web.handler.RequestHandler;
 import thomasb.web.latch.TimeLatchHandler;
 import thomasb.web.latch.TimeLatchHandlerImp;
 
-public class CountDownHandler implements RequestHandler {
-	private final RegistrationListener listener;
+public abstract class CountDownHandler implements RequestHandler {
 	private final UUID id = UUID.randomUUID();
-	
-	private final Set<String> participants = new HashSet<>();
+	private final List<String> participants;
 	private final TimeLatchHandler timeLatch;
-	private volatile CountDownHandler successor;
 	
-	public CountDownHandler(HandlerRegistry registry) {
-		this.listener = new RegistrationListener(registry);
-		this.timeLatch = new TimeLatchHandlerImp(10000, 1000);
+	public CountDownHandler(List<String> participants, int duration, int interval) {
+		this.participants = new ArrayList<>(participants);
+		this.timeLatch = new TimeLatchHandlerImp(duration, interval);
 	}
 	
 	@Override
-	public void handle(HttpServletRequest request, HttpServletResponse response)
+	public final void handle(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		handle(new JsonHandlerContext(request, response));
 	}
 	
 	@Override
 	public void handle(HandlerContext context) throws ServletException, IOException {
-		if (successor == null) {
-			successor = new CountDownHandler(listener.getRegistry());
-			listener.putIfAbsent(successor.getId(), successor);
-		}
-		
-		String participant = context.getRequest().getSession().getId();
-		
-		if (participants.size() == 1) {
-			timeLatch.launch();
-		}
-		
-		if (participants.size() < 1 || !participants.contains(participant)) {
-			timeLatch.resetClock();
-		}
-		
-		setHandler(context);
 		timeLatch.handle(context);
 		
+		String participant = context.getRequest().getSession().getId();
 		if (timeLatch.isExpired()) {
+			RedirectUtil.setHandler(context, id, getSuccessor());
 			participants.remove(participant);
-			if (participants.isEmpty()) {
-				listener.remove(this);
-			}
+			onExpire();
+		} else {
+			RedirectUtil.setHandler(context, id, null);
 		}
+		
+		context.writeResponse();
 	}
-	
-	private void setHandler(HandlerContext context) {
-		JsonValue currentId = Json.createArrayBuilder().add(getId().toString()).build().get(0);
-		JsonValue redirectId = Json.createArrayBuilder().add(successor.getId().toString()).build().get(0);
-		context.setResponseParameter("handler", currentId);
-		context.setResponseParameter("redirect", redirectId);
+
+	protected abstract RequestHandler getSuccessor();
+
+	protected void onExpire() {
+		//do nothing by default
 	}
-	
-	boolean contains(String id) {
+
+	public final boolean contains(String id) {
 		return participants.contains(id);
 	}
 	
-	boolean register(String id) {
-		return participants.add(id);
+	public final boolean closed() {
+		return timeLatch.isExpired();
+	}
+
+	public final void launch() {
+		timeLatch.launch();
 	}
 	
-	boolean closed() {
-		return timeLatch.isExpired();
+	public final void reset() {
+		timeLatch.resetClock();
+	}
+	
+	protected final List<String> getParticipants() {
+		return participants;
 	}
 	
 	@Override
@@ -90,3 +78,4 @@ public class CountDownHandler implements RequestHandler {
 		return id;
 	}
 }
+

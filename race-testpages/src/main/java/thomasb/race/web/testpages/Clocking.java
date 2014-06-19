@@ -27,6 +27,11 @@ public class Clocking extends HttpServlet {
 
 	private static final ClockedRequestProcessor<Void> REQUEST_PROCESSOR = new ClockedRequestProcessor<Void>() {
 			@Override
+			public JsonStructure initalData(HttpServletRequest request) {
+				return Json.createObjectBuilder().build();
+			}
+			
+			@Override
 			public Void preprocess(AsyncContext request, int requestTime)
 					throws IOException {
 				return null;
@@ -46,7 +51,7 @@ public class Clocking extends HttpServlet {
 	private ClockedRequestHandler clockedRequestHandler;
 	
 	public Clocking() {
-		clockedRequestHandler = new ClockedRequestHandlerImp(ImmutableSet.of("1", "2"), 1000, REQUEST_PROCESSOR);
+		clockedRequestHandler = new ClockedRequestHandlerImp(ImmutableSet.of("1", "2"), 700, 1000, REQUEST_PROCESSOR);
 	}
 	
 	public void doPost(HttpServletRequest request, HttpServletResponse response)

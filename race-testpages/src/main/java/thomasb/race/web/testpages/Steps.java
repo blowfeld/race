@@ -106,13 +106,18 @@ public class Steps extends HttpServlet {
 			
 			private int getY(JsonObject position) {
 				return position.getJsonNumber("y").intValue();
+			}
+
+			@Override
+			public JsonStructure initalData(HttpServletRequest request) {
+				return Json.createObjectBuilder().build();
 			};
 		};
 	
 	private ClockedRequestHandler clockedRequestHandler;
 	
 	public Steps() {
-		clockedRequestHandler = new ClockedRequestHandlerImp(ImmutableSet.of("1", "2"), 1000, REQUEST_PROCESSOR);
+		clockedRequestHandler = new ClockedRequestHandlerImp(ImmutableSet.of("1", "2"), 700, 1000, REQUEST_PROCESSOR);
 	}
 	
 	public void doPost(HttpServletRequest request,

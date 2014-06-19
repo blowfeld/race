@@ -2,7 +2,10 @@
 <html>
 
 <head>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/race.css">
+
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="js/latch/latches.js"></script>
 <script src="js/redirect.js"></script>
 <script type="text/javascript">
@@ -22,10 +25,15 @@
 <body>
 	<h1>Warm-up lap</h1>
 
-	Your opponents are joining the warm up lap!
+	<div class='message'>
+		Your opponents are joining the warm up lap!
+	</div>
 
-	<h2>Assemble on the grid in:</h2>
-	<div id='remaining'></div>seconds
+	<div class='display'>
+		<h2>Assemble on the grid in:</h2>
+		<div id='remaining'></div>
+		seconds
+	</div>
 
 </body>
 

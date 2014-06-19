@@ -6,8 +6,19 @@ import java.util.List;
 import javax.json.JsonStructure;
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 
 public interface ClockedRequestProcessor<T> {
+	
+	/**
+	 * Provides initial data to be submitted to the client.
+	 * <p>
+	 * This method may be called from different threads.
+	 * @param request 
+	 * 
+	 * @return data object with data from the preprocessing step
+	 */
+	JsonStructure initalData(HttpServletRequest request);
 	
 	/**
 	 * Preprocesses the request for the given time interval count and creates
@@ -21,11 +32,10 @@ public interface ClockedRequestProcessor<T> {
 	 * @return data object with data from the preprocessing step
 	 * 
 	 * @throws ServletException if an exception occurs that interferes
-     *					with the servlet's normal operation 
-     *
-     * @throws IOException if an input or output exception occurs
-     */
-
+	 *					with the servlet's normal operation 
+	 *
+	 * @throws IOException if an input or output exception occurs
+	 */
 	T preprocess(AsyncContext request, int requestTime)
     		throws ServletException, IOException;
 	

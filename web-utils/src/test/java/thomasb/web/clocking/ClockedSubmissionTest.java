@@ -18,6 +18,7 @@ import javax.json.JsonArray;
 import javax.json.JsonStructure;
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.BeforeClass;
@@ -56,11 +57,11 @@ public class ClockedSubmissionTest {
 	
 	private void setupRequestsWithSchedule(int delay) throws IOException {
 		clockedSubmission = new ClockedSubmission<>(ImmutableSet.of("1", "2"), 50, DUMMY_PROCESSOR);
-		request_2_0 = new TestAsyncContext(2, "2");
-		request_2_1 = new TestAsyncContext(2, "2");
-		request_1_0 = new TestAsyncContext(clockedSubmission, 1, delay, request_2_0, "1");
+		request_2_0 = new TestAsyncContext(2, "0");
+		request_2_1 = new TestAsyncContext(2, "1");
+		request_1_0 = new TestAsyncContext(clockedSubmission, 1, delay, request_2_0, "0");
 		request_1_1 = new TestAsyncContext(clockedSubmission, 1, delay, request_2_1, "1");
-		request_0_0 = new TestAsyncContext(clockedSubmission, 0, delay, request_1_0, "1");
+		request_0_0 = new TestAsyncContext(clockedSubmission, 0, delay, request_1_0, "0");
 		request_0_1 = new TestAsyncContext(clockedSubmission, 0, delay, request_1_1, "1");
 	}
 	
@@ -214,6 +215,11 @@ public class ClockedSubmissionTest {
 	
 	private static ClockedRequestProcessor<?> createProcessorMock() {
 		return new ClockedRequestProcessor<Void>() {
+			@Override
+			public JsonStructure initalData(HttpServletRequest request) {
+				return Json.createObjectBuilder().build();
+			};
+			
 			@Override
 			public Void preprocess(AsyncContext request, int requestTime)
 					throws IOException {
