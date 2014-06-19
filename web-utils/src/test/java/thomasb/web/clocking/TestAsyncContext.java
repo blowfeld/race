@@ -3,6 +3,7 @@ package thomasb.web.clocking;
 import static java.lang.Thread.sleep;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,6 +16,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 class TestAsyncContext implements AsyncContext {
 	private long invocationTime;
@@ -23,20 +25,23 @@ class TestAsyncContext implements AsyncContext {
 	private final int intervalCount;
 	private final int delay;
 	private final HttpServletResponse response;
+	private final String sessionId;
 	
 	TestAsyncContext(ClockedSubmission<?> clockedSubmission,
 			int intervalCount,
 			int delay,
-			AsyncContext followUpRequest) throws IOException {
+			AsyncContext followUpRequest,
+			String sessionId) throws IOException {
 		this.clockedSubmission = clockedSubmission;
 		this.intervalCount = intervalCount;
 		this.delay = delay;
 		this.followUpRequest = followUpRequest;
+		this.sessionId = sessionId;
 		this.response = createResponseMock();
 	}
 	
-	TestAsyncContext(int intervalCount) throws IOException {
-		this(null, intervalCount, 0, null);
+	TestAsyncContext(int intervalCount, String sessionId) throws IOException {
+		this(null, intervalCount, 0, null, sessionId);
 	}
 
 	@Override
@@ -58,9 +63,13 @@ class TestAsyncContext implements AsyncContext {
 
 	@Override
 	public ServletRequest getRequest() {
+		HttpSession sessionMock = mock(HttpSession.class);
+		when(sessionMock.getId()).thenReturn(sessionId);
+		
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		doReturn(String.valueOf(intervalCount))
 				.when(request).getParameter(ClockedRequestHandlerImp.TIME_PARAMETER);
+		doReturn(sessionMock).when(request).getSession();
 		
 		return request;
 	}

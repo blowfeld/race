@@ -19,6 +19,8 @@ import thomasb.web.clocking.ClockedRequestHandler;
 import thomasb.web.clocking.ClockedRequestHandlerImp;
 import thomasb.web.clocking.ClockedRequestProcessor;
 
+import com.google.common.collect.ImmutableSet;
+
 @SuppressWarnings("serial")
 public class Clocking extends HttpServlet {
 	private static final JsonArray EMPTY_ARRAY = Json.createArrayBuilder().build();
@@ -44,7 +46,7 @@ public class Clocking extends HttpServlet {
 	private ClockedRequestHandler clockedRequestHandler;
 	
 	public Clocking() {
-		clockedRequestHandler = new ClockedRequestHandlerImp(2, 1000, REQUEST_PROCESSOR);
+		clockedRequestHandler = new ClockedRequestHandlerImp(ImmutableSet.of("1", "2"), 1000, REQUEST_PROCESSOR);
 	}
 	
 	public void doPost(HttpServletRequest request, HttpServletResponse response)

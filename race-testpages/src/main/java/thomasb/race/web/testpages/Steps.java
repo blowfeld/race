@@ -24,6 +24,8 @@ import thomasb.web.clocking.ClockedRequestHandler;
 import thomasb.web.clocking.ClockedRequestHandlerImp;
 import thomasb.web.clocking.ClockedRequestProcessor;
 
+import com.google.common.collect.ImmutableSet;
+
 @SuppressWarnings("serial")
 public class Steps extends HttpServlet {
 	private static final ClockedRequestProcessor<JsonObject> REQUEST_PROCESSOR = new ClockedRequestProcessor<JsonObject>() {
@@ -110,7 +112,7 @@ public class Steps extends HttpServlet {
 	private ClockedRequestHandler clockedRequestHandler;
 	
 	public Steps() {
-		clockedRequestHandler = new ClockedRequestHandlerImp(2, 1000, REQUEST_PROCESSOR);
+		clockedRequestHandler = new ClockedRequestHandlerImp(ImmutableSet.of("1", "2"), 1000, REQUEST_PROCESSOR);
 	}
 	
 	public void doPost(HttpServletRequest request,

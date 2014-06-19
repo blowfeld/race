@@ -5,6 +5,7 @@ import static com.google.common.collect.Lists.transform;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.List;
 
 import javax.json.Json;
@@ -27,15 +28,18 @@ final class RequestCollection<T> {
 	
 	private final List<ClockedRequest<T>> requests = newArrayList();
 	private final ClockedRequestProcessor<T> requestProcessor;
-	private final int participants;
+	private final Collection<String> participants;
 	
-	RequestCollection(ClockedRequestProcessor<T> requestProcessor,
-			int participants) {
+	RequestCollection(ClockedRequestProcessor<T> requestProcessor, Collection<String> participants) {
 		this.requestProcessor = requestProcessor;
 		this.participants = participants;
 	}
 	
 	boolean add(ClockedRequest<T> request, int currentTime) throws IOException, ServletException {
+		if (!participants.contains(request.getRequest().getSession().getId())) {
+			throw new UnknownParticipantException(request.getRequest().getSession().getId());
+		}
+		
 		if (currentTime > request.getTime()) {
 			DISPATCHER.submit(timeout(request).getContext());
 			return false;
@@ -43,7 +47,7 @@ final class RequestCollection<T> {
 		
 		requests.add(request);
 		
-		return requests.size() == participants;
+		return requests.size() == participants.size();
 	}
 	
 	void submit() {
@@ -84,5 +88,16 @@ final class RequestCollection<T> {
 		responseObject.add(ClockedRequest.TIME_PARAMETER, request.getTime());
 		responseObject.add(ClockedRequest.DATA_PARAMETER, data);
 		responseWriter.write(responseObject.build().toString());
+	}
+	
+	/**
+	 * Indicate that a request is received from an unregistered session id.
+	 */
+	public static class UnknownParticipantException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+		
+		public UnknownParticipantException(String id) {
+			super("Id " + id + " is not registered.");
+		}
 	}
 }

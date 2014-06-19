@@ -1,6 +1,7 @@
 package thomasb.web.clocking;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
@@ -31,11 +32,11 @@ public final class ClockedRequestHandlerImp implements ClockedRequestHandler {
 	private final CountDownLatch startLatch;
 	private boolean init = true;
 	
-	public ClockedRequestHandlerImp(int participants,
+	public ClockedRequestHandlerImp(Collection<String> participants,
 			int interval,
 			ClockedRequestProcessor<?> requestProcessor) {
 		this.clockedSubmission = new ClockedSubmission<>(participants, interval, requestProcessor);
-		this.startLatch = new CountDownLatch(participants);
+		this.startLatch = new CountDownLatch(participants.size());
 		this.clockedSubmission.init();
 	}
 	

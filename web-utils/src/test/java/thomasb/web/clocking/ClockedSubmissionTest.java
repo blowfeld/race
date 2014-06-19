@@ -24,6 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 //TODO Rewrite this unit test, as the timings are not really deterministic
@@ -43,10 +44,10 @@ public class ClockedSubmissionTest {
 	// Thus some tests fail if executed individually.
 	@BeforeClass
 	public static void initThread() throws InterruptedException, IOException, ServletException {
-		ClockedSubmission<?> submissionThread = new ClockedSubmission<>(2, 50, DUMMY_PROCESSOR);
+		ClockedSubmission<?> submissionThread = new ClockedSubmission<>(ImmutableSet.of("1", "2"), 50, DUMMY_PROCESSOR);
 		submissionThread.init();
 		submissionThread.launch();
-		submissionThread.addRequest(new TestAsyncContext(0));
+		submissionThread.addRequest(new TestAsyncContext(0, "1"));
 		
 		sleep(10);
 		
@@ -54,13 +55,13 @@ public class ClockedSubmissionTest {
 	}
 	
 	private void setupRequestsWithSchedule(int delay) throws IOException {
-		clockedSubmission = new ClockedSubmission<>(2, 50, DUMMY_PROCESSOR);
-		request_2_0 = new TestAsyncContext(2);
-		request_2_1 = new TestAsyncContext(2);
-		request_1_0 = new TestAsyncContext(clockedSubmission, 1, delay, request_2_0);
-		request_1_1 = new TestAsyncContext(clockedSubmission, 1, delay, request_2_1);
-		request_0_0 = new TestAsyncContext(clockedSubmission, 0, delay, request_1_0);
-		request_0_1 = new TestAsyncContext(clockedSubmission, 0, delay, request_1_1);
+		clockedSubmission = new ClockedSubmission<>(ImmutableSet.of("1", "2"), 50, DUMMY_PROCESSOR);
+		request_2_0 = new TestAsyncContext(2, "2");
+		request_2_1 = new TestAsyncContext(2, "2");
+		request_1_0 = new TestAsyncContext(clockedSubmission, 1, delay, request_2_0, "1");
+		request_1_1 = new TestAsyncContext(clockedSubmission, 1, delay, request_2_1, "1");
+		request_0_0 = new TestAsyncContext(clockedSubmission, 0, delay, request_1_0, "1");
+		request_0_1 = new TestAsyncContext(clockedSubmission, 0, delay, request_1_1, "1");
 	}
 	
 	@Test

@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -19,7 +20,7 @@ final class ClockedSubmission<T> {
 	@GuardedBy("submissionExecutor")
 	private volatile ClockedExecutorThread submissionExecutor;
 	
-	ClockedSubmission(int participants,
+	ClockedSubmission(Collection<String> participants,
 			int submissionInterval,
 			ClockedRequestProcessor<T> requestProcessor) {
 		this.submissionInterval = submissionInterval;

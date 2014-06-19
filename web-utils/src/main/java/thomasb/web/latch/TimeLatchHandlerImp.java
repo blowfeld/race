@@ -31,6 +31,7 @@ public final class TimeLatchHandlerImp implements TimeLatchHandler {
 	
 	private final ClockedExecutorThread clock;
 	private final int resolution;
+	private final int duration;
 
 	private volatile int count;
 	private volatile boolean isExpired = false;
@@ -41,8 +42,9 @@ public final class TimeLatchHandlerImp implements TimeLatchHandler {
 	
 	public TimeLatchHandlerImp(int time, int resolution) {
 		this.resolution = resolution;
-		this.count = time / resolution;
+		this.duration = time / resolution;
 		this.clock = new ClockedExecutorThread(resolution, VOID_ACTION);
+		this.count = this.duration;
 		clock.start();
 	}
 	
@@ -51,7 +53,7 @@ public final class TimeLatchHandlerImp implements TimeLatchHandler {
 	}
 	
 	public void resetClock() {
-		count += clock.getIntervalCount();
+		count = clock.getIntervalCount() + duration;
 	}
 	
 	@Override
@@ -71,8 +73,6 @@ public final class TimeLatchHandlerImp implements TimeLatchHandler {
 		} else {
 			respondWithRemainingTime(context);
 		}
-		
-		context.writeResponse();
 	}
 	
 	private void respondWithExpired(HandlerContext context) throws IOException {
