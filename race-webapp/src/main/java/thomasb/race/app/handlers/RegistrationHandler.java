@@ -39,11 +39,15 @@ public class RegistrationHandler extends CountDownHandler {
 	}
 
 	private synchronized void register(String sessionId) {
+		if (getParticipants().contains(sessionId)) {
+			return;
+		}
+		
 		boolean added = getParticipants().add(sessionId);
 		if (added && getParticipants().size() == 2) {
 			launch();
 		}
-
+		
 		if (added && getParticipants().size() > 1) {
 			reset();
 		}
