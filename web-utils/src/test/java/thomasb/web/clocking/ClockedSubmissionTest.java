@@ -56,7 +56,7 @@ public class ClockedSubmissionTest {
 	}
 	
 	private void setupRequestsWithSchedule(int delay) throws IOException {
-		clockedSubmission = new ClockedSubmission<>(ImmutableSet.of("1", "2"), 50, DUMMY_PROCESSOR);
+		clockedSubmission = new ClockedSubmission<>(ImmutableSet.of("0", "1"), 50, DUMMY_PROCESSOR);
 		request_2_0 = new TestAsyncContext(2, "0");
 		request_2_1 = new TestAsyncContext(2, "1");
 		request_1_0 = new TestAsyncContext(clockedSubmission, 1, delay, request_2_0, "0");
@@ -217,7 +217,7 @@ public class ClockedSubmissionTest {
 		return new ClockedRequestProcessor<Void>() {
 			@Override
 			public JsonStructure initalData(HttpServletRequest request) {
-				return Json.createObjectBuilder().build();
+				return null;//Json.createObjectBuilder().build();
 			};
 			
 			@Override
@@ -227,7 +227,7 @@ public class ClockedSubmissionTest {
 			}
 			
 			@Override
-			public JsonStructure timeoutResponse(AsyncContext request, int requestTime) {
+			public JsonStructure timeoutResponse(AsyncContext request, int requestTime, int currentTime) {
 				HttpServletResponse response = (HttpServletResponse) request.getResponse();
 				response.setStatus(408);
 				

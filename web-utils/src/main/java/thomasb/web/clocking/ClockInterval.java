@@ -9,7 +9,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-final class ClockInterval {
+final class ClockInterval implements ClockedExecutor.Interval {
 	private final int count;
 	private final int duration;
 	private final CountDownLatch latch;
@@ -33,20 +33,21 @@ final class ClockInterval {
 		this.termination = executor.schedule(new TerminationTask(latch), duration, TimeUnit.MILLISECONDS);
 	}
 
-	void await() throws InterruptedException {
+	public void await() throws InterruptedException {
 		latch.await();
 	}
 	
-	void finish() {
+	@Override
+	public void finish() {
 		termination.cancel(false);
 		latch.countDown();
 	}
 	
-	ClockInterval next() {
+	public ClockInterval next() {
 		return new ClockInterval(count + 1, duration, executor);
 	}
 	
-	int getCount() {
+	public int getCount() {
 		return count;
 	}
 	

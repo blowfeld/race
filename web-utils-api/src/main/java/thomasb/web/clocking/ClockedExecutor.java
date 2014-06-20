@@ -6,10 +6,16 @@ public interface ClockedExecutor extends Runnable {
 	
 	void finish();
 	
-	void step();
-	
 	@Override
 	void run();
 	
+	Interval getCurrentInterval();
+	
 	int getIntervalCount();
+	
+	interface Interval {
+
+		void finish();
+	
+	}
 }

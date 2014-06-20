@@ -37,7 +37,7 @@ public final class ClockedRequestHandlerImp implements ClockedRequestHandler {
 	private final int interval;
 	private final int timeout;
 	
-	private boolean init = true;
+	private volatile boolean init = true;
 
 	
 	public ClockedRequestHandlerImp(Collection<String> participants,
@@ -48,7 +48,7 @@ public final class ClockedRequestHandlerImp implements ClockedRequestHandler {
 		this.timeout = timeout;
 		this.requestProcessor = requestProcessor;
 		
-		this.clockedSubmission = new ClockedSubmission<>(participants, interval, requestProcessor);
+		this.clockedSubmission = new ClockedSubmission<>(participants, interval + timeout, requestProcessor);
 		this.startLatch = new CountDownLatch(participants.size());
 		this.clockedSubmission.init();
 	}
@@ -68,13 +68,14 @@ public final class ClockedRequestHandlerImp implements ClockedRequestHandler {
 			} catch (InterruptedException e) {
 				return;
 			}
-			writeInitialData(request, response);
 			init = false;
+			clockedSubmission.launch();
+
+			writeInitialData(request, response);
 			
 			return;
 		}
 		
-		System.err.println("Started: " + request.getSession().getId());
 		AsyncContext async = request.startAsync(request, response);
 		clockedSubmission.addRequest(async);
 	}
@@ -82,7 +83,6 @@ public final class ClockedRequestHandlerImp implements ClockedRequestHandler {
 	private void awaitParticipants() throws InterruptedException {
 		startLatch.countDown();
 		startLatch.await();
-		clockedSubmission.launch();
 	}
 	
 	private void writeInitialData(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -91,7 +91,8 @@ public final class ClockedRequestHandlerImp implements ClockedRequestHandler {
 				.write("interval", interval)
 				.write("timeout", timeout)
 				.write("data", requestProcessor.initalData(request))
-			.writeEnd();
+			.writeEnd()
+		.close();
 	}
 	
 	@Override

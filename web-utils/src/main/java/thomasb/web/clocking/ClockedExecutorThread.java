@@ -1,6 +1,7 @@
 package thomasb.web.clocking;
 
 import java.util.concurrent.CountDownLatch;
+import thomasb.web.clocking.ClockInterval;
 
 public final class ClockedExecutorThread extends Thread implements ClockedExecutor {
 	private final Runnable action;
@@ -23,8 +24,8 @@ public final class ClockedExecutorThread extends Thread implements ClockedExecut
 		stop = true;
 	}
 	
-	public void step() {
-		clockInterval.finish();
+	public ClockInterval getCurrentInterval() {
+		return clockInterval;
 	}
 	
 	@Override

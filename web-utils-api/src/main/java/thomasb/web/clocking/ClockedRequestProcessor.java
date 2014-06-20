@@ -43,6 +43,7 @@ public interface ClockedRequestProcessor<T> {
 	 * Processes the response in case it is not received in time.
 	 * @param request the client request to be processed
 	 * @param requestTime the time interval count the request was intended for
+	 * @param currentTime the time interval count the request arrived
 	 * 
 	 * @return data object with data from the preprocessing step
 	 * 
@@ -51,7 +52,7 @@ public interface ClockedRequestProcessor<T> {
 	 *
 	 * @throws IOException if an input or output exception occurs
 	 */
-	JsonStructure timeoutResponse(AsyncContext request, int requestTime)
+	JsonStructure timeoutResponse(AsyncContext request, int requestTime, int currentTime)
 			throws ServletException, IOException;
 	
 	/**

@@ -48,7 +48,7 @@ final class ClockedSubmission<T> {
 	void addRequest(AsyncContext context) throws IOException, ServletException {
 		ClockedRequest<T> request = new ClockedRequest<>(context);
 		checkArgument(submissionExecutor.getIntervalCount() >= request.getTime(), "Request with illegal timing was received: expected %s, was %s", submissionExecutor.getIntervalCount(), request.getTime());
-
+		
 		ClockedRequest<T> preprocessed = preprocess(request);
 		
 		synchronized(submissionExecutor) {
@@ -67,10 +67,11 @@ final class ClockedSubmission<T> {
 	}
 	
 	private void scheduleRequest(ClockedRequest<T> request) throws ServletException, IOException {
+		ClockInterval currentInterval = submissionExecutor.getCurrentInterval();
+		System.err.println("T: " + submissionExecutor.getIntervalCount());
 		boolean submit = requests.add(request, submissionExecutor.getIntervalCount());
-		
 		if (submit) {
-			submissionExecutor.step();
+			currentInterval.finish();
 		}
 	}
 	

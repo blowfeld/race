@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableSet;
 
 final class RequestCollection<T> {
 	private static final Dispatcher DISPATCHER = new Dispatcher();
@@ -32,7 +33,7 @@ final class RequestCollection<T> {
 	
 	RequestCollection(ClockedRequestProcessor<T> requestProcessor, Collection<String> participants) {
 		this.requestProcessor = requestProcessor;
-		this.participants = participants;
+		this.participants = ImmutableSet.copyOf(participants);
 	}
 	
 	boolean add(ClockedRequest<T> request, int currentTime) throws IOException, ServletException {
@@ -41,7 +42,7 @@ final class RequestCollection<T> {
 		}
 		
 		if (currentTime > request.getTime()) {
-			DISPATCHER.submit(timeout(request).getContext());
+			DISPATCHER.submit(timeout(request, currentTime).getContext());
 			return false;
 		}
 		
@@ -56,12 +57,12 @@ final class RequestCollection<T> {
 		requests.clear();
 	}
 	
-	private ClockedRequest<T> timeout(ClockedRequest<T> request)
+	private ClockedRequest<T> timeout(ClockedRequest<T> request, int currentTime)
 			throws ServletException, IOException {
 		AsyncContext context = request.getContext();
 		int requestTime = request.getTime();
 		
-		JsonStructure timeoutData = requestProcessor.timeoutResponse(context, requestTime);
+		JsonStructure timeoutData = requestProcessor.timeoutResponse(context, requestTime, currentTime);
 		writeResponse(request, timeoutData);
 		
 		return request;
