@@ -19,7 +19,7 @@ public class RaceHandler implements RequestHandler {
 	
 	public RaceHandler(List<String> participants, ScoreHandler scoreHandler) {
 		StepProcessor stepProcessor = new StepProcessor(participants, scoreHandler);
-		clockedRequestHandler = new ClockedRequestHandlerImp(participants, 700, 1000, stepProcessor);
+		clockedRequestHandler = new ClockedRequestHandlerImp(participants, 200, 100, stepProcessor);
 	}
 
 	@Override

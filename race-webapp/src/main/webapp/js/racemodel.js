@@ -31,7 +31,7 @@ race.model = function() {
 		
 		var addParticipant = function(id, eventProcessor) {
 			var eventQueue = CE.eventQueue(eventProcessor);
-			participants[id] = add(id, eventQueue);
+			add(id, eventQueue);
 		};
 		
 		var add = function(id, eventQueue) {
@@ -40,7 +40,7 @@ race.model = function() {
 			player.start();
 		};
 		
-		var schedule = function(eventData) {
+		var schedule = function(events) {
 			for (var i = 0; i < events.length; i++) {
 				var event = events[i];
 				participants[event.id].schedule(event);

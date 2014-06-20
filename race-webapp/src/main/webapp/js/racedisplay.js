@@ -17,20 +17,26 @@ race.display = function() {
 	
 	var display = function(parent) {
 		var add = function(id) {
-			$(parent).add('<div id="#player_' + id + '"><dl><dt>id</dt><dd id="id"></dd><dt>position</dt><dd id="pos"></dd><dt>count</dt><dd id="count"></dd><dt>duration</dt><dd id="duration"></dd></dl></div>');
+			$(parent).append('<div id="player_' + id + '"><dl><dt>id</dt><dd class="id"></dd><dt>position</dt><dd class="pos"></dd><dt>count</dt><dd class="count"></dd><dt>duration</dt><dd class="duration"></dd></dl></div>');
 		};
 		
 		var show = function(event) {
-			var displayId = parent + '.#player_' + event.id;
-			$(displayId + ' #id').text(event.id);
+//			console.log(event);
+			var displayId = '#player_' + event.id;
+			$(displayId + ' .id').text(event.id);
 			var posString = JSON.stringify([event.pos.x, event.pos.y]);
-			$(displayId + ' #pos').text(posString);
-			$(displayId + ' #count').text(event.count);
-			$(displayId + ' #duration').text(event.getDuration());
+			$(displayId + ' .pos').text(posString);
+			$(displayId + ' .count').text(event.count);
+			$(displayId + ' .duration').text(event.getDuration());
 		};
 		
+		var blink = function(id, duration) {
+			var displayId = '#player_' + event.id;
+			$(displayId + ' .id').effect("pulsate", {}, duration);
+		}
+		
 		return {
-			draw : draw,
+			add : add,
 			show : show
 		}
 	};

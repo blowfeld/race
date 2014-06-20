@@ -7,6 +7,7 @@ import java.io.StringReader;
 import java.util.List;
 
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
@@ -23,6 +24,7 @@ import thomasb.web.clocking.ClockedRequestProcessor;
 
 public class StepProcessor implements ClockedRequestProcessor<JsonObject> {
 	private static final String REDIRECT_PARAMETER = "redirect";
+	private static final String SERVER_TIME = "serverTime";
 	private static final String EVENT_DATA_PARAMETER = "eventData";
 	private static final String DATA_PARAMETER = "data";
 	private static final String ID_PARAMETER = "id";
@@ -30,7 +32,7 @@ public class StepProcessor implements ClockedRequestProcessor<JsonObject> {
 	private static final String CONTROL_PARAMETER = "command";
 	
 	private final ScoreHandler scoreHandler;
-	private final JsonStructure initialData;
+	private final JsonArray jsonParticipants;
 	
 	public StepProcessor(List<String> participants, ScoreHandler scoreHandler) {
 		this.scoreHandler = scoreHandler;
@@ -40,14 +42,15 @@ public class StepProcessor implements ClockedRequestProcessor<JsonObject> {
 			participantArray.add(participant);
 		}
 		
-		this.initialData = Json.createObjectBuilder()
-				.add("participants", participantArray)
-			.build();
+		this.jsonParticipants = participantArray.build();
 	}
 	
 	@Override
 	public JsonStructure initalData(HttpServletRequest request) {
-		return initialData;
+		return Json.createObjectBuilder()
+				.add("id", request.getSession().getId())
+				.add("participants", jsonParticipants)
+			.build();
 	}
 	
 	@Override
@@ -69,15 +72,18 @@ public class StepProcessor implements ClockedRequestProcessor<JsonObject> {
 	}
 	
 	@Override
-	public JsonStructure timeoutResponse(AsyncContext request, int requestTime)
+	public JsonStructure timeoutResponse(AsyncContext request, int requestTime, int currentTime)
 			throws ServletException, IOException {
-		return Json.createArrayBuilder().build();
+		System.err.println("timeout: " + ((HttpServletRequest)request.getRequest()).getSession().getId());
+		return Json.createObjectBuilder()
+				.add("SERVER_TIME", currentTime)
+			.build();
 	}
 	
 	@Override
 	public List<JsonStructure> process(List<ClockedRequest<JsonObject>> requests) {
 		JsonObjectBuilder responseBuilder = Json.createObjectBuilder();
-		if (!requests.isEmpty() && requests.get(0).getTime() > 10) {
+		if (!requests.isEmpty() && requests.get(0).getTime() > 100) {
 			responseBuilder.add(REDIRECT_PARAMETER, scoreHandler.getId().toString());
 		} else {
 			responseBuilder.add(REDIRECT_PARAMETER, JsonValue.NULL);

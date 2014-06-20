@@ -4,17 +4,12 @@
 <link rel="stylesheet" type="text/css" href="css/race.css">
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="js/latch/latches.js"></script>
-<script src="js/redirect.js"></script>
-<script type="text/javascript">
-	$(document).ready(function() {
-		var setDisplay = function(displayValue) {
-			$('#remaining').text(displayValue);
-		}
-		
-		redirectLatch('core', 'scores.html', setDisplay).run();
-	});
-</script>
+<script src="js/clocking/clocks.js"></script>
+<script src="js/clocking/events.js"></script>
+<script src="js/racedisplay.js"></script>
+<script src="js/racecontroll.js"></script>
+<script src="js/racemodel.js"></script>
+<script src="js/race.js"></script>
 
 <title>Race 2000</title>
 
@@ -23,7 +18,7 @@
 <body>
 
 	<h2>Race:</h2>
-	<div id='remaining'></div>seconds
+	<div id='race'></div>
 
 
 </body>

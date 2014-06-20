@@ -3,6 +3,7 @@ if(race === undefined) {
 }
 
 race.controll = function() {
+	var CE = clocking.events;
 	
 	var eventParser = function(time) {
 		return function(event) {
@@ -12,18 +13,19 @@ race.controll = function() {
 	};
 	
 	
-	var stepClockActions = function(raceModel, input, eventProcessor, redirect) {
+	var stepClockActions = function(raceModel, display, input, eventProcessor, redirect) {
 		var lastEvent = {id:id, pos:{x:0,y:0}};
 		var input = keyInput(id);
 		var interval;
 		var id;
 		
-		var init(initalData, interv, timeout) {
+		var init = function(initialData, interv, timeout) {
 			id = initialData.id;
 			
 			for (var i = 0; i < initialData.participants.length; i++) {
-				var id = initialData.participants[i];
-				raceModel.addParticipant(id, eventProcessor);
+				var participant = initialData.participants[i];
+				display.add(participant);
+				raceModel.addParticipant(participant, eventProcessor);
 			}
 			
 			interval= interv;
@@ -31,18 +33,29 @@ race.controll = function() {
 		
 		var onTick = function(data, count, intervalStart, intervalEnd) {
 			if (data.redirect) {
-				window.location = redirect + data.redirect;
+				window.location = redirect + '?' + data.redirect;
 				return;
 			}
 			
-			schedule(data.eventData);
+			if (data.eventData) {
+				schedule(data.eventData, count, intervalStart, intervalEnd);
+				return null;
+			}
+			
+			onTimeout();
+			
+			return data.serverTime;
 		}
 		
-		var schedule = function(eventData) {
+		var schedule = function(eventData, count, intervalStart, intervalEnd) {
 			var events = eventData.map(eventParser(count));
 			var rescheduleToClient = reschedule(count, intervalStart, intervalEnd);
 			var rescheduledEvents = events.map(rescheduleToClient);
 			raceModel.schedule(rescheduledEvents);
+			
+			var ownEvents = rescheduledEvents.filter(function(e) { return e.id === id; });
+			lastEvent = ownEvents.sort(function(e1, e2) { return e2.getEnd() - e1.getEnd(); })[0];
+			
 		};
 		
 		var reschedule = function(count, intervalStart, intervalEnd) {
@@ -53,7 +66,7 @@ race.controll = function() {
 		
 		var onTimeout = function() {
 			console.log("timeout");
-			//do nothing
+			display.blink(id, interval);
 		};
 		
 		var submissionData = function(count) {
@@ -68,6 +81,7 @@ race.controll = function() {
 		};
 		
 		return {
+			init : init,
 			onTick : onTick,
 			onTimeout : onTimeout,
 			submissionData : submissionData
@@ -96,11 +110,11 @@ race.controll = function() {
 			
 			if(isTracked(event.keyCode)) {
 				lastInput = event.keyCode;
+				event.preventDefault();
+				event.stopPropagation();
 			} else {
 				lastInput = 0;
 			}
-			event.preventDefault();
-			event.stopProgation();
 		});
 		
 		return {
