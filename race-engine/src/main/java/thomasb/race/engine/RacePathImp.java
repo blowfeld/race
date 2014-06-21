@@ -1,4 +1,4 @@
-package thomasb.race.engine.entities;
+package thomasb.race.engine;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Objects.hash;

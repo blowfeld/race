@@ -1,4 +1,4 @@
-package thomasb.race.engine.entities;
+package thomasb.race.engine;
 
 import static java.util.Objects.hash;
 import thomasb.race.engine.PathSegment;

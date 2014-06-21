@@ -9,10 +9,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import thomasb.race.engine.entities.ControlStateImp;
-import thomasb.race.engine.entities.PathSegmentImp;
-import thomasb.race.engine.entities.PointDoubleImp;
-import thomasb.race.engine.entities.RacePathImp;
+import thomasb.race.engine.ControlStateImp;
+import thomasb.race.engine.PathSegmentImp;
+import thomasb.race.engine.PointDoubleImp;
+import thomasb.race.engine.RacePathImp;
 
 import com.google.common.collect.ImmutableList;
 

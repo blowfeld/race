@@ -1,4 +1,4 @@
-package thomasb.race.engine.entities;
+package thomasb.race.engine;
 
 import thomasb.race.engine.Speed;
 
