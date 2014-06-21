@@ -6,6 +6,6 @@ public interface ControlState {
 	
 	int getSpeed();
 	
-	ControlState adjust(ControllEvent event);
+	ControlState adjust(ControlEvent event);
 	
 }

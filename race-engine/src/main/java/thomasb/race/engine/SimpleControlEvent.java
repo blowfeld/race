@@ -1,6 +1,6 @@
 package thomasb.race.engine;
 
-public enum SimpleControlEvent implements ControllEvent {
+public enum SimpleControlEvent implements ControlEvent {
 	LEFT(0, 1),
 	RIGHT(0, -1),
 	SPEED_UP(1, 0),

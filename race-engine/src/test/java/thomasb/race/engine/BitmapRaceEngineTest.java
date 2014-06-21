@@ -27,7 +27,7 @@ public class BitmapRaceEngineTest {
 	
 	@Test
 	public void pathStaysInPlaceIfNotMooving() {
-		ControlState currentState = Mocks.controllState(0, 90);
+		ControlState currentState = Mocks.controlState(0, 90);
 		PointDouble startPoint = new PointDoubleImp(1.0, 2.0);
 		
 		RacePath actualPath = engine.calculatePath(startPoint, currentState, 1);

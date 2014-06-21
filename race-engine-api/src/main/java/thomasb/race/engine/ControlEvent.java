@@ -1,6 +1,6 @@
 package thomasb.race.engine;
 
-public interface ControllEvent {
+public interface ControlEvent {
 	
 	int speedChange();
 	

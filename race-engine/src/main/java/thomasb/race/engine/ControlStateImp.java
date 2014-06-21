@@ -31,7 +31,7 @@ public final class ControlStateImp implements ControlState {
 	}
 	
 	@Override
-	public ControlState adjust(ControllEvent event) {
+	public ControlState adjust(ControlEvent event) {
 		int newSpeed = min(max(speed + event.speedChange(), SPEED_MIN), SPEED_MAX);
 		int steeringChange = event.steeringChange() % 360;
 		int newDirection = (360 + steering + steeringChange) % 360;
