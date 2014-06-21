@@ -37,7 +37,7 @@ public final class RacePathImp implements RacePath {
 			return true;
 		}
 		
-		if (obj instanceof RacePath) {
+		if (!(obj instanceof RacePath)) {
 			return false;
 		}
 		

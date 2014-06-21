@@ -1,8 +1,7 @@
 package thomasb.race.engine;
 
-import static java.lang.Double.doubleToLongBits;
+import static java.lang.Double.compare;
 import static java.util.Objects.hash;
-import thomasb.race.engine.PointDouble;
 
 public final class PointDoubleImp implements PointDouble {
 	private final double x;
@@ -34,13 +33,13 @@ public final class PointDoubleImp implements PointDouble {
 			return true;
 		}
 		
-		if (obj instanceof PointDouble) {
+		if (!(obj instanceof PointDouble)) {
 			return false;
 		}
 		
 		PointDouble other = (PointDouble) obj;
-		return doubleToLongBits(x) == doubleToLongBits(other.getX()) &&
-				doubleToLongBits(y) == doubleToLongBits(other.getX());
+		return (compare(x, other.getX()) == 0) &&
+				(compare(y, other.getY()) == 0);
 	}
 	
 	public String toString() {

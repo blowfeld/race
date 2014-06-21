@@ -36,7 +36,7 @@ public final class ControlStateImp implements ControlState {
 			return true;
 		}
 		
-		if (obj instanceof ControlState) {
+		if (!(obj instanceof ControlState)) {
 			return false;
 		}
 		

@@ -7,16 +7,14 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-
-import thomasb.race.engine.ControlStateImp;
-import thomasb.race.engine.PathSegmentImp;
-import thomasb.race.engine.PointDoubleImp;
-import thomasb.race.engine.RacePathImp;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.ImmutableList;
 
-public class RaceEngineTest {
+@RunWith(MockitoJUnitRunner.class)
+public class BitmapRaceEngineTest {
 	private RaceEngine engine;
 	
 	@Mock private Speed speed_0;
@@ -36,6 +34,11 @@ public class RaceEngineTest {
 		when(steer_left.getDegrees()).thenReturn(45);
 		when(steer_straight.getDegrees()).thenReturn(0);
 		when(steer_right.getDegrees()).thenReturn(-45);
+	}
+	
+	@Before
+	public void setupEngine() {
+		engine = new BitmapRaceEngine();
 	}
 	
 	@Test
