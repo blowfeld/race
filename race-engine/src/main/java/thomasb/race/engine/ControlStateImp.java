@@ -1,33 +1,47 @@
 package thomasb.race.engine;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.util.Objects.hash;
-import thomasb.race.engine.ControlState;
-import thomasb.race.engine.Speed;
-import thomasb.race.engine.Steering;
 
 public final class ControlStateImp implements ControlState {
-	private final Steering steering;
-	private final Speed speed;
+	private static final int SPEED_MIN = 0;
+	private static final int SPEED_MAX = 2;
 	
-	public ControlStateImp(Steering steering, Speed speed) {
-		this.steering = checkNotNull(steering);
-		this.speed = checkNotNull(speed);
+	private final int speed;
+	private final int steering;
+	
+	public ControlStateImp(int speed, int steering) {
+		checkArgument(0 <= speed && speed <= 2, "Speed must be in [0, 2]");
+		checkArgument(0 <= steering && steering < 360, "Speed must be in [0, 360)");
+		
+		this.speed = speed;
+		this.steering = steering;
 	}
 	
 	@Override
-	public Steering getSteering() {
-		return steering;
-	}
-	
-	@Override
-	public Speed getSpeed() {
+	public int getSpeed() {
 		return speed;
 	}
 	
 	@Override
+	public int getSteering() {
+		return steering;
+	}
+	
+	@Override
+	public ControlState adjust(ControllEvent event) {
+		int newSpeed = min(max(speed + event.speedChange(), SPEED_MIN), SPEED_MAX);
+		int steeringChange = event.steeringChange() % 360;
+		int newDirection = (360 + steering + steeringChange) % 360;
+		
+		return new ControlStateImp(newSpeed, newDirection);
+	}
+	
+	@Override
 	public int hashCode() {
-		return hash(speed.getSpeed(), steering.getDegrees());
+		return hash(speed, steering);
 	}
 
 	@Override
@@ -42,12 +56,8 @@ public final class ControlStateImp implements ControlState {
 		
 		ControlState other = (ControlState) obj;
 		
-		if (other.getSpeed() == null || other.getSteering() == null) {
-			return false;
-		}
-		
-		return speed.getSpeed() == other.getSpeed().getSpeed() &&
-				steering.getDegrees() == other.getSteering().getDegrees();
+		return speed == other.getSpeed() &&
+				steering == other.getSteering();
 	}
 	
 	@Override

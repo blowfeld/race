@@ -2,8 +2,10 @@ package thomasb.race.engine;
 
 public interface ControlState {
 	
-	Steering getSteering();
+	int getSteering();
 	
-	Speed getSpeed();
+	int getSpeed();
+	
+	ControlState adjust(ControllEvent event);
 	
 }

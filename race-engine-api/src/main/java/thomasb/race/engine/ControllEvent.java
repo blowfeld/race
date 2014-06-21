@@ -1,7 +1,9 @@
 package thomasb.race.engine;
 
-public enum ControllEvent {
+public interface ControllEvent {
 	
-	LEFT, RIGHT, SPEED_UP, SLOW_DOWN, VOID;
+	int speedChange();
+	
+	int steeringChange();
 	
 }

@@ -19,6 +19,7 @@ public class EqualsHashCodeTest {
 	@Parameters
 	public static Collection<Object[]> classes() {
 		return Arrays.asList(new Object[][] {
+				{ControlStateImp.class, true},
 				{PathSegmentImp.class, true},
 				{PointDoubleImp.class, true},
 				{RacePathImp.class, true}});
