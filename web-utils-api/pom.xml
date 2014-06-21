@@ -26,22 +26,6 @@
 			<artifactId>javax.json-api</artifactId>
 			<version>${project.json-api.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>${project.guava.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.jcip</groupId>
-			<artifactId>jcip-annotations</artifactId>
-			<version>${project.jcip-annotations.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish</groupId>
-			<artifactId>javax.json</artifactId>
-			<version>${project.json.version}</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 </project>
