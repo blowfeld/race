@@ -21,7 +21,7 @@ public class EqualsHashCodeTest {
 		return Arrays.asList(new Object[][] {
 				{ControlStateImp.class, true},
 				{PathSegmentImp.class, true},
-				{PointDoubleImp.class, true},
+				{VectorPoint.class, true},
 				{RacePathImp.class, true}});
 	}
 	
