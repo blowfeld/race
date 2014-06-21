@@ -76,7 +76,7 @@ public class StepProcessor implements ClockedRequestProcessor<JsonObject> {
 			throws ServletException, IOException {
 		System.err.println("timeout: " + ((HttpServletRequest)request.getRequest()).getSession().getId());
 		return Json.createObjectBuilder()
-				.add("SERVER_TIME", currentTime)
+				.add(SERVER_TIME, currentTime)
 			.build();
 	}
 	

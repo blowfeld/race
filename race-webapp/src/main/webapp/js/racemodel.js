@@ -47,10 +47,22 @@ race.model = function() {
 			}
 		};
 		
+		var participants = function() {
+			return participants.length;
+		};
+		
+		var findAbsent = function(presentIds) {
+			var ids = Object.keys(participants);
+			
+			return ids.filter(function(id) { return !(id in presentIds); });
+		};
+		
 		return {
 			addParticipant : addParticipant,
 			add : add,
-			schedule : schedule
+			schedule : schedule,
+			participants : participants,
+			findAbsent : findAbsent
 		};
 	}
 	

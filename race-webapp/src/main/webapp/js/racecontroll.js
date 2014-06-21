@@ -39,11 +39,12 @@ race.controll = function() {
 			
 			if (data.eventData) {
 				schedule(data.eventData, count, intervalStart, intervalEnd);
+				highlightTimeouts(data.eventData);
 				return null;
 			}
 			
 			onTimeout();
-			
+			console.log("server time " + data.serverTime);
 			return data.serverTime;
 		}
 		
@@ -63,6 +64,15 @@ race.controll = function() {
 				return CE.rescheduleToClient(timedEvent, count, intervalStart, intervalEnd);
 			};
 		};
+		
+		var highlightTimeouts = function(events) {
+			if (events.length === raceModel.participants()) {
+				return;
+			}
+			
+			var presentIds = events.map(function(e) { return e.id; });
+			raceModel.findAbsent(presentIds).forEach(display.blink);
+		}
 		
 		var onTimeout = function() {
 			console.log("timeout");

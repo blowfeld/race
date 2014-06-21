@@ -46,7 +46,8 @@ clocking.clocks = function() {
 				setTimeout(nextTick, interval);
 			};
 			
-			var onTimeout = function(response) {
+			var onTimeout = function() {
+				clockActions.onTimeout();
 				tick(count + 1);
 			};
 			
