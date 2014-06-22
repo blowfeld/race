@@ -1,10 +1,9 @@
 package thomasb.race.engine;
 
 import static java.lang.Math.sqrt;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-import static thomasb.race.engine.RacePathMatcher.isCloseTo;
+import static thomasb.race.engine.Matchers.isCloseTo;
 
 import java.util.List;
 
@@ -71,8 +70,11 @@ public class RaceEngineImpTest {
 		TrackSegment asphaltHor = new RaceTrackSegment(
 				point_0_0 , point_10_0, 2, false, false);
 		
+		TrackSegment wallHor = new RaceTrackSegment(
+				point_10_0 , point_10_0, 2, true, false);
+		
 		when(raceTrack.partitions(point_0_0, 90))
-			.thenReturn(ImmutableList.of(asphaltHor));
+			.thenReturn(ImmutableList.of(asphaltHor, wallHor));
 		
 		TrackSegment asphaltDiag = new RaceTrackSegment(
 				point_0_0 , point_2_2, 2, false, false);
@@ -135,10 +137,10 @@ public class RaceEngineImpTest {
 		
 		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 1.5, currentState);
 		
-		RacePathSegment expectedAsphaltSegment = 
+		RacePathSegment expectedAsphaltSegment =
 				new RacePathSegment(startPoint, point_0_1, 0.0, 0.5);
 		
-		RacePathSegment expectedGreenSegment = 
+		RacePathSegment expectedGreenSegment =
 				new RacePathSegment(point_0_1, point_0_2, 0.5, 1.5);
 
 		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE,
@@ -154,9 +156,27 @@ public class RaceEngineImpTest {
 		
 		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 2.0, currentState);
 		
-		RacePathSegment expectedEndSegment = 
+		RacePathSegment expectedEndSegment =
 				new RacePathSegment(point_0_2, point_0_3, 1.5, 2.0);
 		
-		assertEquals(actualPath.getSegments().get(2), expectedEndSegment);
+		assertThat(actualPath.getSegments().get(2), isCloseTo(expectedEndSegment, PRECISION));
+	}
+	
+	@Test
+	public void pathTerminatesAtWall() {
+		ControlState currentState = Mocks.controlState(2, 90);
+		PointDouble startPoint = point_0_0;
+		
+		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 10.0, currentState);
+		
+		RacePathSegment expectedAsphaltSegment =
+				new RacePathSegment(point_0_0, point_10_0, 0.0, 5.0);
+		RacePathSegment expectedWallSegment =
+				new RacePathSegment(point_10_0, point_10_0, 5.0, 10.0);
+		
+		RacePath expectedPath = new RacePathImp(PlayerStatus.TERMINATED,
+				ImmutableList.of(expectedAsphaltSegment, expectedWallSegment));
+		
+		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
 	}
 }

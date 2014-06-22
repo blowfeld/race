@@ -5,14 +5,24 @@ import static java.util.Objects.hash;
 public final class RacePathSegment extends AbstractSegment implements PathSegment {
 	private final double startTime;
 	private final double endTime;
+	private final PlayerStatus status;
 	
-	public RacePathSegment(PointDouble start,
+	RacePathSegment(PointDouble start,
 			PointDouble end,
 			double startTime,
 			double endTime) {
+		this(start, end, startTime, endTime, PlayerStatus.ACTIVE);
+	}
+	
+	RacePathSegment(PointDouble start,
+			PointDouble end,
+			double startTime,
+			double endTime,
+			PlayerStatus status) {
 		super(start, end);
 		this.startTime = startTime;
 		this.endTime = endTime;
+		this.status = status;
 	}
 	
 	@Override
@@ -23,6 +33,10 @@ public final class RacePathSegment extends AbstractSegment implements PathSegmen
 	@Override
 	public double getEndTime() {
 		return endTime;
+	}
+	
+	PlayerStatus getStatus() {
+		return status;
 	}
 	
 	@Override

@@ -6,10 +6,6 @@ import org.hamcrest.Description;
 class RacePathMatcher extends BaseMatcher<RacePath> {
 	private final RacePath expected;
 	private final double precision;
-
-	static RacePathMatcher isCloseTo(RacePath expected, double precision) {
-		return new RacePathMatcher(expected, precision);
-	}
 	
 	RacePathMatcher(RacePath expected, double precision) {
 		this.expected = expected;

@@ -7,10 +7,6 @@ class PathSegmentMatcher extends BaseMatcher<PathSegment> {
 	private final PathSegment expected;
 	private final double precision;
 
-	static PathSegmentMatcher isCloseTo(PathSegment expected, double precision) {
-		return new PathSegmentMatcher(expected, precision);
-	}
-	
 	PathSegmentMatcher(PathSegment expected, double precision) {
 		this.expected = expected;
 		this.precision = precision;

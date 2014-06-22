@@ -24,39 +24,48 @@ public class RaceEngineImp implements RaceEngine {
 		
 		List<TrackSegment> trackSegments = raceTrack.partitions(start, control.getSteering());
 		
-		List<PathSegment> pathSegments = calculatePathSegments(trackSegments,
+		List<RacePathSegment> pathSegments = calculatePathSegments(trackSegments,
 				control,
 				startTime,
 				startTime + duration);
 		
-		return new RacePathImp(ACTIVE, pathSegments);
+		PlayerStatus status = pathSegments.get(pathSegments.size() - 1).getStatus();
+		
+		return new RacePathImp(status, pathSegments);
 	}
 
-	private List<PathSegment> calculatePathSegments(List<TrackSegment> trackSegments,
+	private List<RacePathSegment> calculatePathSegments(List<TrackSegment> trackSegments,
 			ControlState control,
 			double startTime,
 			double endTime) {
 		double segmentStartTime = startTime;
 		
-		Builder<PathSegment> pathSegments = ImmutableList.builder();
+		Builder<RacePathSegment> pathSegments = ImmutableList.builder();
 		Iterator<TrackSegment> segmentItr = trackSegments.iterator();
 		while (segmentItr.hasNext() && segmentStartTime < endTime) {
 			RaceTrackSegment segment = RaceTrackSegment.from(segmentItr.next());
 			
-			PathSegment pathSegment = calculateNext(segment, control, segmentStartTime, endTime);
+			RacePathSegment pathSegment = calculatePathSegment(segment, control, segmentStartTime, endTime);
 			pathSegments.add(pathSegment);
+			
 			segmentStartTime = pathSegment.getEndTime();
-			
-			
 		}
 		
 		return pathSegments.build();
 	}
-
-	private PathSegment calculateNext(RaceTrackSegment segment,
+	
+	private RacePathSegment calculatePathSegment(RaceTrackSegment segment,
 			ControlState control,
 			double segmentStartTime,
 			double endTime) {
+		if (segment.isTerminating()) {
+			return new RacePathSegment(segment.getStart(),
+					segment.getEnd(),
+					segmentStartTime,
+					endTime,
+					PlayerStatus.TERMINATED);
+		}
+		
 		int speed = min(control.getSpeed(), segment.getMaxSpeed());
 		double maxDistance = speed * (endTime - segmentStartTime);
 		
