@@ -23,7 +23,7 @@ public class RaceEngineImp implements RaceEngine {
 			return zeroLengthPath(start, startTime, duration);
 		}
 		
-		List<TrackSegment> trackSegments = raceTrack.partitions(start, control.getSteering());
+		List<TrackSegment> trackSegments = raceTrack.segmentsFor(start, control.getSteering());
 		
 		pathCalc = new PathCalculator(trackSegments, control, startTime, startTime + duration);
 		pathCalc.calculate();

@@ -70,7 +70,7 @@ public class RaceEngineImpTest {
 		TrackSegment asphaltVert3 = new RaceTrackSegment(
 				point_0_3 , point_0_4, 2, false);
 		
-		when(raceTrack.partitions(point_0_0, 0))
+		when(raceTrack.segmentsFor(point_0_0, 0))
 			.thenReturn(ImmutableList.of(asphaltVert,
 					greenVert,
 					asphaltVert2,
@@ -82,13 +82,13 @@ public class RaceEngineImpTest {
 		TrackSegment wallHor = new RaceTrackSegment(
 				point_10_0 , point_10_0, 0, false);
 		
-		when(raceTrack.partitions(point_0_0, 90))
+		when(raceTrack.segmentsFor(point_0_0, 90))
 			.thenReturn(ImmutableList.of(asphaltHor, wallHor));
 		
 		TrackSegment asphaltDiag = new RaceTrackSegment(
 				point_0_0 , point_2_2, 2, false);
 		
-		when(raceTrack.partitions(point_0_0, 45))
+		when(raceTrack.segmentsFor(point_0_0, 45))
 			.thenReturn(ImmutableList.of(asphaltDiag));
 	}
 	
