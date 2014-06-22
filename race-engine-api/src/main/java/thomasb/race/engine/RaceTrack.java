@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface RaceTrack {
 	
-	List<TrackSegment> partitions(Segment segment);
+	List<TrackSegment> partitions(PointDouble startPoint, int direction);
 
 }

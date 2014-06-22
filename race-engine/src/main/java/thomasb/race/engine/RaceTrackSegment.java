@@ -1,5 +1,7 @@
 package thomasb.race.engine;
 
+import static java.lang.Math.sqrt;
+
 public final class RaceTrackSegment extends BaseSegment implements TrackSegment {
 	private final int maxSpeed;
 	private final boolean terminating;
@@ -16,6 +18,18 @@ public final class RaceTrackSegment extends BaseSegment implements TrackSegment 
 		this.finish = isFinish;
 	}
 
+	static RaceTrackSegment from(TrackSegment segment) {
+		if (segment instanceof RaceTrackSegment) {
+			return (RaceTrackSegment) segment;
+		}
+		
+		return new RaceTrackSegment(segment.getStart(),
+				segment.getEnd(),
+				segment.getMaxSpeed(),
+				segment.isTerminating(),
+				segment.isFinish());
+	}
+	
 	@Override
 	public int getMaxSpeed() {
 		return maxSpeed;
@@ -31,6 +45,12 @@ public final class RaceTrackSegment extends BaseSegment implements TrackSegment 
 	@Override
 	public boolean isTerminating() {
 		return terminating;
+	}
+	
+	double length() {
+		VectorPoint diff = VectorPoint.from(getEnd()).diff(getStart());
+		
+		return sqrt(diff.dot(diff));
 	}
 
 	@Override

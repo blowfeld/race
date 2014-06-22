@@ -16,7 +16,7 @@ public final class VectorPoint implements PointDouble {
 		this.y = y;
 	}
 	
-	static VectorPoint fromPoint(PointDouble point) {
+	static VectorPoint from(PointDouble point) {
 		return point instanceof VectorPoint ?
 			(VectorPoint) point :
 			new VectorPoint(point.getX(), point.getY());
