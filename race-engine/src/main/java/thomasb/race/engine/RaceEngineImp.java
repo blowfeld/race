@@ -58,7 +58,7 @@ public class RaceEngineImp implements RaceEngine {
 			ControlState control,
 			double segmentStartTime,
 			double endTime) {
-		if (segment.isTerminating()) {
+		if (segment.getMaxSpeed() == 0) {
 			return new RacePathSegment(segment.getStart(),
 					segment.getEnd(),
 					segmentStartTime,

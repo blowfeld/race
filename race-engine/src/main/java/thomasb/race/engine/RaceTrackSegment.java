@@ -5,17 +5,14 @@ import static java.util.Objects.hash;
 
 public final class RaceTrackSegment extends AbstractSegment implements TrackSegment {
 	private final int maxSpeed;
-	private final boolean terminating;
 	private final boolean finish;
 
 	public RaceTrackSegment(PointDouble start,
 			PointDouble end,
 			int maxSpeed,
-			boolean isTerminating,
 			boolean isFinish) {
 		super(start, end);
 		this.maxSpeed = maxSpeed;
-		this.terminating = isTerminating;
 		this.finish = isFinish;
 	}
 
@@ -27,7 +24,6 @@ public final class RaceTrackSegment extends AbstractSegment implements TrackSegm
 		return new RaceTrackSegment(segment.getStart(),
 				segment.getEnd(),
 				segment.getMaxSpeed(),
-				segment.isTerminating(),
 				segment.isFinish());
 	}
 	
@@ -41,12 +37,6 @@ public final class RaceTrackSegment extends AbstractSegment implements TrackSegm
 	public boolean isFinish() {
 		return finish;
 	}
-
-	
-	@Override
-	public boolean isTerminating() {
-		return terminating;
-	}
 	
 	double length() {
 		VectorPoint diff = VectorPoint.from(getEnd()).diff(getStart());
@@ -56,7 +46,7 @@ public final class RaceTrackSegment extends AbstractSegment implements TrackSegm
 	
 	@Override
 	public final int hashCode() {
-		return hash(getStart(), getEnd(), maxSpeed, finish, terminating);
+		return hash(getStart(), getEnd(), maxSpeed, finish);
 	}
 	
 	@Override
@@ -74,15 +64,13 @@ public final class RaceTrackSegment extends AbstractSegment implements TrackSegm
 		return getStart().equals(other.getStart()) &&
 				getEnd().equals(other.getEnd()) &&
 				maxSpeed == other.getMaxSpeed() &&
-				finish == other.isFinish() &&
-				terminating == other.isTerminating();
+				finish == other.isFinish();
 	}
 
 
 	@Override
 	public String toString() {
 		return "RaceTrackSegment [maxSpeed=" + maxSpeed +
-				", terminating=" + terminating +
 				", finish=" + finish +
 				", start=" + getStart() +
 				", end=" + getEnd() + "]";

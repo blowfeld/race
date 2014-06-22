@@ -10,6 +10,4 @@ public interface TrackSegment {
 	
 	boolean isFinish();
 	
-	boolean isTerminating();
-	
 }

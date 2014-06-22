@@ -56,28 +56,28 @@ public class RaceEngineImpTest {
 	@Before
 	public void setupTrack() {
 		TrackSegment asphaltVert = new RaceTrackSegment(
-				point_0_0 , point_0_1, 2, false, false);
+				point_0_0 , point_0_1, 2, false);
 		
 		TrackSegment greenVert = new RaceTrackSegment(
-				point_0_1 , point_0_2, 1, false, false);
+				point_0_1 , point_0_2, 1, false);
 		
 		TrackSegment asphaltVert2 = new RaceTrackSegment(
-				point_0_2 , point_0_3, 2, false, true);
+				point_0_2 , point_0_3, 2, true);
 		
 		when(raceTrack.partitions(point_0_0, 0))
 			.thenReturn(ImmutableList.of(asphaltVert, greenVert, asphaltVert2));
 		
 		TrackSegment asphaltHor = new RaceTrackSegment(
-				point_0_0 , point_10_0, 2, false, false);
+				point_0_0 , point_10_0, 2, false);
 		
 		TrackSegment wallHor = new RaceTrackSegment(
-				point_10_0 , point_10_0, 2, true, false);
+				point_10_0 , point_10_0, 0, false);
 		
 		when(raceTrack.partitions(point_0_0, 90))
 			.thenReturn(ImmutableList.of(asphaltHor, wallHor));
 		
 		TrackSegment asphaltDiag = new RaceTrackSegment(
-				point_0_0 , point_2_2, 2, false, false);
+				point_0_0 , point_2_2, 2, false);
 		
 		when(raceTrack.partitions(point_0_0, 45))
 			.thenReturn(ImmutableList.of(asphaltDiag));
