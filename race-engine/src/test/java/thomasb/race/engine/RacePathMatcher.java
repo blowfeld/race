@@ -43,8 +43,12 @@ class RacePathMatcher extends BaseMatcher<RacePath> {
 				.isClose(otherSegment.getStart(), precision);
 		boolean endClose = VectorPoint.fromPoint(expectedSegment.getEnd())
 				.isClose(otherSegment.getEnd(), precision);
+		boolean startTimeClose = expectedSegment.getStartTime() -
+				otherSegment.getStartTime() < precision;
+		boolean endTimeClose = expectedSegment.getEndTime() -
+				otherSegment.getEndTime() < precision;
 		
-		return startClose && endClose;
+		return startClose && endClose && startTimeClose && endTimeClose;
 	}
 
 	@Override

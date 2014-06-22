@@ -20,9 +20,10 @@ public class EqualsHashCodeTest {
 	public static Collection<Object[]> classes() {
 		return Arrays.asList(new Object[][] {
 				{ControlStateImp.class, true},
-				{PathSegmentImp.class, true},
+				{BaseSegment.class, true},
 				{VectorPoint.class, true},
-				{RacePathImp.class, true}});
+				{RacePathSegment.class, true},
+				{RaceTrackSegment.class, true}});
 	}
 	
 	public EqualsHashCodeTest(Class<?> clazz, boolean expected) {

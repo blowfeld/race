@@ -4,6 +4,7 @@ import static java.lang.Double.compare;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
+import static java.lang.Math.toRadians;
 import static java.util.Objects.hash;
 
 public final class VectorPoint implements PointDouble {
@@ -22,7 +23,8 @@ public final class VectorPoint implements PointDouble {
 	}
 	
 	static VectorPoint fromDirection(int direction) {
-		return new VectorPoint(sin(direction), cos(direction));
+		return new VectorPoint(sin(toRadians(direction)),
+				cos(toRadians(direction)));
 	}
 	
 	@Override

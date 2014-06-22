@@ -28,12 +28,13 @@ public class BitmapRaceEngineTest {
 	
 	@Test
 	public void pathStaysInPlaceIfNotMooving() {
-		ControlState currentState = Mocks.controlState(0, 90);
+		ControlState controlState = Mocks.controlState(0, 90);
 		PointDouble startPoint = new VectorPoint(1.0, 2.0);
 		
-		RacePath actualPath = engine.calculatePath(startPoint, currentState, 1);
+		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 1.1, controlState);
 		
-		List<PathSegmentImp> expectedSegment = ImmutableList.of(new PathSegmentImp(startPoint, startPoint));
+		List<RacePathSegment> expectedSegment = ImmutableList.of(
+				new RacePathSegment(startPoint, startPoint, 0.0, 1.0));
 		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, expectedSegment);
 		
 		assertThat(actualPath, isCloseTo(expectedPath));
@@ -44,12 +45,32 @@ public class BitmapRaceEngineTest {
 		ControlState currentState = Mocks.controlState(2, 0);
 		PointDouble startPoint = new VectorPoint(0.0, 0.0);
 		
-		RacePath actualPath = engine.calculatePath(startPoint, currentState, 1);
+		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 1.0, currentState);
 		
 		PointDouble expectedEnd = new VectorPoint(0, 2.0);
-		List<PathSegmentImp> expectedSegment = ImmutableList.of(new PathSegmentImp(startPoint, expectedEnd));
+		List<RacePathSegment> expectedSegment = ImmutableList.of(
+				new RacePathSegment(startPoint, expectedEnd, 0.0, 1.0));
 		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, expectedSegment);
 		
 		assertThat(actualPath, isCloseTo(expectedPath));
+	}
+	
+	@Test
+	public void pathFollowsDirection() {
+		ControlState currentState = Mocks.controlState(1, 90);
+		PointDouble startPoint = new VectorPoint(0.0, 0.0);
+		
+		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 1.0, currentState);
+		
+		PointDouble expectedEnd = new VectorPoint(1.0, 0.0);
+		List<RacePathSegment> expectedSegment = ImmutableList.of(
+				new RacePathSegment(startPoint, expectedEnd, 0.0, 1.0));
+		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, expectedSegment);
+		
+		assertThat(actualPath, isCloseTo(expectedPath));
+	}
+	
+	public void pathIntersectsGreen() {
+		
 	}
 }
