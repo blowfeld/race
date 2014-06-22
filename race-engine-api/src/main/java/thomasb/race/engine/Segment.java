@@ -1,6 +1,6 @@
 package thomasb.race.engine;
 
-public interface PathSegment {
+public interface Segment {
 	
 	PointDouble getStart();
 	
