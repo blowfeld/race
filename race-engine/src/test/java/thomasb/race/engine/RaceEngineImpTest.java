@@ -1,6 +1,7 @@
 package thomasb.race.engine;
 
 import static java.lang.Math.sqrt;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static thomasb.race.engine.RacePathMatcher.isCloseTo;
@@ -17,9 +18,12 @@ import com.google.common.collect.ImmutableList;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RaceEngineImpTest {
+	private static final double PRECISION = 1e-15;
+	
 	@Mock PointDouble point_0_0;
 	@Mock PointDouble point_0_1;
 	@Mock PointDouble point_0_2;
+	@Mock PointDouble point_0_3;
 	@Mock PointDouble point_1_0;
 	@Mock PointDouble point_1_1;
 	@Mock PointDouble point_1_2;
@@ -36,6 +40,7 @@ public class RaceEngineImpTest {
 		setupPoint(point_0_0, 0.0, 0.0);
 		setupPoint(point_0_1, 0.0, 1.0);
 		setupPoint(point_0_2, 0.0, 2.0);
+		setupPoint(point_0_3, 0.0, 3.0);
 		setupPoint(point_1_0, 1.0, 0.0);
 		setupPoint(point_1_1, 1.0, 1.0);
 		setupPoint(point_1_2, 1.0, 2.0);
@@ -57,11 +62,11 @@ public class RaceEngineImpTest {
 		TrackSegment greenVert = new RaceTrackSegment(
 				point_0_1 , point_0_2, 1, false, false);
 		
-		TrackSegment wallVert = new RaceTrackSegment(
-				point_0_2 , point_0_2, 1, false, true);
+		TrackSegment asphaltVert2 = new RaceTrackSegment(
+				point_0_2 , point_0_3, 2, false, true);
 		
 		when(raceTrack.partitions(point_0_0, 0))
-			.thenReturn(ImmutableList.of(asphaltVert, greenVert, wallVert));
+			.thenReturn(ImmutableList.of(asphaltVert, greenVert, asphaltVert2));
 		
 		TrackSegment asphaltHor = new RaceTrackSegment(
 				point_0_0 , point_10_0, 2, false, false);
@@ -92,7 +97,7 @@ public class RaceEngineImpTest {
 				new RacePathSegment(startPoint, startPoint, 0.0, 1.0));
 		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, expectedSegment);
 		
-		assertThat(actualPath, isCloseTo(expectedPath));
+		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
 	}
 	
 	@Test
@@ -102,12 +107,11 @@ public class RaceEngineImpTest {
 		
 		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 1.0, currentState);
 		
-		PointDouble expectedEnd = point_2_0;
 		List<RacePathSegment> expectedSegment = ImmutableList.of(
-				new RacePathSegment(startPoint, expectedEnd, 0.0, 1.0));
+				new RacePathSegment(startPoint, point_2_0, 0.0, 1.0));
 		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, expectedSegment);
 		
-		assertThat(actualPath, isCloseTo(expectedPath));
+		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
 	}
 	
 	@Test
@@ -117,32 +121,42 @@ public class RaceEngineImpTest {
 		
 		RacePath actualPath = engine.calculatePath(startPoint, 0.0, sqrt(2), currentState);
 		
-		PointDouble expectedEnd = point_1_1;
 		List<RacePathSegment> expectedSegment = ImmutableList.of(
-				new RacePathSegment(startPoint, expectedEnd, 0.0, sqrt(2)));
+				new RacePathSegment(startPoint, point_1_1, 0.0, sqrt(2)));
 		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, expectedSegment);
 		
-		assertThat(actualPath, isCloseTo(expectedPath));
+		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
 	}
 	
 	@Test
-	public void pathIntersectsGreenSlowsDown() {
+	public void pathSlowsDownOnGreen() {
 		ControlState currentState = Mocks.controlState(2, 0);
 		PointDouble startPoint = point_0_0;
 		
 		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 1.5, currentState);
 		
-		PointDouble expectedAsphaltEnd = point_0_1;
 		RacePathSegment expectedAsphaltSegment = 
-				new RacePathSegment(startPoint, expectedAsphaltEnd, 0.0, 0.5);
+				new RacePathSegment(startPoint, point_0_1, 0.0, 0.5);
 		
-		PointDouble expectedGreenEnd = point_0_2;
 		RacePathSegment expectedGreenSegment = 
-				new RacePathSegment(expectedAsphaltEnd, expectedGreenEnd, 0.5, 1.5);
+				new RacePathSegment(point_0_1, point_0_2, 0.5, 1.5);
 
 		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE,
 				ImmutableList.of(expectedAsphaltSegment, expectedGreenSegment));
 		
-		assertThat(actualPath, isCloseTo(expectedPath));
+		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
+	}
+	
+	@Test
+	public void pathSpeedsUpAfterGreen() {
+		ControlState currentState = Mocks.controlState(2, 0);
+		PointDouble startPoint = point_0_0;
+		
+		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 2.0, currentState);
+		
+		RacePathSegment expectedEndSegment = 
+				new RacePathSegment(point_0_2, point_0_3, 1.5, 2.0);
+		
+		assertEquals(actualPath.getSegments().get(2), expectedEndSegment);
 	}
 }

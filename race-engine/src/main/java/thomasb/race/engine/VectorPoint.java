@@ -56,7 +56,7 @@ public final class VectorPoint implements PointDouble {
 	boolean isClose(PointDouble other, double precision) {
 		VectorPoint delta = this.diff(other);
 		
-		return sqrt(delta.dot(delta)) < precision;
+		return sqrt(delta.dot(delta)) <= precision;
 	}
 	
 	@Override

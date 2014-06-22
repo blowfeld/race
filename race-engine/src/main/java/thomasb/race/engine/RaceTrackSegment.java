@@ -1,8 +1,9 @@
 package thomasb.race.engine;
 
 import static java.lang.Math.sqrt;
+import static java.util.Objects.hash;
 
-public final class RaceTrackSegment extends BaseSegment implements TrackSegment {
+public final class RaceTrackSegment extends AbstractSegment implements TrackSegment {
 	private final int maxSpeed;
 	private final boolean terminating;
 	private final boolean finish;
@@ -52,6 +53,31 @@ public final class RaceTrackSegment extends BaseSegment implements TrackSegment 
 		
 		return sqrt(diff.dot(diff));
 	}
+	
+	@Override
+	public final int hashCode() {
+		return hash(getStart(), getEnd(), maxSpeed, finish, terminating);
+	}
+	
+	@Override
+	public final boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		
+		if (!(obj instanceof TrackSegment)) {
+			return false;
+		}
+		
+		TrackSegment other = (TrackSegment) obj;
+		
+		return getStart().equals(other.getStart()) &&
+				getEnd().equals(other.getEnd()) &&
+				maxSpeed == other.getMaxSpeed() &&
+				finish == other.isFinish() &&
+				terminating == other.isTerminating();
+	}
+
 
 	@Override
 	public String toString() {

@@ -5,13 +5,15 @@ import org.hamcrest.Description;
 
 class RacePathMatcher extends BaseMatcher<RacePath> {
 	private final RacePath expected;
+	private final double precision;
 
-	static RacePathMatcher isCloseTo(RacePath expected) {
-		return new RacePathMatcher(expected);
+	static RacePathMatcher isCloseTo(RacePath expected, double precision) {
+		return new RacePathMatcher(expected, precision);
 	}
 	
-	RacePathMatcher(RacePath expected) {
+	RacePathMatcher(RacePath expected, double precision) {
 		this.expected = expected;
+		this.precision = precision;
 	}
 	
 	@Override
@@ -28,7 +30,7 @@ class RacePathMatcher extends BaseMatcher<RacePath> {
 		}
 		
 		for (int i = 0; i < other.getSegments().size(); i++) {
-			if (!startAndEndPointsClose(other, i, 0.00001)) {
+			if (!isClose(expected.getSegments().get(i), other.getSegments().get(i), precision)) {
 				return false;
 			}
 		}
@@ -36,19 +38,8 @@ class RacePathMatcher extends BaseMatcher<RacePath> {
 		return true;
 	}
 
-	private boolean startAndEndPointsClose(RacePath other, int i, double precision) {
-		PathSegment expectedSegment = expected.getSegments().get(i);
-		PathSegment otherSegment = other.getSegments().get(i);
-		boolean startClose = VectorPoint.from(expectedSegment.getStart())
-				.isClose(otherSegment.getStart(), precision);
-		boolean endClose = VectorPoint.from(expectedSegment.getEnd())
-				.isClose(otherSegment.getEnd(), precision);
-		boolean startTimeClose = expectedSegment.getStartTime() -
-				otherSegment.getStartTime() < precision;
-		boolean endTimeClose = expectedSegment.getEndTime() -
-				otherSegment.getEndTime() < precision;
-		
-		return startClose && endClose && startTimeClose && endTimeClose;
+	private boolean isClose(PathSegment expected, PathSegment actual, double precision) {
+		return new PathSegmentMatcher(expected, precision).matches(actual);
 	}
 
 	@Override

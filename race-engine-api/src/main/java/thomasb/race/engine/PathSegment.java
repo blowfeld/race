@@ -1,6 +1,10 @@
 package thomasb.race.engine;
 
-public interface PathSegment extends Segment {
+public interface PathSegment {
+	
+	PointDouble getStart();
+	
+	PointDouble getEnd();
 	
 	double getStartTime();
 	
