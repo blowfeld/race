@@ -2,7 +2,7 @@ package thomasb.race.engine;
 
 import static java.util.Objects.hash;
 
-public final class RacePathSegment extends AbstractSegment implements PathSegment {
+final class RacePathSegment extends AbstractSegment implements PathSegment {
 	private final double startTime;
 	private final double endTime;
 	

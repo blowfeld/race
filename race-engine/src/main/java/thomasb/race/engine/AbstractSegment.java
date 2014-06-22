@@ -7,7 +7,7 @@ abstract class AbstractSegment {
 	private final PointDouble start;
 	private final PointDouble end;
 	
-	public AbstractSegment(PointDouble start, PointDouble end) {
+	AbstractSegment(PointDouble start, PointDouble end) {
 		this.start = checkNotNull(start);
 		this.end = checkNotNull(end);
 	}

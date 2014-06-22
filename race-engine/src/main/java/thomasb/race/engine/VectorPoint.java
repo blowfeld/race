@@ -7,11 +7,11 @@ import static java.lang.Math.sqrt;
 import static java.lang.Math.toRadians;
 import static java.util.Objects.hash;
 
-public final class VectorPoint implements PointDouble {
+final class VectorPoint implements PointDouble {
 	private final double x;
 	private final double y;
 	
-	public VectorPoint(double x, double y) {
+	VectorPoint(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}

@@ -4,12 +4,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
 
-public final class RacePathImp implements RacePath {
+final class RacePathImp implements RacePath {
 	private final PlayerStatus status;
 	private final int finishedLaps;
 	private final List<? extends PathSegment> segments;
 	
-	public RacePathImp(PlayerStatus status,
+	RacePathImp(PlayerStatus status,
 			int finishedLaps,
 			List<? extends PathSegment> segments) {
 		this.finishedLaps = finishedLaps;

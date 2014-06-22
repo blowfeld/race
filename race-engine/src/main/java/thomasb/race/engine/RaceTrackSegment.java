@@ -3,11 +3,11 @@ package thomasb.race.engine;
 import static java.lang.Math.sqrt;
 import static java.util.Objects.hash;
 
-public final class RaceTrackSegment extends AbstractSegment implements TrackSegment {
+final class RaceTrackSegment extends AbstractSegment implements TrackSegment {
 	private final int maxSpeed;
 	private final boolean finish;
 
-	public RaceTrackSegment(PointDouble start,
+	RaceTrackSegment(PointDouble start,
 			PointDouble end,
 			int maxSpeed,
 			boolean isFinish) {
