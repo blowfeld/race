@@ -1,6 +1,7 @@
 package thomasb.race.engine;
 
 import static java.lang.Math.sqrt;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static thomasb.race.engine.Matchers.isCloseTo;
@@ -23,6 +24,7 @@ public class RaceEngineImpTest {
 	@Mock PointDouble point_0_1;
 	@Mock PointDouble point_0_2;
 	@Mock PointDouble point_0_3;
+	@Mock PointDouble point_0_4;
 	@Mock PointDouble point_1_0;
 	@Mock PointDouble point_1_1;
 	@Mock PointDouble point_1_2;
@@ -40,6 +42,7 @@ public class RaceEngineImpTest {
 		setupPoint(point_0_1, 0.0, 1.0);
 		setupPoint(point_0_2, 0.0, 2.0);
 		setupPoint(point_0_3, 0.0, 3.0);
+		setupPoint(point_0_4, 0.0, 4.0);
 		setupPoint(point_1_0, 1.0, 0.0);
 		setupPoint(point_1_1, 1.0, 1.0);
 		setupPoint(point_1_2, 1.0, 2.0);
@@ -64,8 +67,14 @@ public class RaceEngineImpTest {
 		TrackSegment asphaltVert2 = new RaceTrackSegment(
 				point_0_2 , point_0_3, 2, true);
 		
+		TrackSegment asphaltVert3 = new RaceTrackSegment(
+				point_0_3 , point_0_4, 2, false);
+		
 		when(raceTrack.partitions(point_0_0, 0))
-			.thenReturn(ImmutableList.of(asphaltVert, greenVert, asphaltVert2));
+			.thenReturn(ImmutableList.of(asphaltVert,
+					greenVert,
+					asphaltVert2,
+					asphaltVert3));
 		
 		TrackSegment asphaltHor = new RaceTrackSegment(
 				point_0_0 , point_10_0, 2, false);
@@ -95,9 +104,9 @@ public class RaceEngineImpTest {
 		
 		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 1.1, controlState);
 		
-		List<RacePathSegment> expectedSegment = ImmutableList.of(
+		List<RacePathSegment> expectedSegments = ImmutableList.of(
 				new RacePathSegment(startPoint, startPoint, 0.0, 1.0));
-		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, expectedSegment);
+		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, 0, expectedSegments);
 		
 		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
 	}
@@ -109,9 +118,9 @@ public class RaceEngineImpTest {
 		
 		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 1.0, currentState);
 		
-		List<RacePathSegment> expectedSegment = ImmutableList.of(
+		List<RacePathSegment> expectedSegments = ImmutableList.of(
 				new RacePathSegment(startPoint, point_2_0, 0.0, 1.0));
-		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, expectedSegment);
+		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, 0, expectedSegments);
 		
 		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
 	}
@@ -123,9 +132,9 @@ public class RaceEngineImpTest {
 		
 		RacePath actualPath = engine.calculatePath(startPoint, 0.0, sqrt(2), currentState);
 		
-		List<RacePathSegment> expectedSegment = ImmutableList.of(
+		List<RacePathSegment> expectedSegments = ImmutableList.of(
 				new RacePathSegment(startPoint, point_1_1, 0.0, sqrt(2)));
-		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, expectedSegment);
+		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, 0, expectedSegments);
 		
 		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
 	}
@@ -143,7 +152,7 @@ public class RaceEngineImpTest {
 		RacePathSegment expectedGreenSegment =
 				new RacePathSegment(point_0_1, point_0_2, 0.5, 1.5);
 
-		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE,
+		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, 0,
 				ImmutableList.of(expectedAsphaltSegment, expectedGreenSegment));
 		
 		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
@@ -174,9 +183,19 @@ public class RaceEngineImpTest {
 		RacePathSegment expectedWallSegment =
 				new RacePathSegment(point_10_0, point_10_0, 5.0, 10.0);
 		
-		RacePath expectedPath = new RacePathImp(PlayerStatus.TERMINATED,
+		RacePath expectedPath = new RacePathImp(PlayerStatus.TERMINATED, 0,
 				ImmutableList.of(expectedAsphaltSegment, expectedWallSegment));
 		
 		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
+	}
+	
+	@Test
+	public void pathCrossesFinishIncrementsLap() {
+		ControlState currentState = Mocks.controlState(1, 0);
+		PointDouble startPoint = point_0_0;
+		
+		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 4.0, currentState);
+		
+		assertEquals(actualPath.finishedLaps(), 1);
 	}
 }
