@@ -16,7 +16,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.google.common.collect.ImmutableList;
 
 @RunWith(MockitoJUnitRunner.class)
-public class BitmapRaceEngineTest {
+public class RaceEngineImpTest {
 	@Mock PointDouble point_0_0;
 	@Mock PointDouble point_0_1;
 	@Mock PointDouble point_0_2;
@@ -78,7 +78,7 @@ public class BitmapRaceEngineTest {
 	
 	@Before
 	public void setupEngine() {
-		engine = new BitmapRaceEngine(raceTrack);
+		engine = new RaceEngineImp(raceTrack);
 	}
 	
 	@Test

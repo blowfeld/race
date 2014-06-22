@@ -8,10 +8,10 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 
-public class BitmapRaceEngine implements RaceEngine {
+public class RaceEngineImp implements RaceEngine {
 	private final RaceTrack raceTrack;
 
-	public BitmapRaceEngine(RaceTrack raceTrack) {
+	public RaceEngineImp(RaceTrack raceTrack) {
 		this.raceTrack = raceTrack;
 	}
 
