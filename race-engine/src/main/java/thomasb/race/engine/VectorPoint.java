@@ -53,6 +53,10 @@ final class VectorPoint implements PointDouble {
 		return x * other.getX() + y * other.getY();
 	}
 	
+	double signedArea(PointDouble other) {
+		return x * other.getY() - y * other.getX();
+	}
+	
 	boolean isClose(PointDouble other, double precision) {
 		VectorPoint delta = this.diff(other);
 		

@@ -2,8 +2,8 @@ package thomasb.race.engine;
 
 import static java.lang.Math.sqrt;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -79,6 +79,28 @@ public class VectorPointTest {
 		
 		assertEquals(8.0, product, PRECISION);
 		assertEquals(unitX.dot(unitY), unitY.dot(unitX), PRECISION);
+	}
+	
+	@Test
+	public void squareArea() {
+		VectorPoint a = new VectorPoint(2.0, 0.0);
+		VectorPoint b = new VectorPoint(0.0, 2.0);
+		
+		double area = a.signedArea(b);
+		
+		assertEquals(4.0, area, 0.0);
+		assertEquals(b.signedArea(a), -a.signedArea(b), 0.0);
+	}
+	
+	@Test
+	public void parallelArea() {
+		VectorPoint a = new VectorPoint(2.0, 2.0);
+		VectorPoint b = new VectorPoint(4.0, 4.0);
+		
+		double area = a.signedArea(b);
+		
+		assertEquals(0.0, area, 0.0);
+		assertEquals(b.signedArea(a), -a.signedArea(b), 0.0);
 	}
 	
 	@Test
