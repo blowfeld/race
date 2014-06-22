@@ -1,6 +1,6 @@
 package thomasb.race.engine;
 
-public interface TimedPathSegment extends Segment {
+public interface PathSegment extends Segment {
 	
 	double getStartTime();
 	

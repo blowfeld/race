@@ -1,6 +1,6 @@
 package thomasb.race.engine;
 
-public interface TrackPathSegment extends Segment {
+public interface TrackSegment extends Segment {
 	
 	int getMaxSpeed();
 	

@@ -6,6 +6,6 @@ public interface RacePath {
 	
 	PlayerStatus getStatus();
 	
-	List<? extends TimedPathSegment> getSegments();
+	List<? extends PathSegment> getSegments();
 	
 }
