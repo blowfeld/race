@@ -44,7 +44,7 @@ public class RayTest extends Test2D {
 	@Test
 	public void onLine() {
 		for (int y = 0; y < 20; y++) {
-			assertEquals(HalfPlane.ON_LINE, ray.detectHalfPlane(points[10][y]));
+			assertEquals(HalfPlane.ON_RAY, ray.detectHalfPlane(points[10][y]));
 		}
 	}
 	

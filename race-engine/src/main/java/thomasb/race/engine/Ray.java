@@ -1,8 +1,11 @@
 package thomasb.race.engine;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.lang.Double.compare;
+
 
 class Ray {
-	enum HalfPlane { LEFT, RIGHT, ON_LINE }
+	enum HalfPlane { LEFT, RIGHT, ON_RAY }
 	
 	private final VectorPoint startPoint;
 	private final VectorPoint rayVector;
@@ -17,8 +20,8 @@ class Ray {
 		
 		double signedArea = rayVector.signedArea(diff);
 		
-		if (signedArea == 0) {
-			return HalfPlane.ON_LINE;
+		if (compare(signedArea, 0.0) == 0) {
+			return HalfPlane.ON_RAY;
 		}
 		
 		return signedArea > 0 ? HalfPlane.LEFT : HalfPlane.RIGHT;
@@ -27,7 +30,7 @@ class Ray {
 	/**
 	 * Calculate the intersection point with the ray specified by the given points.
 	 * <p>
-	 * With x as the rayVector, y_z = point_1 - point2, z_x = point2 - startPoint: 
+	 * With x as the rayVector, y_z = point_1 - point2, z_x = point2 - startPoint, a = distance: 
 	 * <p>
 	 * a * x + b * y_z + z_x = 0
 	 * <p>
@@ -40,7 +43,7 @@ class Ray {
 	 * 
 	 * @return intersection point
 	 */
-	public Intersection getIntersection(PointDouble point1, PointDouble point2) {
+	Ray.Intersection getIntersection(PointDouble point1, PointDouble point2) {
 		VectorPoint x = rayVector;
 		VectorPoint y_z = VectorPoint.from(point2).diff(point1);
 		VectorPoint x_z = VectorPoint.from(point2).diff(startPoint);
@@ -49,8 +52,39 @@ class Ray {
 		double inverse_0_1 = - y_z.getX();
 		
 		double normalization = 1 / (x.getX() * y_z.getY() - y_z.getX() * x.getY());
-		double a = normalization * (inverse_0_0 * x_z.getX() + inverse_0_1 * x_z.getY());
+		double distance = normalization * (inverse_0_0 * x_z.getX() + inverse_0_1 * x_z.getY());
 		
-		return new Intersection(a, startPoint, rayVector);
+		return new Intersection(distance);
+	}
+	
+	Ray.Intersection pointOnRay(PointDouble pointOnRay) {
+		checkArgument(detectHalfPlane(pointOnRay) == HalfPlane.ON_RAY, "point is not on the ray: %s", pointOnRay);
+		
+		return new Intersection(pointOnRay);
+	}
+	
+	
+	class Intersection {
+		private final double distance;
+		
+		Intersection(PointDouble pointOnRay) {
+			this(startPoint.diff(pointOnRay).norm());
+		}
+
+		Intersection(double distance) {
+			this.distance = distance;
+		}
+		
+		double distance() {
+			return distance;
+		}
+		
+		VectorPoint startPoint() {
+			return startPoint;
+		}
+		
+		VectorPoint intersectionPoint() {
+			return startPoint.add(rayVector.multiply(distance));
+		}
 	}
 }
