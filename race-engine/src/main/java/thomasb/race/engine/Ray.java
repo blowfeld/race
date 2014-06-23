@@ -24,52 +24,33 @@ class Ray {
 		return signedArea > 0 ? HalfPlane.LEFT : HalfPlane.RIGHT;
 	}
 
-	public boolean doesIntersect(PointDouble point1, PointDouble point2) {
-		return detectHalfPlane(point1) == detectHalfPlane(point2);
-	}
 	/**
-	 * a * x + b * y_z + z_x = 0 => (x.T, y.T) dot (a,b).T = x_z
-	 * 
-	 * (a,b).T = (x.T, y.T).inv dot x_z
+	 * Calculate the intersection point with the ray specified by the given points.
+	 * <p>
+	 * With x as the rayVector, y_z = point_1 - point2, z_x = point2 - startPoint: 
+	 * <p>
+	 * a * x + b * y_z + z_x = 0
+	 * <p>
+	 * => (x.T, y.T) dot (a,b).T = x_z
+	 * <p>
+	 * => (a,b).T = (x.T, y.T).inv dot x_z
 	 * 
 	 * @param point1
 	 * @param point2
-	 * @return
+	 * 
+	 * @return intersection point
 	 */
-	public Ray.Intersection getIntersection(PointDouble point1, PointDouble point2) {
+	public Intersection getIntersection(PointDouble point1, PointDouble point2) {
 		VectorPoint x = rayVector;
 		VectorPoint y_z = VectorPoint.from(point2).diff(point1);
 		VectorPoint x_z = VectorPoint.from(point2).diff(startPoint);
 		
-		double inverseNormal = 1 / (x.getX() * y_z.getY() - y_z.getX() * x.getY());
 		double inverse_0_0 = y_z.getY();
 		double inverse_0_1 = - y_z.getX();
-//			double inverse_1_0 = - x.getY();
-//			double inverse_1_1 = x.getX();
-//			
-		double a = inverseNormal * (inverse_0_0 * x_z.getX() + inverse_0_1 * x_z.getY());
-//			double b = inverseNormal * (inverse_1_0 * x_z.getX() + inverse_1_1 * x_z.getY());
+		
+		double normalization = 1 / (x.getX() * y_z.getY() - y_z.getX() * x.getY());
+		double a = normalization * (inverse_0_0 * x_z.getX() + inverse_0_1 * x_z.getY());
 		
 		return new Intersection(a, startPoint, rayVector);
-	}
-	
-	static class Intersection {
-		private final double a;
-		private final VectorPoint startPoint;
-		private final VectorPoint rayVector;
-
-		public Intersection(double a, VectorPoint startPoint, VectorPoint rayVector) {
-			this.a = a;
-			this.startPoint = startPoint;
-			this.rayVector = rayVector;
-		}
-		
-		double distance() {
-			return a;
-		}
-		
-		VectorPoint intersectionPoint() {
-			return startPoint.add(rayVector.multiply(a));
-		}
 	}
 }

@@ -1,5 +1,6 @@
 package thomasb.race.engine;
 
+import static java.lang.Double.isInfinite;
 import static java.lang.Double.isNaN;
 import static java.lang.Math.sqrt;
 import static org.junit.Assert.assertEquals;
@@ -11,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import thomasb.race.engine.Ray.HalfPlane;
-import thomasb.race.engine.Ray.Intersection;
 
 public class RayTest extends Test2D {
 	private static final double PRECISION = 1e-15;
@@ -130,5 +130,14 @@ public class RayTest extends Test2D {
 		assertTrue(isNaN(intersection.distance()));
 		assertTrue(isNaN(intersection.intersectionPoint().getX()));
 		assertTrue(isNaN(intersection.intersectionPoint().getY()));
+	}
+	
+	@Test
+	public void parallelRay() {
+		Intersection intersection = ray.getIntersection(points[9][9], points[9][11]);
+		
+		assertTrue(isInfinite(intersection.distance()));
+		assertTrue(isNaN(intersection.intersectionPoint().getX()));
+		assertTrue(isInfinite(intersection.intersectionPoint().getY()));
 	}
 }
