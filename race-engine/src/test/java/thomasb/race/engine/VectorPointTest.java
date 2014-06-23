@@ -104,9 +104,39 @@ public class VectorPointTest {
 	}
 	
 	@Test
+	public void normPositive() {
+		VectorPoint a = new VectorPoint(0.0, -1.0);
+		VectorPoint b = new VectorPoint(-1.0, -1.0);
+		VectorPoint c = new VectorPoint(-1.0, 1.0);
+		
+		assertEquals(1, a.norm(), PRECISION);
+		assertEquals(sqrt(2), b.norm(), PRECISION);
+		assertEquals(sqrt(2), c.norm(), PRECISION);
+	}
+	
+	@Test
+	public void normValue() {
+		VectorPoint a = new VectorPoint(0.0, 0.0);
+		VectorPoint b = new VectorPoint(1.0, 0.0);
+		VectorPoint c = new VectorPoint(1.0, 1.0);
+		
+		assertEquals(0, a.norm(), PRECISION);
+		assertEquals(1, b.norm(), PRECISION);
+		assertEquals(sqrt(2), c.norm(), PRECISION);
+	}
+	
+	@Test
 	public void closePointsAreClose() {
 		VectorPoint a = new VectorPoint(1.0, 2.0);
 		VectorPoint b = new VectorPoint(1.000001, 2.000001);
+		
+		assertTrue(a.isClose(b, 0.0001));
+	}
+	
+	@Test
+	public void isCloseLessEqualsPrecision() {
+		VectorPoint a = new VectorPoint(1.0, 2.0);
+		VectorPoint b = new VectorPoint(1.0001, 2.0);
 		
 		assertTrue(a.isClose(b, 0.0001));
 	}

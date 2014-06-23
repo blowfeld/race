@@ -57,10 +57,12 @@ final class VectorPoint implements PointDouble {
 		return x * other.getY() - y * other.getX();
 	}
 	
+	double norm() {
+		return sqrt(this.dot(this));
+	}
+	
 	boolean isClose(PointDouble other, double precision) {
-		VectorPoint delta = this.diff(other);
-		
-		return sqrt(delta.dot(delta)) <= precision;
+		return this.diff(other).norm() <= precision;
 	}
 	
 	@Override
