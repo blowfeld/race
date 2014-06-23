@@ -19,4 +19,17 @@ public class Mocks {
 		
 		return controlState;
 	}	
+	
+	public static TrackSegment trackSegment(PointDouble start,
+			PointDouble end,
+			int maxSpeed,
+			boolean isFinish) {
+		TrackSegment segment = mock(TrackSegment.class);
+		when(segment.getStart()).thenReturn(start);
+		when(segment.getEnd()).thenReturn(end);
+		when(segment.getMaxSpeed()).thenReturn(maxSpeed);
+		when(segment.isFinish()).thenReturn(isFinish);
+		
+		return segment;
+	}	
 }

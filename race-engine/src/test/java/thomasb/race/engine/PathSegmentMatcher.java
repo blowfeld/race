@@ -20,10 +20,10 @@ class PathSegmentMatcher extends BaseMatcher<PathSegment> {
 		
 		PathSegment other = (PathSegment) item;
 		
-		boolean startClose = VectorPoint.from(expected.getStart())
-				.isClose(other.getStart(), precision);
-		boolean endClose = VectorPoint.from(expected.getEnd())
-				.isClose(other.getEnd(), precision);
+		boolean startClose = new PointMatcher(expected.getStart(), precision)
+				.matches(other.getStart());
+		boolean endClose = new PointMatcher(expected.getEnd(), precision)
+				.matches(other.getEnd());
 		boolean startTimeClose = expected.getStartTime() -
 				other.getStartTime() <= precision;
 		boolean endTimeClose = expected.getEndTime() -
