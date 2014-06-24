@@ -1,17 +1,25 @@
 package thomasb.race.engine;
 
-import java.util.Iterator;
+import static com.google.common.collect.Collections2.filter;
+
 import java.util.List;
 
-import thomasb.race.engine.Ray.HalfPlane;
 import thomasb.race.engine.Ray.Intersection;
+import thomasb.race.engine.Ray.IntersectionType;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 final class TrackPolygon {
+	private static final Predicate<Intersection> POINT_FILTER = new Predicate<Intersection>() {
+		@Override
+		public boolean apply(Intersection input) {
+			return input.getType() == IntersectionType.POINT;
+		}
+	};
+	
 	private final List<PointDouble> corners;
 	private final TrackType type;
 
@@ -19,47 +27,31 @@ final class TrackPolygon {
 		this.corners = points;
 		this.type = type;
 	}
-
+	
 	public List<Intersection> intersectionPoints(Ray ray) {
 		PointDouble previous = Iterables.getLast(corners);
 		
-		HalfPlane previousPlane = HalfPlane.ON_RAY;
-		Iterator<PointDouble> reverseItr = Lists.reverse(corners).iterator();
-		while (reverseItr.hasNext() && previousPlane == HalfPlane.ON_RAY) {
-			previousPlane = ray.detectHalfPlane(reverseItr.next());
-		}
-		
 		Builder<Intersection> intersectionPoints = ImmutableList.builder();
-		PointDouble onRayStack = null;
-		for (PointDouble point : corners) {
-			HalfPlane halfPlane = ray.detectHalfPlane(point);
-			if (halfPlane == HalfPlane.ON_RAY) {
-				onRayStack = point;
-			} else if (halfPlane != previousPlane) {
-				if (onRayStack != null) {
-					Intersection pointOnRay = ray.pointOnRay(onRayStack);
-					if (pointOnRay.distance() > 0) {
-						intersectionPoints.add(pointOnRay);
-					}
-					onRayStack = null;
-				}
-				Intersection intersection = ray.getIntersection(previous, point);
-				if (intersection.distance() > 0) {
-					intersectionPoints.add(intersection);
-				}
-				
-				previousPlane = halfPlane;
-			} else {
-				onRayStack = null;
-				previousPlane = halfPlane;
+		for (PointDouble corner : corners) {
+			Intersection intersection = ray.getIntersection(previous, corner);
+			if (intersection != null) {
+				intersectionPoints.add(intersection);
 			}
 			
-			previous = point;
+			previous = corner;
 		}
 		
 		return intersectionPoints.build();
 	}
-
+	
+	public boolean containsStartPoint(Ray ray) {
+		return containsStartPoint(ray, intersectionPoints(ray));
+	}
+	
+	public boolean containsStartPoint(Ray ray, List<Intersection> intersectionPoints) {
+		return filter(intersectionPoints, POINT_FILTER).size() % 2 == 1;
+	}
+	
 	public TrackType getType() {
 		return type;
 	}

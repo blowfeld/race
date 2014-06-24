@@ -1,11 +1,11 @@
 package thomasb.race.engine;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.lang.Double.compare;
+import static java.lang.Math.signum;
 
 
 class Ray {
 	enum HalfPlane { LEFT, RIGHT, ON_RAY }
+	enum IntersectionType { POINT, LINE_SEGMENT; }
 	
 	private final VectorPoint startPoint;
 	private final VectorPoint rayVector;
@@ -20,7 +20,7 @@ class Ray {
 		
 		double signedArea = rayVector.signedArea(diff);
 		
-		if (compare(signedArea, 0.0) == 0) {
+		if (signedArea == 0.0) {
 			return HalfPlane.ON_RAY;
 		}
 		
@@ -44,6 +44,46 @@ class Ray {
 	 * @return intersection point
 	 */
 	Ray.Intersection getIntersection(PointDouble point1, PointDouble point2) {
+		if (point1.equals(point2)) {
+			return null;
+		}
+		
+		HalfPlane startPlane = detectHalfPlane(point1);
+		HalfPlane endPlane = detectHalfPlane(point2);
+		if (startPlane == endPlane && startPlane != HalfPlane.ON_RAY) {
+			return null;
+		}
+		
+		if (startPlane == HalfPlane.ON_RAY && endPlane == HalfPlane.ON_RAY) {
+			VectorPoint startDiff = VectorPoint.from(point1).diff(startPoint);
+			VectorPoint endDiff = VectorPoint.from(point2).diff(startPoint);
+			
+			boolean startOnRay = signum(rayVector.dot(startDiff)) >= 0;
+			boolean endOnRay = signum(rayVector.dot(endDiff)) >= 0;
+
+			if (!(startOnRay || endOnRay)) {
+				return null;
+			}
+			
+			if (!startOnRay) {
+				return new Intersection(0, startPoint, point2);
+			}
+			
+			if (!endOnRay) {
+				return new Intersection(0, startPoint, point1);
+			}
+			
+			if (startDiff.norm() < endDiff.norm()) {
+				return new Intersection(startDiff.norm(), point1, point2);
+			}
+			
+			return new Intersection(endDiff.norm(), point2, point1);
+		}
+		
+		if (startPlane == HalfPlane.ON_RAY || endPlane == HalfPlane.ON_RAY) {
+			return null;
+		}
+		
 		VectorPoint x = rayVector;
 		VectorPoint y_z = VectorPoint.from(point2).diff(point1);
 		VectorPoint x_z = VectorPoint.from(point2).diff(startPoint);
@@ -54,25 +94,28 @@ class Ray {
 		double normalization = 1 / (x.getX() * y_z.getY() - y_z.getX() * x.getY());
 		double distance = normalization * (inverse_0_0 * x_z.getX() + inverse_0_1 * x_z.getY());
 		
-		return new Intersection(distance);
+		return distance < 0 ? null : new Intersection(distance);
 	}
-	
-	Ray.Intersection pointOnRay(PointDouble pointOnRay) {
-		checkArgument(detectHalfPlane(pointOnRay) == HalfPlane.ON_RAY, "point is not on the ray: %s", pointOnRay);
-		
-		return new Intersection(pointOnRay);
-	}
-	
 	
 	class Intersection {
 		private final double distance;
+		private final PointDouble intersectionStart;
+		private final PointDouble intersectionEnd;
+		private final IntersectionType intersectionType;
 		
-		Intersection(PointDouble pointOnRay) {
-			this(startPoint.diff(pointOnRay).norm());
+		Intersection(double distance, PointDouble intersectionStart, PointDouble intersectionEnd) {
+			this.distance = distance;
+			this.intersectionStart = intersectionStart;
+			this.intersectionEnd = intersectionEnd;
+			this.intersectionType = intersectionStart.equals(intersectionEnd) ?
+					IntersectionType.POINT : IntersectionType.LINE_SEGMENT;
 		}
-
+		
 		Intersection(double distance) {
 			this.distance = distance;
+			this.intersectionStart = startPoint.add(rayVector.multiply(distance));
+			this.intersectionEnd = this.intersectionStart;
+			this.intersectionType = IntersectionType.POINT;
 		}
 		
 		double distance() {
@@ -83,8 +126,16 @@ class Ray {
 			return startPoint;
 		}
 		
-		VectorPoint intersectionPoint() {
-			return startPoint.add(rayVector.multiply(distance));
+		IntersectionType getType() {
+			return intersectionType;
+		}
+		
+		PointDouble getIntersectionStart() {
+			return intersectionStart;
+		}
+		
+		PointDouble getIntersectionEnd() {
+			return intersectionEnd;
 		}
 	}
 }

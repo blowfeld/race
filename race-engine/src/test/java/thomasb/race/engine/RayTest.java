@@ -1,11 +1,9 @@
 package thomasb.race.engine;
 
-import static java.lang.Double.isInfinite;
-import static java.lang.Double.isNaN;
 import static java.lang.Math.sqrt;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static thomasb.race.engine.RaceMatchers.isCloseTo;
 
 import org.junit.Before;
@@ -68,7 +66,7 @@ public class RayTest extends Test2D {
 		Intersection intersection = ray.getIntersection(points[5][10], points[15][10]);
 		
 		assertEquals(intersection.distance(), 0.0, PRECISION);;
-		assertThat(intersection.intersectionPoint(), isCloseTo(points[10][10], PRECISION));;
+		assertThat(intersection.getIntersectionStart(), isCloseTo(points[10][10], PRECISION));;
 	}
 	
 	@Test
@@ -76,15 +74,14 @@ public class RayTest extends Test2D {
 		Intersection intersection = ray.getIntersection(points[9][15], points[11][15]);
 		
 		assertEquals(5.0, intersection.distance(), PRECISION);;
-		assertThat(intersection.intersectionPoint(), isCloseTo(points[10][15], PRECISION));;
+		assertThat(intersection.getIntersectionStart(), isCloseTo(points[10][15], PRECISION));;
 	}
 	
 	@Test
-	public void intersectWitNegativeDistance() {
+	public void noIntersection() {
 		Intersection intersection = ray.getIntersection(points[9][9], points[11][9]);
 		
-		assertEquals(-1.0, intersection.distance(), PRECISION);;
-		assertThat(intersection.intersectionPoint(), isCloseTo(points[10][9], PRECISION));;
+		assertNull(intersection);
 	}
 	
 	@Test
@@ -93,7 +90,7 @@ public class RayTest extends Test2D {
 		Intersection rightLeft = ray.getIntersection(points[11][15], points[9][15]);
 		
 		assertEquals(leftRight.distance(), rightLeft.distance(), 0.0);;
-		assertThat(leftRight.intersectionPoint(), isCloseTo(rightLeft.intersectionPoint(), PRECISION));
+		assertThat(leftRight.getIntersectionStart(), isCloseTo(rightLeft.getIntersectionStart(), PRECISION));
 	}
 	
 	@Test
@@ -101,7 +98,7 @@ public class RayTest extends Test2D {
 		Intersection intersection = ray.getIntersection(points[9][9], points[11][11]);
 		
 		assertEquals(0.0, intersection.distance(), PRECISION);;
-		assertThat(intersection.intersectionPoint(), isCloseTo(points[10][10], PRECISION));;
+		assertThat(intersection.getIntersectionStart(), isCloseTo(points[10][10], PRECISION));;
 	}
 	
 	@Test
@@ -110,35 +107,73 @@ public class RayTest extends Test2D {
 		
 		Intersection intersection = diagonalRay.getIntersection(points[9][11], points[12][11]);
 		
-		assertEquals(sqrt(2), intersection.distance(), PRECISION);;
-		assertThat(intersection.intersectionPoint(), isCloseTo(points[11][11], PRECISION));;
+		assertEquals(sqrt(2), intersection.distance(), PRECISION);
+		assertThat(intersection.getIntersectionStart(), isCloseTo(points[11][11], PRECISION));;
 	}
 	
 	@Test
-	public void diagonalIntersectsWithNegativesDistance() {
+	public void diagonalNoIntersection() {
 		Ray diagonalRay = new Ray(points[10][10], 45);
 		
 		Intersection intersection = diagonalRay.getIntersection(points[8][9], points[10][9]);
 		
-		assertEquals(-sqrt(2), intersection.distance(), PRECISION);;
-		assertThat(intersection.intersectionPoint(), isCloseTo(points[9][9], PRECISION));;
+		assertNull(intersection);
 	}
 	
 	@Test
-	public void pointsOnLine() {
-		Intersection intersection = ray.getIntersection(points[10][9], points[10][9]);
+	public void pointsOnLineNoInteresection() {
+		Intersection intersection = ray.getIntersection(points[10][8], points[10][9]);
 		
-		assertTrue(isNaN(intersection.distance()));
-		assertTrue(isNaN(intersection.intersectionPoint().getX()));
-		assertTrue(isNaN(intersection.intersectionPoint().getY()));
+		assertNull(intersection);
+	}
+	
+	@Test
+	public void pointsOnLinePartialIntersection() {
+		Intersection intersection = ray.getIntersection(points[10][8], points[10][11]);
+		
+		assertEquals(0.0, intersection.distance(), PRECISION);
+		assertThat(intersection.getIntersectionStart(), isCloseTo(points[10][10], PRECISION));;
+		assertThat(intersection.getIntersectionEnd(), isCloseTo(points[10][11], PRECISION));;
+	}
+	
+	@Test
+	public void pointsOnLineFullIntersection() {
+		Intersection intersection = ray.getIntersection(points[10][11], points[10][15]);
+		
+		assertEquals(1.0, intersection.distance(), PRECISION);
+		assertThat(intersection.getIntersectionStart(), isCloseTo(points[10][11], PRECISION));;
+		assertThat(intersection.getIntersectionEnd(), isCloseTo(points[10][15], PRECISION));;
+	}
+	
+	@Test
+	public void pointsOnLineFullIntersectionReverseOrder() {
+		Intersection intersection = ray.getIntersection(points[10][15], points[10][11]);
+		
+		assertEquals(1.0, intersection.distance(), PRECISION);
+		assertThat(intersection.getIntersectionStart(), isCloseTo(points[10][11], PRECISION));;
+		assertThat(intersection.getIntersectionEnd(), isCloseTo(points[10][15], PRECISION));;
+	}
+	
+	@Test
+	public void samePointsDoNotIntersect() {
+		Intersection intersection = ray.getIntersection(points[10][11], points[10][11]);
+		
+		assertNull(intersection);
+	}
+	
+	@Test
+	public void onePointsOnRayDoesNotIntersect() {
+		Intersection intersection1 = ray.getIntersection(points[10][11], points[11][11]);
+		Intersection intersection2 = ray.getIntersection(points[11][11], points[10][11]);
+		
+		assertNull(intersection1);
+		assertNull(intersection2);
 	}
 	
 	@Test
 	public void parallelRay() {
 		Intersection intersection = ray.getIntersection(points[9][9], points[9][11]);
 		
-		assertTrue(isInfinite(intersection.distance()));
-		assertTrue(isNaN(intersection.intersectionPoint().getX()));
-		assertTrue(isInfinite(intersection.intersectionPoint().getY()));
+		assertNull(intersection);
 	}
 }
