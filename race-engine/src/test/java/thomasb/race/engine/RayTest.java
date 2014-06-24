@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import thomasb.race.engine.Ray.HalfPlane;
+import thomasb.race.engine.Ray.Intersection;
 
 public class RayTest extends Test2D {
 	private static final double PRECISION = 1e-15;
