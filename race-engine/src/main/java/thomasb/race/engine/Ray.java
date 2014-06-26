@@ -2,6 +2,10 @@ package thomasb.race.engine;
 
 import static java.lang.Math.signum;
 
+import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+
 
 class Ray {
 	enum HalfPlane { LEFT, RIGHT, ON_RAY }
@@ -90,11 +94,7 @@ class Ray {
 		double normalization = 1 / (x.getX() * y_z.getY() - y_z.getX() * x.getY());
 		double distance = normalization * (inverse_0_0 * x_z.getX() + inverse_0_1 * x_z.getY());
 		
-		boolean startOnRay = startPlane == HalfPlane.ON_RAY;
-		boolean endOnRay = endPlane == HalfPlane.ON_RAY;
-		
-		return distance < 0 ?
-				null : new Intersection(distance, startOnRay, endOnRay);
+		return distance < 0 ? null : new Intersection(distance, startPlane, endPlane);
 	}
 	
 	class Intersection {
@@ -104,6 +104,7 @@ class Ray {
 		private final IntersectionType intersectionType;
 		private final boolean startOnRay;
 		private final boolean endOnRay;
+		private final List<HalfPlane> halfPlanes;
 		
 		Intersection(double distance,
 				PointDouble intersectionStart,
@@ -115,15 +116,17 @@ class Ray {
 					IntersectionType.POINT : IntersectionType.LINE_SEGMENT;
 			this.startOnRay = true;
 			this.endOnRay = true;
+			this.halfPlanes = ImmutableList.of(HalfPlane.ON_RAY);
 		}
 		
-		Intersection(double distance, boolean startOnRay, boolean endOnRay) {
+		Intersection(double distance, HalfPlane startPlane, HalfPlane endPlane) {
 			this.distance = distance;
 			this.intersectionStart = startPoint.add(rayVector.multiply(distance));
 			this.intersectionEnd = this.intersectionStart;
 			this.intersectionType = IntersectionType.POINT;
-			this.startOnRay = startOnRay;
-			this.endOnRay = endOnRay;
+			this.startOnRay = startPlane == HalfPlane.ON_RAY;
+			this.endOnRay = endPlane == HalfPlane.ON_RAY;
+			this.halfPlanes = ImmutableList.of(startPlane, endPlane);
 		}
 		
 		double distance() {
@@ -152,6 +155,10 @@ class Ray {
 		
 		boolean endOnRay() {
 			return endOnRay;
+		}
+		
+		public List<HalfPlane> getHalfPlanes() {
+			return halfPlanes;
 		}
 	}
 }
