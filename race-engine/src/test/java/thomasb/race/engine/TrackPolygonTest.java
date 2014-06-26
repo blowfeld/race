@@ -10,11 +10,9 @@ import static thomasb.race.engine.RaceMatchers.isCloseTo;
 import java.util.Comparator;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import thomasb.race.engine.Ray.Intersection;
-import thomasb.race.engine.Ray.IntersectionType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -141,11 +139,9 @@ public class TrackPolygonTest extends Test2D {
 		List<Intersection> actual = trackPolygon.intersectionPoints(ray);
 		
 		List<PointDouble> expectedIntersections = Lists.newArrayList(
-				points[15][5]);
+				points[15][5], points[15][15]);
 		
 		assertPointsClose(actual, expectedIntersections, startPoint);
-		assertEquals(IntersectionType.LINE_SEGMENT, actual.get(0).getType());
-		assertThat(actual.get(0).getIntersectionEnd(), isCloseTo(points[15][15], PRECISION));
 	}
 	
 	@Test
@@ -169,9 +165,13 @@ public class TrackPolygonTest extends Test2D {
 	}
 	
 	@Test
-	@Ignore
-	public void touchBoundaryAndEnterPolygon() {
-		TrackPolygon trackPolygon = setupPolygon(points[5][5], points[10][5], points[10][10], points[15][10], points[15][15], points[5][15]);
+	public void touchingRayIntersectsInLineSegmentAndEntersPolygon() {
+		TrackPolygon trackPolygon = setupPolygon(points[5][5],
+				points[10][5],
+				points[10][10],
+				points[15][10],
+				points[15][15],
+				points[5][15]);
 		
 		PointDouble startPoint = points[10][0];
 		Ray ray = new Ray(startPoint, 0);
@@ -179,13 +179,33 @@ public class TrackPolygonTest extends Test2D {
 		List<Intersection> actual = trackPolygon.intersectionPoints(ray);
 		
 		List<PointDouble> expectedIntersections = Lists.newArrayList(
-				points[10][5], points[10][15]);
+				points[10][5], points[10][10], points[10][15]);
 		
 		assertPointsClose(actual, expectedIntersections, startPoint);
-		assertEquals(IntersectionType.LINE_SEGMENT, actual.get(0).getType());
-		assertThat(actual.get(0).getIntersectionEnd(), isCloseTo(points[10][10], PRECISION));
 		
 		assertFalse(trackPolygon.containsStartPoint(ray));
+	}
+	
+	@Test
+	public void touchingRayIntersectsInLineSegmentAndLeavesPolygon() {
+		TrackPolygon trackPolygon = setupPolygon(points[5][5],
+				points[15][5],
+				points[15][10],
+				points[10][10],
+				points[10][15],
+				points[5][15]);
+		
+		PointDouble startPoint = points[10][8];
+		Ray ray = new Ray(startPoint, 0);
+		
+		List<Intersection> actual = trackPolygon.intersectionPoints(ray);
+		
+		List<PointDouble> expectedIntersections = Lists.newArrayList(
+				points[10][10], points[10][15]);
+		
+		assertPointsClose(actual, expectedIntersections, startPoint);
+		
+		assertTrue(trackPolygon.containsStartPoint(ray));
 	}
 	
 	private void assertPointsClose(List<Intersection> actualIntersections, List<PointDouble> expected, PointDouble startPoint) {

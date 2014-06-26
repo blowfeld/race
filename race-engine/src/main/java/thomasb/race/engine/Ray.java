@@ -1,5 +1,6 @@
 package thomasb.race.engine;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.signum;
 
 import java.util.List;
@@ -157,8 +158,20 @@ class Ray {
 			return endOnRay;
 		}
 		
-		public List<HalfPlane> getHalfPlanes() {
+		List<HalfPlane> getHalfPlanes() {
 			return halfPlanes;
+		}
+		
+		Intersection merge(Intersection other) {
+			checkArgument(other.intersectionType != Ray.IntersectionType.LINE_SEGMENT &&
+					(startOnRay && other.endOnRay) || (endOnRay && other.startOnRay),
+					"Intersection must be a corner point");
+			
+			if (startOnRay) {
+				return new Intersection(distance, halfPlanes.get(1), other.halfPlanes.get(0));
+			}
+			
+			return new Intersection(distance, halfPlanes.get(0), other.halfPlanes.get(1));
 		}
 	}
 }

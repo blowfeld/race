@@ -1,28 +1,17 @@
 package thomasb.race.engine;
 
-import static com.google.common.collect.Collections2.filter;
 import static thomasb.race.engine.Ray.IntersectionType.LINE_SEGMENT;
-import static thomasb.race.engine.Ray.IntersectionType.POINT;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import thomasb.race.engine.Ray.HalfPlane;
 import thomasb.race.engine.Ray.Intersection;
-import thomasb.race.engine.Ray.IntersectionType;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 final class TrackPolygon {
-	private static final Predicate<Intersection> POINT_FILTER = new Predicate<Intersection>() {
-		@Override
-		public boolean apply(Intersection input) {
-			return input.getType() == IntersectionType.POINT;
-		}
-	};
-	
 	private final List<PointDouble> corners;
 	private final TrackType type;
 
@@ -34,46 +23,37 @@ final class TrackPolygon {
 	public List<Intersection> intersectionPoints(Ray ray) {
 		List<Intersection> intersectionPoints = new ArrayList<>();
 		PointDouble previousCorner = Iterables.getLast(corners);
-		Intersection previousIntersection = ray.getIntersection(previousCorner, corners.get(0));
-		IntersectionType previousIntersectionType = previousIntersection == null ?
-				null : previousIntersection.getType();
-		HalfPlane previousHalfPlane = ray.detectHalfPlane(corners.get(0)) == HalfPlane.ON_RAY && previousIntersectionType != IntersectionType.LINE_SEGMENT ?
-				ray.detectHalfPlane(previousCorner) : null;
-		
 		for (PointDouble corner : corners) {
 			Intersection intersection = ray.getIntersection(previousCorner, corner);
-			if (intersection != null) {
-				if (intersection.getType() == LINE_SEGMENT) {
-					// always add line segments, as the polygon boundary may be included or not
-					intersectionPoints.add(intersection);
-					previousHalfPlane = null;
-				} else if (previousIntersectionType == LINE_SEGMENT) {
-					// since this is not a line segment, the intersection point is the end point
-					// of the previous line segment
-				} else if (intersection.endOnRay()) {
-					// we will add this intersection point in the next step if necessary,
-					// either with a line segment, or if we change half planes
-				} else if (previousHalfPlane != ray.detectHalfPlane(corner)) {
-					// we cross the polygon boundary in a corner point
-					intersectionPoints.add(intersection);
+			if (intersection != null && intersection.getType() != LINE_SEGMENT) {
+				if (!intersectionPoints.isEmpty() && (intersection.startOnRay() || intersection.endOnRay())) {
+					int lastIndex = intersectionPoints.size() - 1;
+					Intersection lastIntersectionPoint = intersectionPoints.get(lastIndex);
+					if (lastIntersectionPoint.distance() == intersection.distance() &&
+							!lastIntersectionPoint.getHalfPlanes().containsAll(intersection.getHalfPlanes())) {
+						Intersection merged = lastIntersectionPoint.merge(intersection);
+						intersectionPoints.set(lastIndex, merged);
+					} else {
+						intersectionPoints.add(intersection);
+					}
 				} else {
-					// we touch the polygon in a corner point, but do not cross the boundary.
-					// Corner points are never included in the polygon
+					intersectionPoints.add(intersection);
 				}
-				
-				// Remember the half plane if the end touches the ray
-				if (intersection.endOnRay() && intersection.getType() == POINT) {
-					previousHalfPlane = ray.detectHalfPlane(previousCorner);
-				} else {
-					previousHalfPlane = null;
-				}
-				
-				previousIntersectionType = intersection.getType();
 			}
 			
 			previousCorner = corner;
 		}
 		
+		int lastIndex = intersectionPoints.size() - 1;
+		Intersection lastIntersectionPoint = intersectionPoints.get(lastIndex);
+		Intersection intersection = intersectionPoints.get(0);
+		if (lastIntersectionPoint.distance() == intersection.distance() &&
+				!lastIntersectionPoint.getHalfPlanes().containsAll(intersection.getHalfPlanes())) {
+			Intersection merged = lastIntersectionPoint.merge(intersection);
+			intersectionPoints.set(0, merged);
+			intersectionPoints.remove(lastIndex);
+		}
+			
 		return ImmutableList.copyOf(intersectionPoints);
 	}
 	
@@ -82,7 +62,24 @@ final class TrackPolygon {
 	}
 	
 	public boolean containsStartPoint(Ray ray, List<Intersection> intersectionPoints) {
-		return filter(intersectionPoints, POINT_FILTER).size() % 2 == 1;
+		int boundaryCrossings = 0;
+		
+		HalfPlane previousHalfPlane = null;
+		for (Intersection intersection : intersectionPoints) {
+			List<HalfPlane> halfPlanes = intersection.getHalfPlanes();
+			if (!halfPlanes.contains(HalfPlane.ON_RAY) || (previousHalfPlane != null && !halfPlanes.contains(previousHalfPlane))) {
+				boundaryCrossings += 1;
+			}
+			
+			if (previousHalfPlane == null && halfPlanes.contains(HalfPlane.ON_RAY)) {
+				previousHalfPlane = halfPlanes.get(0) == HalfPlane.ON_RAY ?
+						halfPlanes.get(1) : halfPlanes.get(0);
+			} else {
+				previousHalfPlane = null;
+			}
+		}
+		
+		return boundaryCrossings % 2 == 1;
 	}
 	
 	public TrackType getType() {
