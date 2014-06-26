@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static thomasb.race.engine.RaceMatchers.isCloseTo;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -155,6 +156,20 @@ public class TrackPolygonTest extends Test2D {
 	}
 	
 	@Test
+	public void containsStartingPointOfRayStartingOnBoundary() {
+		TrackPolygon trackPolygon = setupPolygon(points[5][5], points[5][15], points[15][15], points[15][5]);
+		
+		PointDouble startPoint = points[10][15];
+		Ray rayOutside = new Ray(startPoint, 0);
+		
+		assertFalse(trackPolygon.containsStartPoint(rayOutside));
+
+		Ray rayInside = new Ray(startPoint, 180);
+		
+		assertTrue(trackPolygon.containsStartPoint(rayInside));
+	}
+	
+	@Test
 	public void doesNotContainStartingPointOfRayStartingFromOutside() {
 		TrackPolygon trackPolygon = setupPolygon(points[5][5], points[5][15], points[15][15], points[15][5]);
 		
@@ -182,7 +197,6 @@ public class TrackPolygonTest extends Test2D {
 				points[10][5], points[10][10], points[10][15]);
 		
 		assertPointsClose(actual, expectedIntersections, startPoint);
-		
 		assertFalse(trackPolygon.containsStartPoint(ray));
 	}
 	
@@ -206,6 +220,22 @@ public class TrackPolygonTest extends Test2D {
 		assertPointsClose(actual, expectedIntersections, startPoint);
 		
 		assertTrue(trackPolygon.containsStartPoint(ray));
+	}
+	
+	@Test
+	public void rayHasNoIntersection() {
+		TrackPolygon trackPolygon = setupPolygon(
+				points[5][5], points[5][15], points[15][15], points[15][5]);
+		
+		PointDouble startPoint = points[2][0];
+		Ray ray = new Ray(startPoint, 0);
+		
+		List<Intersection> actual = trackPolygon.intersectionPoints(ray);
+		
+		List<PointDouble> expectedIntersections = Collections.emptyList();
+		
+		assertPointsClose(actual, expectedIntersections, startPoint);
+		assertFalse(trackPolygon.containsStartPoint(ray));
 	}
 	
 	private void assertPointsClose(List<Intersection> actualIntersections, List<PointDouble> expected, PointDouble startPoint) {

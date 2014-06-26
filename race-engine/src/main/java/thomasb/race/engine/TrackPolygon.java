@@ -44,14 +44,16 @@ final class TrackPolygon {
 			previousCorner = corner;
 		}
 		
-		int lastIndex = intersectionPoints.size() - 1;
-		Intersection lastIntersectionPoint = intersectionPoints.get(lastIndex);
-		Intersection intersection = intersectionPoints.get(0);
-		if (lastIntersectionPoint.distance() == intersection.distance() &&
-				!lastIntersectionPoint.getHalfPlanes().containsAll(intersection.getHalfPlanes())) {
-			Intersection merged = lastIntersectionPoint.merge(intersection);
-			intersectionPoints.set(0, merged);
-			intersectionPoints.remove(lastIndex);
+		if (!intersectionPoints.isEmpty()) {
+			int lastIndex = intersectionPoints.size() - 1;
+			Intersection lastIntersectionPoint = intersectionPoints.get(lastIndex);
+			Intersection intersection = intersectionPoints.get(0);
+			if (lastIntersectionPoint.distance() == intersection.distance() &&
+					!lastIntersectionPoint.getHalfPlanes().containsAll(intersection.getHalfPlanes())) {
+				Intersection merged = lastIntersectionPoint.merge(intersection);
+				intersectionPoints.set(0, merged);
+				intersectionPoints.remove(lastIndex);
+			}
 		}
 			
 		return ImmutableList.copyOf(intersectionPoints);
@@ -68,7 +70,7 @@ final class TrackPolygon {
 		for (Intersection intersection : intersectionPoints) {
 			List<HalfPlane> halfPlanes = intersection.getHalfPlanes();
 			if (!halfPlanes.contains(HalfPlane.ON_RAY) || (previousHalfPlane != null && !halfPlanes.contains(previousHalfPlane))) {
-				boundaryCrossings += 1;
+				boundaryCrossings += intersection.distance() > 0.0 ? 1 : 0;
 			}
 			
 			if (previousHalfPlane == null && halfPlanes.contains(HalfPlane.ON_RAY)) {
@@ -84,5 +86,9 @@ final class TrackPolygon {
 	
 	public TrackType getType() {
 		return type;
+	}
+	
+	public List<PointDouble> getCorners() {
+		return corners;
 	}
 }
