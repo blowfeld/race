@@ -20,8 +20,19 @@ class RacePathMatcher extends BaseMatcher<RacePath> {
 		
 		RacePath other = (RacePath) item;
 		
-		if (expected.getStatus() != other.getStatus() ||
-				expected.getSegments().size() != other.getSegments().size()) {
+		if (expected.getSegments().size() != other.getSegments().size()) {
+			return false;
+		}
+		
+		if (expected.getEndState().getControlState() != other.getEndState().getControlState()) {
+			return false;
+		}
+		
+		if (expected.getEndState().getLaps() != other.getEndState().getLaps()) {
+			return false;
+		}
+		
+		if (expected.getEndState().getPlayerStatus() != other.getEndState().getPlayerStatus()) {
 			return false;
 		}
 		

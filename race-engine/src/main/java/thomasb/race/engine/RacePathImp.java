@@ -5,26 +5,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.List;
 
 final class RacePathImp implements RacePath {
-	private final PlayerStatus status;
-	private final int finishedLaps;
+	private final PlayerState state;
 	private final List<? extends PathSegment> segments;
 	
-	RacePathImp(PlayerStatus status,
-			int finishedLaps,
+	RacePathImp(PlayerState state,
 			List<? extends PathSegment> segments) {
-		this.finishedLaps = finishedLaps;
-		this.status = checkNotNull(status);
+		this.state = checkNotNull(state);
 		this.segments = checkNotNull(segments);
 	}
 	
 	@Override
-	public PlayerStatus getStatus() {
-		return status;
-	}
-	
-	@Override
-	public int finishedLaps() {
-		return finishedLaps;
+	public PlayerState getEndState() {
+		return state;
 	}
 	
 	@Override
@@ -34,8 +26,7 @@ final class RacePathImp implements RacePath {
 	
 	@Override
 	public String toString() {
-		return "RacePathImp [status=" + status +
-				", finishedLaps=" + finishedLaps +
+		return "RacePathImp [status=" + state +
 				", segments=" + segments + "]";
 	}
 }

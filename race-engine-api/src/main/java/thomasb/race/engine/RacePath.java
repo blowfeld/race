@@ -4,9 +4,7 @@ import java.util.List;
 
 public interface RacePath {
 	
-	PlayerStatus getStatus();
-	
-	int finishedLaps();
+	PlayerState getEndState();
 	
 	List<? extends PathSegment> getSegments();
 	

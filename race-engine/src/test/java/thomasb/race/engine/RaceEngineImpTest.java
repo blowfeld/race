@@ -70,11 +70,11 @@ public class RaceEngineImpTest extends Test2D {
 		ControlState controlState = Mocks.controlState(0, 90);
 		PointDouble startPoint = points[1][2];
 		
-		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 1.1, controlState);
+		RacePath actualPath = engine.calculatePath(createState(controlState, startPoint), 0.0, 1.1);
 		
 		List<RacePathSegment> expectedSegments = ImmutableList.of(
 				new RacePathSegment(startPoint, startPoint, 0.0, 1.0));
-		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, 0, expectedSegments);
+		RacePath expectedPath = new RacePathImp(createState(controlState, startPoint), expectedSegments);
 		
 		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
 	}
@@ -84,11 +84,11 @@ public class RaceEngineImpTest extends Test2D {
 		ControlState currentState = Mocks.controlState(2, 90);
 		PointDouble startPoint = points[0][0];
 		
-		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 1.0, currentState);
+		RacePath actualPath = engine.calculatePath(createState(currentState, startPoint), 0.0, 1.0);
 		
 		List<RacePathSegment> expectedSegments = ImmutableList.of(
 				new RacePathSegment(startPoint, points[2][0], 0.0, 1.0));
-		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, 0, expectedSegments);
+		RacePath expectedPath = new RacePathImp(createState(currentState, points[2][0]), expectedSegments);
 		
 		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
 	}
@@ -98,11 +98,11 @@ public class RaceEngineImpTest extends Test2D {
 		ControlState currentState = Mocks.controlState(1, 45);
 		PointDouble startPoint = points[0][0];
 		
-		RacePath actualPath = engine.calculatePath(startPoint, 0.0, sqrt(2), currentState);
+		RacePath actualPath = engine.calculatePath(createState(currentState, startPoint), 0.0, sqrt(2));
 		
 		List<RacePathSegment> expectedSegments = ImmutableList.of(
 				new RacePathSegment(startPoint, points[1][1], 0.0, sqrt(2)));
-		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, 0, expectedSegments);
+		RacePath expectedPath = new RacePathImp(createState(currentState, points[1][1]), expectedSegments);
 		
 		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
 	}
@@ -112,7 +112,7 @@ public class RaceEngineImpTest extends Test2D {
 		ControlState currentState = Mocks.controlState(2, 0);
 		PointDouble startPoint = points[0][0];
 		
-		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 1.5, currentState);
+		RacePath actualPath = engine.calculatePath(createState(currentState, startPoint), 0.0, 1.5);
 		
 		RacePathSegment expectedAsphaltSegment =
 				new RacePathSegment(startPoint, points[0][1], 0.0, 0.5);
@@ -120,7 +120,7 @@ public class RaceEngineImpTest extends Test2D {
 		RacePathSegment expectedGreenSegment =
 				new RacePathSegment(points[0][1], points[0][2], 0.5, 1.5);
 
-		RacePath expectedPath = new RacePathImp(PlayerStatus.ACTIVE, 0,
+		RacePath expectedPath = new RacePathImp(createState(currentState, points[0][2]),
 				ImmutableList.of(expectedAsphaltSegment, expectedGreenSegment));
 		
 		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
@@ -131,7 +131,7 @@ public class RaceEngineImpTest extends Test2D {
 		ControlState currentState = Mocks.controlState(2, 0);
 		PointDouble startPoint = points[0][0];
 		
-		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 2.0, currentState);
+		RacePath actualPath = engine.calculatePath(createState(currentState, startPoint), 0.0, 2.0);
 		
 		RacePathSegment expectedEndSegment =
 				new RacePathSegment(points[0][2], points[0][3], 1.5, 2.0);
@@ -144,14 +144,14 @@ public class RaceEngineImpTest extends Test2D {
 		ControlState currentState = Mocks.controlState(2, 90);
 		PointDouble startPoint = points[0][0];
 		
-		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 10.0, currentState);
+		RacePath actualPath = engine.calculatePath(createState(currentState, startPoint), 0.0, 10.0);
 		
 		RacePathSegment expectedAsphaltSegment =
 				new RacePathSegment(points[0][0], points[10][0], 0.0, 5.0);
 		RacePathSegment expectedWallSegment =
 				new RacePathSegment(points[10][0], points[10][0], 5.0, 10.0);
 		
-		RacePath expectedPath = new RacePathImp(PlayerStatus.TERMINATED, 0,
+		RacePath expectedPath = new RacePathImp(new RacePlayerState(points[10][0], currentState, 0, PlayerStatus.TERMINATED),
 				ImmutableList.of(expectedAsphaltSegment, expectedWallSegment));
 		
 		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
@@ -162,8 +162,12 @@ public class RaceEngineImpTest extends Test2D {
 		ControlState currentState = Mocks.controlState(1, 0);
 		PointDouble startPoint = points[0][0];
 		
-		RacePath actualPath = engine.calculatePath(startPoint, 0.0, 4.0, currentState);
+		RacePath actualPath = engine.calculatePath(createState(currentState, startPoint), 0.0, 4.0);
 		
-		assertEquals(actualPath.finishedLaps(), 1);
+		assertEquals(actualPath.getEndState().getLaps(), 1);
+	}
+	
+	private PlayerState createState(ControlState control, PointDouble position) {
+		return new RacePlayerState(position, control, 0, PlayerStatus.ACTIVE);
 	}
 }
