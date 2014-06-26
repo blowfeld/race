@@ -86,6 +86,18 @@ public class PolygonRaceTrackTest extends Test2D {
 	}
 	
 	@Test
+	public void startFromSectionBoundaryTouchBoundary() {
+		List<TrackSegment> actualSegments = raceTrack.segmentsFor(points[4][9], 0);
+		
+		List<TrackSegment> expectedSegments = ImmutableList.of(
+				Mocks.trackSegment(points[4][9], points[4][16], 2, 1),
+				Mocks.trackSegment(points[4][16], points[4][18], 1, 0),
+				Mocks.trackSegment(points[4][18], points[4][20], 0, 0));
+		
+		assertSegments(expectedSegments, actualSegments);
+	}
+	
+	@Test
 	public void crossFinish() {
 		List<TrackSegment> actualSegments = raceTrack.segmentsFor(points[5][9], 0);
 		

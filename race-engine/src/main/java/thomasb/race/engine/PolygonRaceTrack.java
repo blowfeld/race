@@ -10,6 +10,7 @@ import java.util.List;
 
 import thomasb.race.engine.Ray.HalfPlane;
 import thomasb.race.engine.Ray.Intersection;
+import thomasb.race.engine.Ray.IntersectionType;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
@@ -88,7 +89,7 @@ public class PolygonRaceTrack implements RaceTrack {
 		for (int i = 0; i < trackSections.size(); i++) {
 			TrackPolygon section = trackSections.get(i);
 			List<Intersection> intersectionPoints = section.intersectionPoints(ray);
-			if (!section.containsStartPoint(ray)) {
+			if (!section.containsStartPoint(ray, intersectionPoints)) {
 				startSection += 1;
 			};
 			
@@ -104,8 +105,12 @@ public class PolygonRaceTrack implements RaceTrack {
 		PointDouble segmentStart = startPoint;
 		double startDistance = 0.0;
 		List<TrackSegment> segments = new ArrayList<>();
+		if (!allIntersections.isEmpty() && allIntersections.get(0).intersection.getType() == IntersectionType.LINE_SEGMENT) {
+			allIntersections = allIntersections.subList(1, allIntersections.size());
+		}
 		for (BoundaryPoint intersection : allIntersections) {
 			PointDouble segmentEnd = intersection.getPoint();
+			
 			int maxSpeed = determineMaxSpeed(intersection, currentSection == -1 ? startSection : currentSection);
 			int finish = startDistance <= finishDistance  && finishDistance <= intersection.distance() ?
 					crossedFinished : 0;

@@ -10,6 +10,7 @@ import java.util.List;
 
 import thomasb.race.engine.Ray.HalfPlane;
 import thomasb.race.engine.Ray.Intersection;
+import thomasb.race.engine.Ray.IntersectionType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -49,6 +50,10 @@ final class TrackPolygon {
 				} else {
 					intersectionPoints.add(intersection);
 				}
+			} else if (intersection != null &&
+					intersection.getIntersectionStart().equals(ray.getStartPoint()) &&
+					!ray.getStartPoint().equals(corner)) {
+				intersectionPoints.add(intersection);
 			}
 			
 			previousCorner = corner;
@@ -76,6 +81,10 @@ final class TrackPolygon {
 	}
 	
 	public boolean containsStartPoint(Ray ray, List<Intersection> intersectionPoints) {
+		if (!intersectionPoints.isEmpty() && intersectionPoints.get(0).getType() == IntersectionType.LINE_SEGMENT) {
+			return true;
+		}
+		
 		int boundaryCrossings = 0;
 		
 		HalfPlane previousHalfPlane = null;
