@@ -14,6 +14,7 @@ import java.util.List;
 import org.junit.Test;
 
 import thomasb.race.engine.Ray.Intersection;
+import thomasb.race.engine.Ray.IntersectionType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -219,6 +220,24 @@ public class TrackPolygonTest extends Test2D {
 		
 		assertPointsClose(actual, expectedIntersections, startPoint);
 		
+		assertTrue(trackPolygon.containsStartPoint(ray));
+	}
+	
+	@Test
+	public void touchingRayStartsOnBoundaryAndLeavesPolygon() {
+		TrackPolygon trackPolygon = setupPolygon(points[5][5], points[5][15], points[15][15], points[15][5]);
+		
+		PointDouble startPoint = points[5][10];
+		Ray ray = new Ray(startPoint, 0);
+		
+		List<Intersection> actual = trackPolygon.intersectionPoints(ray);
+		
+		List<PointDouble> expectedIntersections = Lists.newArrayList(
+				points[5][10], points[5][15]);
+		
+		assertPointsClose(actual, expectedIntersections, startPoint);
+		
+		assertEquals(IntersectionType.LINE_SEGMENT, actual.get(0).getType());
 		assertTrue(trackPolygon.containsStartPoint(ray));
 	}
 	
