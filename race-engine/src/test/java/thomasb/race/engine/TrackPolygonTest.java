@@ -10,7 +10,7 @@ import static thomasb.race.engine.RaceMatchers.isCloseTo;
 import java.util.Comparator;
 import java.util.List;
 
-import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import thomasb.race.engine.Ray.Intersection;
@@ -39,18 +39,16 @@ public class TrackPolygonTest extends Test2D {
 		};
 	}
 	
-	private TrackPolygon trackPolygon;
-	
-	@Before
-	public void setupPolygon() {
-		List<PointDouble> corners = ImmutableList.of(
-				points[5][5], points[5][15], points[15][15], points[15][5]);
+	public TrackPolygon setupPolygon(PointDouble... points) {
+		List<PointDouble> corners = ImmutableList.copyOf(points);
 		
-		trackPolygon = new TrackPolygon(corners, TrackType.ASPHALT);
+		return new TrackPolygon(corners, TrackType.ASPHALT);
 	}
 	
 	@Test
 	public void rayStartingFromInsideIntersectsOnce() {
+		TrackPolygon trackPolygon = setupPolygon(points[5][5], points[5][15], points[15][15], points[15][5]);
+		
 		PointDouble startPoint = points[10][10];
 		Ray ray = new Ray(startPoint, 0);
 		
@@ -61,6 +59,8 @@ public class TrackPolygonTest extends Test2D {
 	
 	@Test
 	public void rayStartingFromOutsideIntersectsTwice() {
+		TrackPolygon trackPolygon = setupPolygon(points[5][5], points[5][15], points[15][15], points[15][5]);
+		
 		PointDouble startPoint = points[10][0];
 		Ray ray = new Ray(startPoint, 0);
 		
@@ -73,7 +73,68 @@ public class TrackPolygonTest extends Test2D {
 	}
 	
 	@Test
-	public void touchingRayIntersectsInLineSegment() {
+	public void rayStartingFromOutsideIntersectsFirstCornerAndTwice() {
+		TrackPolygon trackPolygon = setupPolygon(points[10][5], points[15][10], points[10][15], points[5][10]);
+		
+		PointDouble startPoint = points[10][0];
+		Ray ray = new Ray(startPoint, 0);
+		
+		List<Intersection> actual = trackPolygon.intersectionPoints(ray);
+		
+		List<PointDouble> expectedIntersections = Lists.newArrayList(
+				points[10][5], points[10][15]);
+		
+		assertPointsClose(actual, expectedIntersections, startPoint);
+	}
+	
+	@Test
+	public void rayStartingFromOutsideIntersectsSecondCornerAndTwice() {
+		TrackPolygon trackPolygon = setupPolygon(points[5][10], points[10][5], points[15][10], points[10][15]);
+		
+		PointDouble startPoint = points[10][0];
+		Ray ray = new Ray(startPoint, 0);
+		
+		List<Intersection> actual = trackPolygon.intersectionPoints(ray);
+		
+		List<PointDouble> expectedIntersections = Lists.newArrayList(
+				points[10][5], points[10][15]);
+		
+		assertPointsClose(actual, expectedIntersections, startPoint);
+	}
+	
+	@Test
+	public void rayStartingFromOutsideIntersectsLastCornerAndTwice() {
+		TrackPolygon trackPolygon = setupPolygon(points[15][10], points[10][15], points[5][10], points[10][5]);
+		
+		PointDouble startPoint = points[10][0];
+		Ray ray = new Ray(startPoint, 0);
+		
+		List<Intersection> actual = trackPolygon.intersectionPoints(ray);
+		
+		List<PointDouble> expectedIntersections = Lists.newArrayList(
+				points[10][5], points[10][15]);
+		
+		assertPointsClose(actual, expectedIntersections, startPoint);
+	}
+	
+	@Test
+	public void rayStartingFromInsideIntersectsFirstCornerOnce() {
+		TrackPolygon trackPolygon = setupPolygon(points[10][15], points[5][10], points[10][5], points[15][10]);
+		
+		PointDouble startPoint = points[10][10];
+		Ray ray = new Ray(startPoint, 0);
+		
+		List<Intersection> actual = trackPolygon.intersectionPoints(ray);
+		
+		List<PointDouble> expectedIntersections = Lists.newArrayList(points[10][15]);
+		
+		assertPointsClose(actual, expectedIntersections, startPoint);
+	}
+	
+	@Test
+	public void touchingRayIntersectsInLineSegmentStartOnFirstCorner() {
+		TrackPolygon trackPolygon = setupPolygon(points[5][15], points[15][15], points[15][5], points[5][5]);
+		
 		PointDouble startPoint = points[15][0];
 		Ray ray = new Ray(startPoint, 0);
 		
@@ -89,6 +150,8 @@ public class TrackPolygonTest extends Test2D {
 	
 	@Test
 	public void containsStartingPointOfRayStartingFromInside() {
+		TrackPolygon trackPolygon = setupPolygon(points[5][5], points[5][15], points[15][15], points[15][5]);
+		
 		PointDouble startPoint = points[10][10];
 		Ray ray = new Ray(startPoint, 0);
 		
@@ -96,9 +159,31 @@ public class TrackPolygonTest extends Test2D {
 	}
 	
 	@Test
-	public void doesNotContainsStartingPointOfRayStartingFromOutside() {
+	public void doesNotContainStartingPointOfRayStartingFromOutside() {
+		TrackPolygon trackPolygon = setupPolygon(points[5][5], points[5][15], points[15][15], points[15][5]);
+		
 		PointDouble startPoint = points[10][0];
 		Ray ray = new Ray(startPoint, 0);
+		
+		assertFalse(trackPolygon.containsStartPoint(ray));
+	}
+	
+	@Test
+	@Ignore
+	public void touchBoundaryAndEnterPolygon() {
+		TrackPolygon trackPolygon = setupPolygon(points[5][5], points[10][5], points[10][10], points[15][10], points[15][15], points[5][15]);
+		
+		PointDouble startPoint = points[10][0];
+		Ray ray = new Ray(startPoint, 0);
+		
+		List<Intersection> actual = trackPolygon.intersectionPoints(ray);
+		
+		List<PointDouble> expectedIntersections = Lists.newArrayList(
+				points[10][5], points[10][15]);
+		
+		assertPointsClose(actual, expectedIntersections, startPoint);
+		assertEquals(IntersectionType.LINE_SEGMENT, actual.get(0).getType());
+		assertThat(actual.get(0).getIntersectionEnd(), isCloseTo(points[10][10], PRECISION));
 		
 		assertFalse(trackPolygon.containsStartPoint(ray));
 	}

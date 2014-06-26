@@ -80,10 +80,6 @@ class Ray {
 			return new Intersection(endDiff.norm(), point2, point1);
 		}
 		
-		if (startPlane == HalfPlane.ON_RAY || endPlane == HalfPlane.ON_RAY) {
-			return null;
-		}
-		
 		VectorPoint x = rayVector;
 		VectorPoint y_z = VectorPoint.from(point2).diff(point1);
 		VectorPoint x_z = VectorPoint.from(point2).diff(startPoint);
@@ -94,7 +90,11 @@ class Ray {
 		double normalization = 1 / (x.getX() * y_z.getY() - y_z.getX() * x.getY());
 		double distance = normalization * (inverse_0_0 * x_z.getX() + inverse_0_1 * x_z.getY());
 		
-		return distance < 0 ? null : new Intersection(distance);
+		boolean startOnRay = startPlane == HalfPlane.ON_RAY;
+		boolean endOnRay = endPlane == HalfPlane.ON_RAY;
+		
+		return distance < 0 ?
+				null : new Intersection(distance, startOnRay, endOnRay);
 	}
 	
 	class Intersection {
@@ -102,20 +102,28 @@ class Ray {
 		private final PointDouble intersectionStart;
 		private final PointDouble intersectionEnd;
 		private final IntersectionType intersectionType;
+		private final boolean startOnRay;
+		private final boolean endOnRay;
 		
-		Intersection(double distance, PointDouble intersectionStart, PointDouble intersectionEnd) {
+		Intersection(double distance,
+				PointDouble intersectionStart,
+				PointDouble intersectionEnd) {
 			this.distance = distance;
 			this.intersectionStart = intersectionStart;
 			this.intersectionEnd = intersectionEnd;
 			this.intersectionType = intersectionStart.equals(intersectionEnd) ?
 					IntersectionType.POINT : IntersectionType.LINE_SEGMENT;
+			this.startOnRay = true;
+			this.endOnRay = true;
 		}
 		
-		Intersection(double distance) {
+		Intersection(double distance, boolean startOnRay, boolean endOnRay) {
 			this.distance = distance;
 			this.intersectionStart = startPoint.add(rayVector.multiply(distance));
 			this.intersectionEnd = this.intersectionStart;
 			this.intersectionType = IntersectionType.POINT;
+			this.startOnRay = startOnRay;
+			this.endOnRay = endOnRay;
 		}
 		
 		double distance() {
@@ -136,6 +144,14 @@ class Ray {
 		
 		PointDouble getIntersectionEnd() {
 			return intersectionEnd;
+		}
+		
+		boolean startOnRay() {
+			return startOnRay;
+		}
+		
+		boolean endOnRay() {
+			return endOnRay;
 		}
 	}
 }
