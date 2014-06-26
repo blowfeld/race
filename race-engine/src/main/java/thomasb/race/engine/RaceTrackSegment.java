@@ -5,15 +5,15 @@ import static java.util.Objects.hash;
 
 final class RaceTrackSegment extends AbstractSegment implements TrackSegment {
 	private final int maxSpeed;
-	private final boolean finish;
+	private final int finish;
 
 	RaceTrackSegment(PointDouble start,
 			PointDouble end,
 			int maxSpeed,
-			boolean isFinish) {
+			int crossedFinish) {
 		super(start, end);
 		this.maxSpeed = maxSpeed;
-		this.finish = isFinish;
+		this.finish = crossedFinish;
 	}
 
 	static RaceTrackSegment from(TrackSegment segment) {
@@ -24,7 +24,7 @@ final class RaceTrackSegment extends AbstractSegment implements TrackSegment {
 		return new RaceTrackSegment(segment.getStart(),
 				segment.getEnd(),
 				segment.getMaxSpeed(),
-				segment.isFinish());
+				segment.crossedFinish());
 	}
 	
 	@Override
@@ -34,7 +34,7 @@ final class RaceTrackSegment extends AbstractSegment implements TrackSegment {
 
 
 	@Override
-	public boolean isFinish() {
+	public int crossedFinish() {
 		return finish;
 	}
 	
@@ -64,7 +64,7 @@ final class RaceTrackSegment extends AbstractSegment implements TrackSegment {
 		return getStart().equals(other.getStart()) &&
 				getEnd().equals(other.getEnd()) &&
 				maxSpeed == other.getMaxSpeed() &&
-				finish == other.isFinish();
+				finish == other.crossedFinish();
 	}
 
 

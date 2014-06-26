@@ -84,9 +84,7 @@ public class RaceEngineImp implements RaceEngine {
 						endTime);
 			}
 			
-			if (segment.isFinish()) {
-				laps += 1;
-			}
+			laps += segment.crossedFinish();
 			
 			int speed = min(control.getSpeed(), segment.getMaxSpeed());
 			double maxDistance = speed * (endTime - segmentStartTime);

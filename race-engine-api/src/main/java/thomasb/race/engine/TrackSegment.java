@@ -8,6 +8,6 @@ public interface TrackSegment {
 	
 	int getMaxSpeed();
 	
-	boolean isFinish();
+	int crossedFinish();
 	
 }

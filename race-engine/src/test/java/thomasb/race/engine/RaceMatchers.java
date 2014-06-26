@@ -10,6 +10,10 @@ public class RaceMatchers {
 		return new PathSegmentMatcher(expected, precision);
 	}
 	
+	static TrackSegmentMatcher isCloseTo(TrackSegment expected, double precision) {
+		return new TrackSegmentMatcher(expected, precision);
+	}
+	
 	static RacePathMatcher isCloseTo(RacePath expected, double precision) {
 		return new RacePathMatcher(expected, precision);
 	}

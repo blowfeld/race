@@ -1,8 +1,11 @@
 package thomasb.race.engine;
 
+import static java.lang.Math.signum;
+import static java.util.Collections.sort;
 import static thomasb.race.engine.Ray.IntersectionType.LINE_SEGMENT;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import thomasb.race.engine.Ray.HalfPlane;
@@ -12,6 +15,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 final class TrackPolygon {
+	private static final Comparator<Intersection> DISTANCE_COMPARATOR = new Comparator<Intersection>() {
+		@Override
+		public int compare(Intersection o1, Intersection o2) {
+			return (int) signum(o1.distance() - o2.distance());
+		}
+	};
+	
 	private final List<PointDouble> corners;
 	private final TrackType type;
 
@@ -55,7 +65,9 @@ final class TrackPolygon {
 				intersectionPoints.remove(lastIndex);
 			}
 		}
-			
+		
+		sort(intersectionPoints, DISTANCE_COMPARATOR);
+		
 		return ImmutableList.copyOf(intersectionPoints);
 	}
 	
@@ -70,7 +82,7 @@ final class TrackPolygon {
 		for (Intersection intersection : intersectionPoints) {
 			List<HalfPlane> halfPlanes = intersection.getHalfPlanes();
 			if (!halfPlanes.contains(HalfPlane.ON_RAY) || (previousHalfPlane != null && !halfPlanes.contains(previousHalfPlane))) {
-				boundaryCrossings += intersection.distance() > 0.0 ? 1 : 0;
+				boundaryCrossings += 1;
 			}
 			
 			if (previousHalfPlane == null && halfPlanes.contains(HalfPlane.ON_RAY)) {
@@ -79,6 +91,10 @@ final class TrackPolygon {
 			} else {
 				previousHalfPlane = null;
 			}
+		}
+		
+		if (intersectionPoints.size() > 1 && intersectionPoints.get(0).distance() == 0.0) {
+			return boundaryCrossings % 2 == 0;
 		}
 		
 		return boundaryCrossings % 2 == 1;

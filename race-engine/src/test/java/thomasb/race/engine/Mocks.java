@@ -33,16 +33,16 @@ public class Mocks {
 	public static TrackSegment trackSegment(PointDouble start,
 			PointDouble end,
 			int maxSpeed,
-			boolean isFinish) {
+			int crossedFinish) {
 		String description = String.format(
 				"TrackSegmentMock[start=%s, end=%s, maxSpeed=%s, isFinished=%s]",
-				start, end, maxSpeed, isFinish);
+				start, end, maxSpeed, crossedFinish);
 
 		TrackSegment segment = mock(TrackSegment.class);
 		when(segment.getStart()).thenReturn(start);
 		when(segment.getEnd()).thenReturn(end);
 		when(segment.getMaxSpeed()).thenReturn(maxSpeed);
-		when(segment.isFinish()).thenReturn(isFinish);
+		when(segment.crossedFinish()).thenReturn(crossedFinish);
 		when(segment.toString()).thenReturn(description);
 		
 		return segment;

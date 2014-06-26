@@ -162,7 +162,7 @@ public class TrackPolygonTest extends Test2D {
 		PointDouble startPoint = points[10][15];
 		Ray rayOutside = new Ray(startPoint, 0);
 		
-		assertFalse(trackPolygon.containsStartPoint(rayOutside));
+		assertTrue(trackPolygon.containsStartPoint(rayOutside));
 
 		Ray rayInside = new Ray(startPoint, 180);
 		

@@ -20,6 +20,12 @@ class Ray {
 		this.rayVector = VectorPoint.fromDirection(direction);
 	}
 	
+	Ray(PointDouble startPoint, PointDouble secondPoint) {
+		this.startPoint = VectorPoint.from(startPoint);
+		VectorPoint directionVector = VectorPoint.from(startPoint).diff(startPoint);
+		this.rayVector = directionVector.multiply(1 / directionVector.norm());
+	}
+	
 	HalfPlane detectHalfPlane(PointDouble point) {
 		VectorPoint diff = VectorPoint.from(point).diff(startPoint);
 		
@@ -173,5 +179,13 @@ class Ray {
 			
 			return new Intersection(distance, halfPlanes.get(0), other.halfPlanes.get(1));
 		}
+	}
+
+	PointDouble getStartPoint() {
+		return startPoint;
+	}
+	
+	VectorPoint rayVector() {
+		return rayVector;
 	}
 }
