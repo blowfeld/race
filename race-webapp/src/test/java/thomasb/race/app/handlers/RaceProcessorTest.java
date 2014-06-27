@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.comparesEqualTo;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.doubleThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -67,8 +68,8 @@ public class RaceProcessorTest {
 	@Mock HttpServletResponse response;
 	@Mock AsyncContext asyncRequest;
 	
-	@Mock ClockedRequest<JsonObject> clockedRequest_1;
-	@Mock ClockedRequest<JsonObject> clockedRequest_2;
+	ClockedRequest<JsonObject> clockedRequest_1;
+	ClockedRequest<JsonObject> clockedRequest_2;
 	
 	private RaceProcessor processor;
 	
@@ -125,6 +126,7 @@ public class RaceProcessorTest {
 				.thenReturn(path);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setupRequest() {
 		String baseRequestDataString =
@@ -169,6 +171,9 @@ public class RaceProcessorTest {
 		
 		String clockedDataJson_1 = String.format(baseRequestDataString, "1", eventsString);
 		String clockedDataJson_2 = String.format(baseRequestDataString, "2", eventsString);
+	
+		clockedRequest_1 = mock(ClockedRequest.class);
+		clockedRequest_2 = mock(ClockedRequest.class);
 		
 		when(clockedRequest_1.getData()).thenReturn((JsonObject) jsonFrom(clockedDataJson_1));
 		when(clockedRequest_2.getData()).thenReturn((JsonObject) jsonFrom(clockedDataJson_2));
@@ -183,7 +188,7 @@ public class RaceProcessorTest {
 	public void setupProcessor() {
 		List<String> participants = ImmutableList.of("1", "2");
 		
-		processor = new RaceProcessor(participants, track , engine, new RaceJsonConverter(), scoreHandler);
+		processor = new RaceProcessor(participants, track , engine, new RaceJsonConverter(), scoreHandler, 10);
 	}
 	
 	@Test
@@ -255,6 +260,67 @@ public class RaceProcessorTest {
 		String expectedItem =
 				"{"
 					+ "\"id\" : \"%s\","
+					+ "\"state\" : {"
+						+ "\"position\" : {"
+							+ "\"x\" : 0.0," // according to #setupRequests
+							+ "\"y\" : 0.0"
+						+ "},"
+						+ "\"status\" : \"ACTIVE\","
+						+ "\"laps\" : 1,"
+						+ "\"control\" : {"
+							+ "\"speed\" : 1,"
+							+ "\"steering\" : 90"
+						+ "}"
+					+ "},"
+					+ "\"eventData\" : {"
+						+ "\"1\" : ["
+							+ "{"
+								+ "\"start\" : {\"x\" : 0.0, \"y\" : 0.0},"
+								+ "\"end\" : {\"x\" : 1.0, \"y\" : 0.0},"
+								+ "\"start_time\" : 1.0,"
+								+ "\"end_time\" : 1.5"
+							+ "},"
+							+ "{"
+								+ "\"start\" : {\"x\" : 1.0, \"y\" : 0.0},"
+								+ "\"end\" : {\"x\" : 2.0, \"y\" : 0.0},"
+								+ "\"start_time\" : 1.5,"
+								+ "\"end_time\" : 2.0"
+							+ "}"
+						+ "],"
+						+ "\"2\" : ["
+							+ "{"
+								+ "\"start\" : {\"x\" : 0.0, \"y\" : 0.0},"
+								+ "\"end\" : {\"x\" : 1.0, \"y\" : 0.0},"
+								+ "\"start_time\" : 1.0,"
+								+ "\"end_time\" : 1.5"
+							+ "},"
+							+ "{"
+								+ "\"start\" : {\"x\" : 1.0, \"y\" : 0.0},"
+								+ "\"end\" : {\"x\" : 2.0, \"y\" : 0.0},"
+								+ "\"start_time\" : 1.5,"
+								+ "\"end_time\" : 2.0"
+							+ "}"
+						+ "]"
+					+ "}"
+				+ "}";
+		
+		JsonStructure expectedJsonItem_1 = jsonFrom(String.format(expectedItem, "1"));
+		JsonStructure expectedJsonItem_2 = jsonFrom(String.format(expectedItem, "2"));
+		
+		assertEquals(ImmutableList.of(expectedJsonItem_1, expectedJsonItem_2), actual);
+	}
+	
+	@Test
+	public void testProcessWithRedirect() throws ServletException, IOException {
+		when(clockedRequest_1.getTime()).thenReturn(15);
+		when(clockedRequest_2.getTime()).thenReturn(15);
+		
+		List<JsonStructure> actual = processor.process(ImmutableList.of(clockedRequest_1, clockedRequest_2));
+		
+		String expectedItem =
+				"{"
+					+ "\"id\" : \"%s\","
+					+ "\"redirect\" : \"" + HANDLER_ID.toString() + "\","
 					+ "\"state\" : {"
 						+ "\"position\" : {"
 							+ "\"x\" : 0.0," // according to #setupRequests

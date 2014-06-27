@@ -42,17 +42,20 @@ final class RaceProcessor implements ClockedRequestProcessor<JsonObject> {
 	private final JsonConverter converter;
 	private final List<String> participants;
 	private final RequestHandler scoreHandler;
+	private final int maxTime;
 	
 	RaceProcessor(List<String> participants,
 			RaceTrack track,
 			RaceEngine engine,
 			JsonConverter converter,
-			RequestHandler scoreHandler) {
+			RequestHandler scoreHandler,
+			int maxTime) {
 		this.participants = participants;
 		this.track = track;
 		this.engine = engine;
 		this.converter = converter;
 		this.scoreHandler = scoreHandler;
+		this.maxTime = maxTime;
 	}
 	
 	@Override
@@ -119,6 +122,9 @@ final class RaceProcessor implements ClockedRequestProcessor<JsonObject> {
 			
 			JsonObject responseData = request.getData();
 			responseBuilder.add(ID_PARAMETER, responseData.get(ID_PARAMETER));
+			if (!requests.isEmpty() && request.getTime() > maxTime) {
+				responseBuilder.add(REDIRECT_PARAMETER, scoreHandler.getId().toString());
+			}
 			responseBuilder.add(STATE_PARAMETER, responseData.get(STATE_PARAMETER));
 			responseBuilder.add(EVENT_DATA_PARAMETER, eventData);
 			
