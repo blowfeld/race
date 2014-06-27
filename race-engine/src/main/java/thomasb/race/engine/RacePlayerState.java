@@ -3,13 +3,13 @@ package thomasb.race.engine;
 import java.util.Objects;
 
 
-final class RacePlayerState implements PlayerState {
+public final class RacePlayerState implements PlayerState {
 	private final PointDouble position;
 	private final ControlState controlState;
 	private final int laps;
 	private final PlayerStatus status;
 
-	RacePlayerState(PointDouble position,
+	public RacePlayerState(PointDouble position,
 			ControlState controlState,
 			int laps,
 			PlayerStatus status) {
