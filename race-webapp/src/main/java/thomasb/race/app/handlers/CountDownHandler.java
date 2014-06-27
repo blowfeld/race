@@ -46,13 +46,13 @@ public abstract class CountDownHandler implements RequestHandler {
 		
 		context.writeResponse();
 	}
-
+	
 	protected abstract RequestHandler getSuccessor();
-
+	
 	protected void onExpire() {
 		//do nothing by default
 	}
-
+	
 	public final boolean contains(String id) {
 		return participants.contains(id);
 	}
@@ -60,7 +60,7 @@ public abstract class CountDownHandler implements RequestHandler {
 	public final boolean closed() {
 		return timeLatch.isExpired();
 	}
-
+	
 	public final void launch() {
 		timeLatch.launch();
 	}
