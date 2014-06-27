@@ -21,6 +21,7 @@ public class EqualsHashCodeTest {
 		return Arrays.asList(new Object[][] {
 				{ControlStateImp.class, true},
 				{VectorPoint.class, true},
+				{RacePlayerState.class, true},
 				{RacePathSegment.class, true},
 				{RaceTrackSegment.class, true}});
 	}

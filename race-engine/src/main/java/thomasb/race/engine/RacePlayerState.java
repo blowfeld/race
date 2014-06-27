@@ -1,12 +1,15 @@
 package thomasb.race.engine;
 
-public class RacePlayerState implements PlayerState {
+import java.util.Objects;
+
+
+final class RacePlayerState implements PlayerState {
 	private final PointDouble position;
 	private final ControlState controlState;
 	private final int laps;
 	private final PlayerStatus status;
 
-	public RacePlayerState(PointDouble position,
+	RacePlayerState(PointDouble position,
 			ControlState controlState,
 			int laps,
 			PlayerStatus status) {
@@ -42,5 +45,28 @@ public class RacePlayerState implements PlayerState {
 				controlState.adjust(event),
 				laps,
 				status);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(position, controlState, laps, status);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+		return true;
+	}
+	
+	if (!(obj instanceof PlayerState)) {
+		return false;
+	}
+	
+	PlayerState other = (PlayerState) obj;
+	
+	return Objects.equals(position, other.getPosition()) &&
+			Objects.equals(controlState, other.getControlState()) &&
+			laps == other.getLaps() &&
+			status == other.getPlayerStatus();
 	}
 }
