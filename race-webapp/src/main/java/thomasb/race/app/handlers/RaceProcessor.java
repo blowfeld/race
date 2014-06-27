@@ -1,5 +1,8 @@
 package thomasb.race.app.handlers;
 
+import static thomasb.race.engine.PlayerStatus.FINISHED;
+import static thomasb.race.engine.PlayerStatus.TERMINATED;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -19,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import thomasb.race.app.json.JsonConverter;
 import thomasb.race.engine.ControlEvent;
 import thomasb.race.engine.PlayerState;
+import thomasb.race.engine.PlayerStatus;
 import thomasb.race.engine.PointDouble;
 import thomasb.race.engine.RaceEngine;
 import thomasb.race.engine.RacePath;
@@ -107,11 +111,19 @@ final class RaceProcessor implements ClockedRequestProcessor<JsonObject> {
 
 	@Override
 	public List<JsonStructure> process(List<? extends ClockedRequest<JsonObject>> requests) {
+		int inactiveCount = 0;
+		
 		JsonObjectBuilder eventDataBuilder = Json.createObjectBuilder();
 		for (ClockedRequest<JsonObject> request : requests) {
 			JsonObject responseData = request.getData();
 			eventDataBuilder.add(responseData.getString(ID_PARAMETER),
 					responseData.getJsonArray(EVENTS));
+			
+			JsonObject jsonState = responseData.getJsonObject(STATE_PARAMETER);
+			PlayerStatus status = PlayerStatus.valueOf(jsonState.getString(JsonConverter.STATUS));
+			if (status == FINISHED || status == TERMINATED) {
+				inactiveCount += 1;
+			}
 		}
 		
 		JsonObject eventData = eventDataBuilder.build();
@@ -122,7 +134,7 @@ final class RaceProcessor implements ClockedRequestProcessor<JsonObject> {
 			
 			JsonObject responseData = request.getData();
 			responseBuilder.add(ID_PARAMETER, responseData.get(ID_PARAMETER));
-			if (!requests.isEmpty() && request.getTime() > maxTime) {
+			if (inactiveCount == participants.size() || request.getTime() > maxTime) {
 				responseBuilder.add(REDIRECT_PARAMETER, scoreHandler.getId().toString());
 			}
 			responseBuilder.add(STATE_PARAMETER, responseData.get(STATE_PARAMETER));

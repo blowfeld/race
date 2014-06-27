@@ -23,21 +23,6 @@ import thomasb.race.engine.RacePlayerState;
 import thomasb.race.engine.VectorPoint;
 
 public class RaceJsonConverter implements JsonConverter {
-	private static final String LAP_TIME = "lapTime";
-	private static final String LAP_COUNT = "count";
-	private static final String SEGMENT_START = "start";
-	private static final String SEGMENT_END = "end";
-	private static final String SEGMENT_START_TIME = "start_time";
-	private static final String SEGMENT_END_TIME = "end_time";
-	private static final String POINT_X = "x";
-	private static final String POINT_Y = "y";
-	private static final String SPEED = "speed";
-	private static final String STEERING = "steering";
-	private static final String POSITION = "position";
-	private static final String CONTROL = "control";
-	private static final String LAPS = "laps";
-	private static final String STATUS = "status";
-
 	@Override
 	public JsonValue serialize(PointDouble state) {
 		JsonObjectBuilder builder = Json.createObjectBuilder();
