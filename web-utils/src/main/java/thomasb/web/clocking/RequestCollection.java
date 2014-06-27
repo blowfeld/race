@@ -20,14 +20,14 @@ import com.google.common.collect.ImmutableSet;
 
 final class RequestCollection<T> {
 	private static final Dispatcher DISPATCHER = new Dispatcher();
-	private static final Function<ClockedRequest<?>, AsyncContext> TO_CONTEXT = new Function<ClockedRequest<?>, AsyncContext>() {
+	private static final Function<ClockedRequestImp<?>, AsyncContext> TO_CONTEXT = new Function<ClockedRequestImp<?>, AsyncContext>() {
 		@Override
-		public AsyncContext apply(ClockedRequest<?> request) {
+		public AsyncContext apply(ClockedRequestImp<?> request) {
 			return request.getContext();
 		}
 	};
 	
-	private final List<ClockedRequest<T>> requests = newArrayList();
+	private final List<ClockedRequestImp<T>> requests = newArrayList();
 	private final ClockedRequestProcessor<T> requestProcessor;
 	private final Collection<String> participants;
 	
@@ -36,7 +36,7 @@ final class RequestCollection<T> {
 		this.participants = ImmutableSet.copyOf(participants);
 	}
 	
-	boolean add(ClockedRequest<T> request, int currentTime) throws IOException, ServletException {
+	boolean add(ClockedRequestImp<T> request, int currentTime) throws IOException, ServletException {
 		if (!participants.contains(request.getRequest().getSession().getId())) {
 			throw new UnknownParticipantException(request.getRequest().getSession().getId());
 		}
@@ -57,7 +57,7 @@ final class RequestCollection<T> {
 		requests.clear();
 	}
 	
-	private ClockedRequest<T> timeout(ClockedRequest<T> request, int currentTime)
+	private ClockedRequestImp<T> timeout(ClockedRequestImp<T> request, int currentTime)
 			throws ServletException, IOException {
 		AsyncContext context = request.getContext();
 		int requestTime = request.getTime();
@@ -86,8 +86,8 @@ final class RequestCollection<T> {
 		PrintWriter responseWriter = response.getWriter();
 		
 		JsonObjectBuilder responseObject = Json.createObjectBuilder();
-		responseObject.add(ClockedRequest.TIME_PARAMETER, request.getTime());
-		responseObject.add(ClockedRequest.DATA_PARAMETER, data);
+		responseObject.add(ClockedRequestImp.TIME_PARAMETER, request.getTime());
+		responseObject.add(ClockedRequestImp.DATA_PARAMETER, data);
 		responseWriter.write(responseObject.build().toString());
 	}
 	

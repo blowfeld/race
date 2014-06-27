@@ -26,7 +26,7 @@ import thomasb.web.handler.HandlerContext;
  * received the response from the server or a given timeout is reached.
  */
 public final class ClockedRequestHandlerImp implements ClockedRequestHandler {
-	public static final String TIME_PARAMETER = ClockedRequest.TIME_PARAMETER;
+	public static final String TIME_PARAMETER = ClockedRequestImp.TIME_PARAMETER;
 	
 	private final UUID id = UUID.randomUUID();
 	

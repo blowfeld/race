@@ -235,7 +235,7 @@ public class ClockedSubmissionTest {
 			}
 			
 			@Override
-			public List<JsonStructure> process(List<ClockedRequest<Void>> requests) {
+			public List<JsonStructure> process(List<? extends ClockedRequest<Void>> requests) {
 				List<JsonStructure> result = Lists.newArrayList();
 				for (@SuppressWarnings("unused") ClockedRequest<Void> request : requests) {
 					JsonArray jsonArray = Json.createArrayBuilder().add(requests.size()).build();

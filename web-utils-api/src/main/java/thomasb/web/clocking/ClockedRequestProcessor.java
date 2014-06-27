@@ -69,5 +69,5 @@ public interface ClockedRequestProcessor<T> {
 	 * 
 	 * @return a list of {@link JsonStructure}s to be sent with the responses
 	 */
-	List<? extends JsonStructure> process(List<ClockedRequest<T>> requests);
+	List<? extends JsonStructure> process(List<? extends ClockedRequest<T>> requests);
 }
