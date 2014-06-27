@@ -60,6 +60,8 @@ public class RaceEngineImpTest extends Test2D {
 		
 		when(raceTrack.segmentsFor(points[0][0], 45))
 			.thenReturn(ImmutableList.of(asphaltDiag));
+		
+		when(raceTrack.getMaxLaps()).thenReturn(1);
 	}
 	
 	@Before
@@ -168,6 +170,7 @@ public class RaceEngineImpTest extends Test2D {
 		
 		assertEquals(1, actualPath.getEndState().getLaps().getCount());
 		assertEquals(3.0, actualPath.getEndState().getLaps().getLapTime(), PRECISION);
+		assertEquals(PlayerStatus.FINISHED, actualPath.getEndState().getPlayerStatus());
 	}
 	
 	private PlayerState createState(ControlState control, PointDouble position) {
