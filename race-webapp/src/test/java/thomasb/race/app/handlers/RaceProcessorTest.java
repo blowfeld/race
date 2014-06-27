@@ -123,7 +123,7 @@ public class RaceProcessorTest {
 	
 	@Before
 	public void setupRequest() {
-		String requestDataJson = 
+		String requestDataJson =
 				"{"
 						+ "\"id\" : \"1\","
 						+ "\"state\" : {"
@@ -163,7 +163,7 @@ public class RaceProcessorTest {
 	public void testInitData() {
 		JsonStructure actual = processor.initalData(request);
 		
-		String expected = 
+		String expected =
 				"{ \"grid\" : {"
 						+ "\"1\" : {\"x\" : 0.0, \"y\" : 0.0},"
 						+ "\"2\" : {\"x\" : 1.0, \"y\" : 0.0}"
@@ -177,7 +177,7 @@ public class RaceProcessorTest {
 	public void testPreprocess() throws ServletException, IOException {
 		JsonStructure actual = processor.preprocess(asyncRequest, 1);
 		
-		String expected = 
+		String expected =
 				"{"
 					+ "\"id\" : \"1\","
 					+ "\"state\" : {"
@@ -211,6 +211,16 @@ public class RaceProcessorTest {
 		assertEquals(jsonFrom(expected), actual);
 	}
 
+	
+	@Test
+	public void testTimeoutResponse() throws ServletException, IOException {
+		JsonStructure actual = processor.timeoutResponse(asyncRequest, 4, 5);
+		
+		String expected = "{ \"serverTime\" : 5}";
+		
+		assertEquals(jsonFrom(expected), actual);
+		
+	}
 	private JsonStructure jsonFrom(String expected) {
 		return Json.createReader(new StringReader(expected)).read();
 	}

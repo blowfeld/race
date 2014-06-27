@@ -33,6 +33,7 @@ final class RaceProcessor implements ClockedRequestProcessor<JsonObject> {
 	private static final String ID_PARAMETER = "id";
 	private static final String CONTROL_PARAMETER = "command";
 	private static final String STATE_PARAMETER = "state";
+	private static final String SERVER_TIME = "serverTime";
 	
 	private final RaceEngine engine;
 	private final RaceTrack track;
@@ -94,7 +95,9 @@ final class RaceProcessor implements ClockedRequestProcessor<JsonObject> {
 	@Override
 	public JsonStructure timeoutResponse(AsyncContext request, int requestTime, int currentTime)
 			throws ServletException, IOException {
-		return null;
+		return Json.createObjectBuilder()
+				.add(SERVER_TIME, currentTime)
+			.build();
 	}
 
 	@Override
