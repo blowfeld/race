@@ -2,7 +2,7 @@ package thomasb.race.app.handlers;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,6 +34,8 @@ final class RaceProcessor implements ClockedRequestProcessor<JsonObject> {
 	private static final String CONTROL_PARAMETER = "command";
 	private static final String STATE_PARAMETER = "state";
 	private static final String SERVER_TIME = "serverTime";
+	private static final String REDIRECT_PARAMETER = "redirect";
+	private static final String EVENT_DATA_PARAMETER = "eventData";
 	
 	private final RaceEngine engine;
 	private final RaceTrack track;
@@ -101,8 +103,28 @@ final class RaceProcessor implements ClockedRequestProcessor<JsonObject> {
 	}
 
 	@Override
-	public List<JsonStructure> process(List<ClockedRequest<JsonObject>> requests) {
-		return Collections.emptyList();
+	public List<JsonStructure> process(List<? extends ClockedRequest<JsonObject>> requests) {
+		JsonObjectBuilder eventDataBuilder = Json.createObjectBuilder();
+		for (ClockedRequest<JsonObject> request : requests) {
+			JsonObject responseData = request.getData();
+			eventDataBuilder.add(responseData.getString(ID_PARAMETER),
+					responseData.getJsonArray(EVENTS));
+		}
+		
+		JsonObject eventData = eventDataBuilder.build();
+		
+		List<JsonStructure> result = new ArrayList<>();
+		for (ClockedRequest<JsonObject> request : requests) {
+			JsonObjectBuilder responseBuilder = Json.createObjectBuilder();
+			
+			JsonObject responseData = request.getData();
+			responseBuilder.add(ID_PARAMETER, responseData.get(ID_PARAMETER));
+			responseBuilder.add(STATE_PARAMETER, responseData.get(STATE_PARAMETER));
+			responseBuilder.add(EVENT_DATA_PARAMETER, eventData);
+			
+			result.add(responseBuilder.build());
+		}
+		
+		return result;
 	}
-
 }

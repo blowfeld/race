@@ -81,7 +81,7 @@ public class StepProcessor implements ClockedRequestProcessor<JsonObject> {
 	}
 	
 	@Override
-	public List<JsonStructure> process(List<ClockedRequest<JsonObject>> requests) {
+	public List<JsonStructure> process(List<? extends ClockedRequest<JsonObject>> requests) {
 		JsonObjectBuilder responseBuilder = Json.createObjectBuilder();
 		if (!requests.isEmpty() && requests.get(0).getTime() > 100) {
 			responseBuilder.add(REDIRECT_PARAMETER, scoreHandler.getId().toString());

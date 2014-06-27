@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.json.Json;
+import javax.json.JsonObject;
 import javax.json.JsonStructure;
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -65,6 +66,9 @@ public class RaceProcessorTest {
 	@Mock HttpServletRequest request;
 	@Mock HttpServletResponse response;
 	@Mock AsyncContext asyncRequest;
+	
+	@Mock ClockedRequest<JsonObject> clockedRequest_1;
+	@Mock ClockedRequest<JsonObject> clockedRequest_2;
 	
 	private RaceProcessor processor;
 	
@@ -123,9 +127,9 @@ public class RaceProcessorTest {
 	
 	@Before
 	public void setupRequest() {
-		String requestDataJson =
+		String baseRequestDataString =
 				"{"
-						+ "\"id\" : \"1\","
+						+ "\"id\" : \"%s\","
 						+ "\"state\" : {"
 							+ "\"position\" : {"
 								+ "\"x\" : 0.0,"
@@ -138,13 +142,36 @@ public class RaceProcessorTest {
 								+ "\"steering\" : 90"
 							+ "}"
 						+ "},"
-						+ "\"command\" : 37"
+						+ "%s"
 				+ "}";
 		
+		String requestDataJson = String.format(baseRequestDataString, "1", "\"command\" : 37");
 		when(request.getParameter(ClockedRequest.DATA_PARAMETER))
 				.thenReturn(requestDataJson);
 		
 		when(asyncRequest.getRequest()).thenReturn(request);
+		
+		String eventsString = 
+				"\"events\" : ["
+						+ "{"
+							+ "\"start\" : {\"x\" : 0.0, \"y\" : 0.0},"
+							+ "\"end\" : {\"x\" : 1.0, \"y\" : 0.0},"
+							+ "\"start_time\" : 1.0,"
+							+ "\"end_time\" : 1.5"
+						+ "},"
+						+ "{"
+							+ "\"start\" : {\"x\" : 1.0, \"y\" : 0.0},"
+							+ "\"end\" : {\"x\" : 2.0, \"y\" : 0.0},"
+							+ "\"start_time\" : 1.5,"
+							+ "\"end_time\" : 2.0"
+						+ "}"
+					+ "]";
+		
+		String clockedDataJson_1 = String.format(baseRequestDataString, "1", eventsString);
+		String clockedDataJson_2 = String.format(baseRequestDataString, "2", eventsString);
+		
+		when(clockedRequest_1.getData()).thenReturn((JsonObject) jsonFrom(clockedDataJson_1));
+		when(clockedRequest_2.getData()).thenReturn((JsonObject) jsonFrom(clockedDataJson_2));
 	}
 	
 	@Before
@@ -210,7 +237,6 @@ public class RaceProcessorTest {
 		
 		assertEquals(jsonFrom(expected), actual);
 	}
-
 	
 	@Test
 	public void testTimeoutResponse() throws ServletException, IOException {
@@ -221,6 +247,64 @@ public class RaceProcessorTest {
 		assertEquals(jsonFrom(expected), actual);
 		
 	}
+	
+	@Test
+	public void testProcess() throws ServletException, IOException {
+		List<JsonStructure> actual = processor.process(ImmutableList.of(clockedRequest_1, clockedRequest_2));
+		
+		String expectedItem =
+				"{"
+					+ "\"id\" : \"%s\","
+					+ "\"state\" : {"
+						+ "\"position\" : {"
+							+ "\"x\" : 0.0," // according to #setupRequests
+							+ "\"y\" : 0.0"
+						+ "},"
+						+ "\"status\" : \"ACTIVE\","
+						+ "\"laps\" : 1,"
+						+ "\"control\" : {"
+							+ "\"speed\" : 1,"
+							+ "\"steering\" : 90"
+						+ "}"
+					+ "},"
+					+ "\"eventData\" : {"
+						+ "\"1\" : ["
+							+ "{"
+								+ "\"start\" : {\"x\" : 0.0, \"y\" : 0.0},"
+								+ "\"end\" : {\"x\" : 1.0, \"y\" : 0.0},"
+								+ "\"start_time\" : 1.0,"
+								+ "\"end_time\" : 1.5"
+							+ "},"
+							+ "{"
+								+ "\"start\" : {\"x\" : 1.0, \"y\" : 0.0},"
+								+ "\"end\" : {\"x\" : 2.0, \"y\" : 0.0},"
+								+ "\"start_time\" : 1.5,"
+								+ "\"end_time\" : 2.0"
+							+ "}"
+						+ "],"
+						+ "\"2\" : ["
+							+ "{"
+								+ "\"start\" : {\"x\" : 0.0, \"y\" : 0.0},"
+								+ "\"end\" : {\"x\" : 1.0, \"y\" : 0.0},"
+								+ "\"start_time\" : 1.0,"
+								+ "\"end_time\" : 1.5"
+							+ "},"
+							+ "{"
+								+ "\"start\" : {\"x\" : 1.0, \"y\" : 0.0},"
+								+ "\"end\" : {\"x\" : 2.0, \"y\" : 0.0},"
+								+ "\"start_time\" : 1.5,"
+								+ "\"end_time\" : 2.0"
+							+ "}"
+						+ "]"
+					+ "}"
+				+ "}";
+		
+		JsonStructure expectedJsonItem_1 = jsonFrom(String.format(expectedItem, "1"));
+		JsonStructure expectedJsonItem_2 = jsonFrom(String.format(expectedItem, "2"));
+		
+		assertEquals(ImmutableList.of(expectedJsonItem_1, expectedJsonItem_2), actual);
+	}
+	
 	private JsonStructure jsonFrom(String expected) {
 		return Json.createReader(new StringReader(expected)).read();
 	}
