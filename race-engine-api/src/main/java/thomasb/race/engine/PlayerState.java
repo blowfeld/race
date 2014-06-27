@@ -9,4 +9,7 @@ public interface PlayerState {
 	int getLaps();
 	
 	PlayerStatus getPlayerStatus();
+	
+	PlayerState adjust(ControlEvent event);
+	
 }

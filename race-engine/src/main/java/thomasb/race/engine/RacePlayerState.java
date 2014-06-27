@@ -35,4 +35,12 @@ public class RacePlayerState implements PlayerState {
 	public PlayerStatus getPlayerStatus() {
 		return status;
 	}
+
+	@Override
+	public PlayerState adjust(ControlEvent event) {
+		return new RacePlayerState(position,
+				controlState.adjust(event),
+				laps,
+				status);
+	}
 }
