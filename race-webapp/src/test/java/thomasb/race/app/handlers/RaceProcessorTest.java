@@ -30,6 +30,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import thomasb.race.app.json.RaceJsonConverter;
 import thomasb.race.engine.ControlEvent;
 import thomasb.race.engine.ControlState;
+import thomasb.race.engine.Lap;
 import thomasb.race.engine.PathSegment;
 import thomasb.race.engine.PlayerState;
 import thomasb.race.engine.PlayerStatus;
@@ -60,6 +61,7 @@ public class RaceProcessorTest {
 	
 	@Mock ControlEvent event;
 	@Mock ControlState controlState;
+	@Mock Lap laps;
 	@Mock PlayerState endState;
 	
 	@Mock RequestHandler scoreHandler;
@@ -102,10 +104,13 @@ public class RaceProcessorTest {
 	public void setupStates() {
 		when(controlState.getSpeed()).thenReturn(1);
 		when(controlState.getSteering()).thenReturn(90);
+
+		when(laps.getCount()).thenReturn(1);
+		when(laps.getLapTime()).thenReturn(1.0);
 		
 		when(endState.getControlState()).thenReturn(controlState);
 		when(endState.getPosition()).thenReturn(point_2_0);
-		when(endState.getLaps()).thenReturn(1);
+		when(endState.getLaps()).thenReturn(laps);
 		when(endState.getPlayerStatus()).thenReturn(PlayerStatus.ACTIVE);
 	}
 	
@@ -138,7 +143,10 @@ public class RaceProcessorTest {
 								+ "\"y\" : 0.0"
 							+ "},"
 							+ "\"status\" : \"ACTIVE\","
-							+ "\"laps\" : 1,"
+							+ "\"laps\" : {"
+								+ "\"count\" : 1,"
+								+ "\"lapTime\" : 1.0"
+							+ "},"
 							+ "\"control\" : {"
 								+ "\"speed\" : 1,"
 								+ "\"steering\" : 90"
@@ -218,7 +226,10 @@ public class RaceProcessorTest {
 							+ "\"y\" : 0.0"
 						+ "},"
 						+ "\"status\" : \"ACTIVE\","
-						+ "\"laps\" : 1,"
+						+ "\"laps\" : {"
+								+ "\"count\" : 1,"
+								+ "\"lapTime\" : 1.0"
+							+ "},"
 						+ "\"control\" : {"
 							+ "\"speed\" : 1,"
 							+ "\"steering\" : 90"
@@ -266,7 +277,10 @@ public class RaceProcessorTest {
 							+ "\"y\" : 0.0"
 						+ "},"
 						+ "\"status\" : \"ACTIVE\","
-						+ "\"laps\" : 1,"
+						+ "\"laps\" : {"
+								+ "\"count\" : 1,"
+								+ "\"lapTime\" : 1.0"
+							+ "},"
 						+ "\"control\" : {"
 							+ "\"speed\" : 1,"
 							+ "\"steering\" : 90"
@@ -327,7 +341,10 @@ public class RaceProcessorTest {
 							+ "\"y\" : 0.0"
 						+ "},"
 						+ "\"status\" : \"ACTIVE\","
-						+ "\"laps\" : 1,"
+						+ "\"laps\" : {"
+								+ "\"count\" : 1,"
+								+ "\"lapTime\" : 1.0"
+							+ "},"
 						+ "\"control\" : {"
 							+ "\"speed\" : 1,"
 							+ "\"steering\" : 90"

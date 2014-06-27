@@ -13,14 +13,18 @@ import thomasb.race.engine.ArrowControlEvent;
 import thomasb.race.engine.ControlEvent;
 import thomasb.race.engine.ControlState;
 import thomasb.race.engine.ControlStateImp;
+import thomasb.race.engine.Lap;
 import thomasb.race.engine.PathSegment;
 import thomasb.race.engine.PlayerState;
 import thomasb.race.engine.PlayerStatus;
 import thomasb.race.engine.PointDouble;
+import thomasb.race.engine.RaceLap;
 import thomasb.race.engine.RacePlayerState;
 import thomasb.race.engine.VectorPoint;
 
 public class RaceJsonConverter implements JsonConverter {
+	private static final String LAP_TIME = "lapTime";
+	private static final String LAP_COUNT = "count";
 	private static final String SEGMENT_START = "start";
 	private static final String SEGMENT_END = "end";
 	private static final String SEGMENT_START_TIME = "start_time";
@@ -50,7 +54,7 @@ public class RaceJsonConverter implements JsonConverter {
 		
 		builder.add(POSITION, serialize(state.getPosition()));
 		builder.add(CONTROL, serialize(state.getControlState()));
-		builder.add(LAPS, state.getLaps());
+		builder.add(LAPS, serialize(state.getLaps()));
 		builder.add(STATUS, serialize(state.getPlayerStatus()));
 		
 		return builder.build();
@@ -61,6 +65,15 @@ public class RaceJsonConverter implements JsonConverter {
 		
 		builder.add(SPEED, state.getSpeed());
 		builder.add(STEERING, state.getSteering());
+		
+		return builder.build();
+	}
+	
+	private JsonValue serialize(Lap laps) {
+		JsonObjectBuilder builder = Json.createObjectBuilder();
+		
+		builder.add(LAP_COUNT, laps.getCount());
+		builder.add(LAP_TIME, laps.getLapTime());
 		
 		return builder.build();
 	}
@@ -99,10 +112,17 @@ public class RaceJsonConverter implements JsonConverter {
 	public PlayerState deserializePlayerState(JsonObject json) {
 		PointDouble position = deserializePointDouble(json.getJsonObject(POSITION));
 		ControlState control = deserializeControlState(json.getJsonObject(CONTROL));
-		int laps = json.getJsonNumber(LAPS).intValue();
+		Lap laps = deserializeLaps(json.getJsonObject(LAPS));
 		PlayerStatus status = PlayerStatus.valueOf(json.getJsonString(STATUS).getString());
 		
 		return new RacePlayerState(position, control, laps, status);
+	}
+
+	private Lap deserializeLaps(JsonObject json) {
+		int count = json.getJsonNumber(LAP_COUNT).intValue();
+		double lapTime = json.getJsonNumber(LAP_TIME).doubleValue();
+		
+		return new RaceLap(count, lapTime);
 	}
 
 	@Override

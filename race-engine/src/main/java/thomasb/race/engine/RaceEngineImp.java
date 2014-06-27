@@ -29,7 +29,7 @@ public class RaceEngineImp implements RaceEngine {
 		pathCalc.calculate();
 		
 		List<PathSegment> pathSegments = pathCalc.pathSegments;
-		Lap lap = pathCalc.laps > state.getLaps().getCount() ? new RaceLap(pathCalc.laps, pathCalc.lapTime) : state.getLaps();
+		Lap lap = (pathCalc.laps > state.getLaps().getCount()) ? new RaceLap(pathCalc.laps, pathCalc.lapTime) : state.getLaps();
 		RacePlayerState playerState = new RacePlayerState(pathCalc.endPosition, state.getControlState(), lap, pathCalc.getStatus());
 		
 		return new RacePathImp(playerState, pathSegments);

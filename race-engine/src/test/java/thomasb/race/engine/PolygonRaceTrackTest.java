@@ -35,7 +35,7 @@ public class PolygonRaceTrackTest extends Test2D {
 				new TrackPolygon(ImmutableList.of(
 						points[0][20], points[0][0], points[20][0], points[20][20]),
 						TrackType.WALL)),
-				points[2][10], points[8][10], Collections.<PointDouble>emptyList());
+				points[2][10], points[8][10], Collections.<PointDouble>emptyList(), 1);
 	}
 	
 	@Test
