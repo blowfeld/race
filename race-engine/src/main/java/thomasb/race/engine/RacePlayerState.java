@@ -6,12 +6,12 @@ import java.util.Objects;
 public final class RacePlayerState implements PlayerState {
 	private final PointDouble position;
 	private final ControlState controlState;
-	private final int laps;
+	private final Lap laps;
 	private final PlayerStatus status;
 
 	public RacePlayerState(PointDouble position,
 			ControlState controlState,
-			int laps,
+			Lap laps,
 			PlayerStatus status) {
 				this.position = position;
 				this.controlState = controlState;
@@ -30,7 +30,7 @@ public final class RacePlayerState implements PlayerState {
 	}
 
 	@Override
-	public int getLaps() {
+	public Lap getLaps() {
 		return laps;
 	}
 
@@ -66,7 +66,7 @@ public final class RacePlayerState implements PlayerState {
 	
 	return Objects.equals(position, other.getPosition()) &&
 			Objects.equals(controlState, other.getControlState()) &&
-			laps == other.getLaps() &&
-			status == other.getPlayerStatus();
+			Objects.equals(laps, other.getLaps()) &&
+			Objects.equals(status, other.getPlayerStatus());
 	}
 }

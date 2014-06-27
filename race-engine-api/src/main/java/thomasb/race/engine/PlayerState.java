@@ -6,7 +6,7 @@ public interface PlayerState {
 	
 	ControlState getControlState();
 	
-	int getLaps();
+	Lap getLaps();
 	
 	PlayerStatus getPlayerStatus();
 	

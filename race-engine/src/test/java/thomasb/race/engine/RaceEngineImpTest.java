@@ -21,6 +21,8 @@ public class RaceEngineImpTest extends Test2D {
 	private static final double PRECISION = 1e-15;
 	
 	@Mock RaceTrack raceTrack;
+
+	private RaceLap zeroLaps = new RaceLap(0, 0.0);
 	
 	private RaceEngine engine;
 
@@ -151,7 +153,7 @@ public class RaceEngineImpTest extends Test2D {
 		RacePathSegment expectedWallSegment =
 				new RacePathSegment(points[10][0], points[10][0], 5.0, 10.0);
 		
-		RacePath expectedPath = new RacePathImp(new RacePlayerState(points[10][0], currentState, 0, PlayerStatus.TERMINATED),
+		RacePath expectedPath = new RacePathImp(new RacePlayerState(points[10][0], currentState, zeroLaps, PlayerStatus.TERMINATED),
 				ImmutableList.of(expectedAsphaltSegment, expectedWallSegment));
 		
 		assertThat(actualPath, isCloseTo(expectedPath, PRECISION));
@@ -164,10 +166,11 @@ public class RaceEngineImpTest extends Test2D {
 		
 		RacePath actualPath = engine.calculatePath(createState(currentState, startPoint), 0.0, 4.0);
 		
-		assertEquals(actualPath.getEndState().getLaps(), 1);
+		assertEquals(1, actualPath.getEndState().getLaps().getCount());
+		assertEquals(3.0, actualPath.getEndState().getLaps().getLapTime(), PRECISION);
 	}
 	
 	private PlayerState createState(ControlState control, PointDouble position) {
-		return new RacePlayerState(position, control, 0, PlayerStatus.ACTIVE);
+		return new RacePlayerState(position, control, zeroLaps, PlayerStatus.ACTIVE);
 	}
 }

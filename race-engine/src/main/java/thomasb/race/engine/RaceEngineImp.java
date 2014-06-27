@@ -29,7 +29,8 @@ public class RaceEngineImp implements RaceEngine {
 		pathCalc.calculate();
 		
 		List<PathSegment> pathSegments = pathCalc.pathSegments;
-		RacePlayerState playerState = new RacePlayerState(pathCalc.endPosition, state.getControlState(), pathCalc.laps, pathCalc.getStatus());
+		Lap lap = pathCalc.laps > state.getLaps().getCount() ? new RaceLap(pathCalc.laps, pathCalc.lapTime) : state.getLaps();
+		RacePlayerState playerState = new RacePlayerState(pathCalc.endPosition, state.getControlState(), lap, pathCalc.getStatus());
 		
 		return new RacePathImp(playerState, pathSegments);
 	}
@@ -47,6 +48,7 @@ public class RaceEngineImp implements RaceEngine {
 		private final double endTime;
 
 		private int laps = 0;
+		private double lapTime = -1.0;
 		private boolean terminating = false;
 		private List<PathSegment> pathSegments;
 		private PointDouble endPosition;
@@ -92,7 +94,8 @@ public class RaceEngineImp implements RaceEngine {
 						endTime);
 			}
 			
-			laps += segment.crossedFinish();
+			int crossedFinish = segment.crossedFinish();
+			laps += crossedFinish;
 			
 			int speed = min(control.getSpeed(), segment.getMaxSpeed());
 			double maxDistance = speed * (endTime - segmentStartTime);
@@ -100,6 +103,9 @@ public class RaceEngineImp implements RaceEngine {
 			double segmentLength = segment.length();
 			if (maxDistance >= segmentLength) {
 				double segmentEndTime = segmentStartTime + (segmentLength / speed);
+				if (crossedFinish > 0) {
+					lapTime = segmentEndTime;
+				}
 				
 				return new RacePathSegment(segment.getStart(),
 						segment.getEnd(),
@@ -108,6 +114,9 @@ public class RaceEngineImp implements RaceEngine {
 			} else {
 				VectorPoint direction = VectorPoint.fromDirection(control.getSteering());
 				VectorPoint delta = direction.multiply(maxDistance);
+				if (crossedFinish > 0) {
+					lapTime = endTime;
+				}
 				
 				return new RacePathSegment(segment.getStart(),
 						VectorPoint.from(segment.getStart()).add(delta),
@@ -117,7 +126,15 @@ public class RaceEngineImp implements RaceEngine {
 		}
 
 		PlayerStatus getStatus() {
-			return terminating ? PlayerStatus.TERMINATED : PlayerStatus.ACTIVE;
+			if (terminating) {
+				return PlayerStatus.TERMINATED;
+			}
+			
+			if (lapTime > 0.0) {
+				return PlayerStatus.FINISHED;
+			}
+			
+			return PlayerStatus.ACTIVE;
 		}
 	}
 }

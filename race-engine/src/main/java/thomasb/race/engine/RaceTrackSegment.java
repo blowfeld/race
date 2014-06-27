@@ -32,7 +32,6 @@ final class RaceTrackSegment extends AbstractSegment implements TrackSegment {
 		return maxSpeed;
 	}
 
-
 	@Override
 	public int crossedFinish() {
 		return finish;

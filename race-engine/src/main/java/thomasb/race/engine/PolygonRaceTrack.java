@@ -65,7 +65,9 @@ public class PolygonRaceTrack implements RaceTrack {
 
 	@Override
 	public List<TrackSegment> segmentsFor(PointDouble startPoint, int direction) {
-		Intersection finishIntersection = new Ray(startPoint, direction).getIntersection(finish1, finish2);
+		Ray ray = new Ray(startPoint, direction);
+		
+		Intersection finishIntersection = ray.getIntersection(finish1, finish2);
 		double finishDistance = -1.0;
 		if (finishIntersection != null) {
 			finishDistance = finishIntersection.distance();
@@ -82,7 +84,6 @@ public class PolygonRaceTrack implements RaceTrack {
 			}
 		}
 		
-		Ray ray = new Ray(startPoint, direction);
 		
 		int startSection = 0;
 		List<BoundaryPoint> allIntersections = new ArrayList<>();
@@ -115,8 +116,15 @@ public class PolygonRaceTrack implements RaceTrack {
 			int finish = startDistance <= finishDistance  && finishDistance <= intersection.distance() ?
 					crossedFinished : 0;
 			
-			RaceTrackSegment trackSegment = new RaceTrackSegment(segmentStart, segmentEnd, maxSpeed, finish);
-			segments.add(trackSegment);
+			RaceTrackSegment trackSegment;
+			if (finish > 0) {
+				segments.add(new RaceTrackSegment(segmentStart, finishIntersection.getIntersectionStart(), maxSpeed, finish));
+				segments.add(new RaceTrackSegment(finishIntersection.getIntersectionStart(), segmentEnd, maxSpeed, 0));
+				
+			} else {
+				trackSegment = new RaceTrackSegment(segmentStart, segmentEnd, maxSpeed, finish);
+				segments.add(trackSegment);
+			}
 			
 			if (intersection.type == currentSection) {
 				currentSection += 1;

@@ -90,7 +90,8 @@ public class PolygonRaceTrackTest extends Test2D {
 		List<TrackSegment> actualSegments = raceTrack.segmentsFor(points[4][9], 0);
 		
 		List<TrackSegment> expectedSegments = ImmutableList.of(
-				Mocks.trackSegment(points[4][9], points[4][16], 2, 1),
+				Mocks.trackSegment(points[4][9], points[4][10], 2, 1),
+				Mocks.trackSegment(points[4][10], points[4][16], 2, 0),
 				Mocks.trackSegment(points[4][16], points[4][18], 1, 0),
 				Mocks.trackSegment(points[4][18], points[4][20], 0, 0));
 		
@@ -102,7 +103,8 @@ public class PolygonRaceTrackTest extends Test2D {
 		List<TrackSegment> actualSegments = raceTrack.segmentsFor(points[5][9], 0);
 		
 		List<TrackSegment> expectedSegments = ImmutableList.of(
-				Mocks.trackSegment(points[5][9], points[5][16], 2, 1),
+				Mocks.trackSegment(points[5][9], points[5][10], 2, 1),
+				Mocks.trackSegment(points[5][10], points[5][16], 2, 0),
 				Mocks.trackSegment(points[5][16], points[5][18], 1, 0),
 				Mocks.trackSegment(points[5][18], points[5][20], 0, 0));
 		
