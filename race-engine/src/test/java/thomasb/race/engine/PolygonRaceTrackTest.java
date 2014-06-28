@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static thomasb.race.engine.RaceMatchers.isCloseTo;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -15,11 +14,11 @@ import com.google.common.collect.ImmutableList;
 public class PolygonRaceTrackTest extends Test2D {
 	private static final double PRECISION = 1e-10;
 	
-	private RaceTrack raceTrack;
+	private TrackSegmentCalculator raceTrack;
 
 	@Before
 	public void setupTrack() {
-		raceTrack = new PolygonRaceTrack(ImmutableList.of(
+		raceTrack = new TrackSegmentCalculator(ImmutableList.of(
 				new TrackPolygon(ImmutableList.of(
 						points[8][12], points[8][8], points[12][8], points[12][12]),
 						TrackType.WALL),
@@ -35,7 +34,7 @@ public class PolygonRaceTrackTest extends Test2D {
 				new TrackPolygon(ImmutableList.of(
 						points[0][20], points[0][0], points[20][0], points[20][20]),
 						TrackType.WALL)),
-				points[2][10], points[8][10], Collections.<PointDouble>emptyList(), 1);
+				points[2][10], points[8][10]);
 	}
 	
 	@Test
