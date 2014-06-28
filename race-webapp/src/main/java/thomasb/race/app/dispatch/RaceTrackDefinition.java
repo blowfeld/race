@@ -54,11 +54,11 @@ public enum RaceTrackDefinition implements RaceTrack {
 		);
 	
 	private static final List<TrackPolygon> TRACK_SECTIONS = ImmutableList.of(
-			new TrackPolygon(CONTOUR, TrackType.WALL),
-			new TrackPolygon(OUTER_WALL, TrackType.GREEN),
-			new TrackPolygon(OUTER_GREEN, TrackType.ASPHALT),
+			new TrackPolygon(INNER_WALL, TrackType.WALL),
 			new TrackPolygon(INNER_GREEN, TrackType.GREEN),
-			new TrackPolygon(INNER_WALL, TrackType.WALL)
+			new TrackPolygon(OUTER_GREEN, TrackType.ASPHALT),
+			new TrackPolygon(OUTER_WALL, TrackType.GREEN),
+			new TrackPolygon(CONTOUR, TrackType.WALL)
 		);
 	
 	@Override
@@ -96,18 +96,18 @@ public enum RaceTrackDefinition implements RaceTrack {
 		
 		@Override
 		public boolean hasNext() {
-			return xOffset(count) > 4.0;
+			return yOffset(count) > 4.0;
 		}
 		
 		@Override
 		public VectorPoint next() {
-			VectorPoint gridPoint = new VectorPoint(xOffset(count), 0.0);
+			VectorPoint gridPoint = new VectorPoint(5.0, yOffset(count));
 			count += 1;
 			
 			return gridPoint;
 		}
 		
-		private double xOffset(int count) {
+		private double yOffset(int count) {
 			return 9.9 - count / 10.0;
 		}
 		
