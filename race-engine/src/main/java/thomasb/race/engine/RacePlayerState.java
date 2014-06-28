@@ -69,4 +69,10 @@ public final class RacePlayerState implements PlayerState {
 			Objects.equals(laps, other.getLaps()) &&
 			Objects.equals(status, other.getPlayerStatus());
 	}
+
+	@Override
+	public String toString() {
+		return "RacePlayerState [position=" + position + ", controlState="
+				+ controlState + ", laps=" + laps + ", status=" + status + "]";
+	}
 }

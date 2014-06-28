@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 
-public class PolygonRaceTrackTest extends Test2D {
+public class TrackSegmentCalculatorTest extends Test2D {
 	private static final double PRECISION = 1e-10;
 	
 	private TrackSegmentCalculator raceTrack;

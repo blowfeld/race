@@ -1,5 +1,6 @@
 package thomasb.race.engine;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Collections2.filter;
 import static java.lang.Math.signum;
 import static java.util.Collections.sort;
@@ -92,6 +93,8 @@ class TrackSegmentCalculator {
 			}
 		}
 		
+		checkArgument(!allIntersections.isEmpty(), "Start point invalid, not contained in any track section: %s", startPoint);
+		
 		sort(allIntersections, DISTANCE_COMPARATOR);
 		
 		int currentSection = startSection;
@@ -133,7 +136,9 @@ class TrackSegmentCalculator {
 			startDistance = intersection.distance();
 		}
 		
-		return ImmutableList.copyOf(filter(segments, NON_ZERO_LENGTH_FILTER));
+		return segments.size() == 1 ? 
+				ImmutableList.copyOf(segments) :
+				ImmutableList.copyOf(filter(segments, NON_ZERO_LENGTH_FILTER));
 	}
 	
 	private int determineMaxSpeed(BoundaryPoint intersection, int currentSection) {
