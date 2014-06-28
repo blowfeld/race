@@ -1,6 +1,6 @@
 package thomasb.race.engine;
 
-enum TrackType implements SectionType {
+public enum TrackType implements SectionType {
 	ASPHALT(2), GREEN(1), WALL(0);
 	
 	private final int maxSpeed;

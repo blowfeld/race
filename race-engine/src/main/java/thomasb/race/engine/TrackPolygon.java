@@ -15,7 +15,7 @@ import thomasb.race.engine.Ray.IntersectionType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
-final class TrackPolygon implements TrackSection {
+public final class TrackPolygon implements TrackSection {
 	private static final Comparator<Intersection> DISTANCE_COMPARATOR = new Comparator<Intersection>() {
 		@Override
 		public int compare(Intersection o1, Intersection o2) {
