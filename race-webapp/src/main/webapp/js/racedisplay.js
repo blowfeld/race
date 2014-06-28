@@ -5,8 +5,8 @@ if(race === undefined) {
 race.display = function() {
 	
 	var eventViewer = function(display, id) {
-		var process = function(event) {
-			display.show(id, event);
+		var process = function(event, callback) {
+			display.show(id, event, callback);
 		};
 		
 		return {
@@ -20,7 +20,11 @@ race.display = function() {
 			$(parent).append('<div id="player_' + id + '"><dl><dt>id</dt><dd class="id"></dd><dt>position</dt><dd class="pos"> ' + JSON.stringify([position.x, position.y]) + ' </dd><dt>count</dt><dd class="count"></dd><dt>duration</dt><dd class="duration"></dd></dl></div>');
 		};
 		
-		var show = function(id, event) {
+		var show = function(id, event, callback) {
+			if (callback) {
+				setTimeout(callback, event.getDuration());
+			}
+			
 			var displayId = '#player_' + id;
 			$(displayId + ' .id').text(id);
 			var posString = JSON.stringify([event.start.x, event.end.y]);

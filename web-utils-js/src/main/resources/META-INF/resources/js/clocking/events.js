@@ -59,8 +59,7 @@ clocking.events = function() {
 			}
 			
 			var event = events.pop();
-			eventProcessor.process(event);
-			setTimeout(execute, 0);
+			eventProcessor.process(event, execute);
 		};
 		
 		return {
