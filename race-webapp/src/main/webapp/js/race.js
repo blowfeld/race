@@ -10,7 +10,7 @@ $(document).ready(function() {
 	var clockActions = RC.stepClockActions(model,
 			disp,
 			RC.keyInput(),
-			RD.eventProcessor(disp),
+			RD.eventViewer,
 			'scores.html');
 	
 	var clock = CC.serverClock(clockActions, 'core/' + location.search.substring(1));

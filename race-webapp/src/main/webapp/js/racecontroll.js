@@ -5,58 +5,70 @@ if(race === undefined) {
 race.controll = function() {
 	var CE = clocking.events;
 	
-	var eventParser = function(time) {
-		return function(event) {
-			event.count = time;
-			return CE.timedEvent(event, time, time + 1);
-		};
+	var eventParser = function(event) {
+		return CE.timedEvent(event, event.startTime, event.endTime);
 	};
 	
 	
 	var stepClockActions = function(raceModel, display, input, eventProcessor, redirect) {
-		var lastEvent = {id:id, pos:{x:0,y:0}};
 		var input = keyInput(id);
-		var interval;
+		
 		var id;
+		var interval;
+		var currentState;
 		
 		var init = function(initialData, interv, timeout) {
 			id = initialData.id;
+			currentState = initialData.state;
+			console.log(JSON.stringify(currentState));
 			
 			for (var i = 0; i < initialData.participants.length; i++) {
 				var participant = initialData.participants[i];
-				display.add(participant);
-				raceModel.addParticipant(participant, eventProcessor);
+				var gridPosition = initialData.grid[participant];
+				display.add(participant, gridPosition);
+				
+				raceModel.addParticipant(participant, eventProcessor(display, participant));
 			}
 			
 			interval= interv;
 		}
 		
 		var onTick = function(data, count, intervalStart, intervalEnd) {
+			if (data.id !== id) {
+				throw "Invalid request id: " + data.id;
+			}
+			
 			if (data.redirect) {
 				window.location = redirect + '?' + data.redirect;
 				return;
 			}
 			
-			if (data.eventData) {
-				schedule(data.eventData, count, intervalStart, intervalEnd);
-				highlightTimeouts(data.eventData);
-				return null;
+			if (data.serverTime) {
+				onTimeout();
+				console.log("server time " + data.serverTime);
+				return data.serverTime;
 			}
 			
-			onTimeout();
-			console.log("server time " + data.serverTime);
-			return data.serverTime;
+			//debug
+			if (JSON.stringify(currentState) != JSON.stringify(data.state)) {
+				console.log(JSON.stringify(data.state));
+			}
+			currentState = data.state;
+			
+			schedule(data.eventData, count, intervalStart, intervalEnd);
+			highlightTimeouts(data.eventData);
+			return null;
 		}
 		
 		var schedule = function(eventData, count, intervalStart, intervalEnd) {
-			var events = eventData.map(eventParser(count));
-			var rescheduleToClient = reschedule(count, intervalStart, intervalEnd);
-			var rescheduledEvents = events.map(rescheduleToClient);
-			raceModel.schedule(rescheduledEvents);
-			
-			var ownEvents = rescheduledEvents.filter(function(e) { return e.id === id; });
-			lastEvent = ownEvents.sort(function(e1, e2) { return e2.getEnd() - e1.getEnd(); })[0];
-			
+			for (playerId in eventData) {
+				var events = eventData[playerId].map(eventParser);
+				var rescheduleToClient = reschedule(count, intervalStart, intervalEnd);
+				events = events.map(rescheduleToClient);
+				events = events.sort(function(e1, e2) { return e2.getStart() - e1.getStart(); });
+				raceModel.schedule(playerId, events);
+				
+			}
 		};
 		
 		var reschedule = function(count, intervalStart, intervalEnd) {
@@ -65,13 +77,13 @@ race.controll = function() {
 			};
 		};
 		
-		var highlightTimeouts = function(events) {
-			if (events.length === raceModel.participants()) {
+		var highlightTimeouts = function(eventData) {
+			var presentParticipants = Object.keys(eventData);
+			if (presentParticipants.length === raceModel.participantCount()) {
 				return;
 			}
 			
-			var presentIds = events.map(function(e) { return e.id; });
-			raceModel.findAbsent(presentIds).forEach(display.blink);
+			raceModel.findAbsent(presentParticipants).forEach(display.blink);
 		}
 		
 		var onTimeout = function() {
@@ -81,11 +93,10 @@ race.controll = function() {
 		
 		var submissionData = function(count) {
 			var command = input.getInput();
-			var lastPosition = lastEvent.pos;
 			
 			return {
 				id : id,
-				pos : lastPosition,
+				state : currentState,
 				command : command
 			};
 		};

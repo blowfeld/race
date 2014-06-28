@@ -40,15 +40,15 @@ race.model = function() {
 			player.start();
 		};
 		
-		var schedule = function(events) {
+		var schedule = function(id, events) {
 			for (var i = 0; i < events.length; i++) {
 				var event = events[i];
-				participants[event.id].schedule(event);
+				participants[id].schedule(event);
 			}
 		};
 		
-		var participants = function() {
-			return participants.length;
+		var participantCount = function() {
+			return Object.keys(participants).length;
 		};
 		
 		var findAbsent = function(presentIds) {
@@ -61,7 +61,7 @@ race.model = function() {
 			addParticipant : addParticipant,
 			add : add,
 			schedule : schedule,
-			participants : participants,
+			participantCount : participantCount,
 			findAbsent : findAbsent
 		};
 	}
