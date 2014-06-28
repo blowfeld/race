@@ -16,8 +16,8 @@ public interface JsonConverter {
 	static final String LAP_COUNT = "count";
 	static final String SEGMENT_START = "start";
 	static final String SEGMENT_END = "end";
-	static final String SEGMENT_START_TIME = "start_time";
-	static final String SEGMENT_END_TIME = "end_time";
+	static final String SEGMENT_START_TIME = "startTime";
+	static final String SEGMENT_END_TIME = "endTime";
 	static final String POINT_X = "x";
 	static final String POINT_Y = "y";
 	static final String SPEED = "speed";
