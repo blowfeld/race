@@ -17,11 +17,14 @@ import com.google.common.collect.ImmutableList;
 public class RegistrationHandler extends CountDownHandler {
 	private final HandlerRegistry registry;
 	
+	private final RaceContext raceContext;
+	
 	private RequestHandler successor;
 	
-	public RegistrationHandler(HandlerRegistry registry) {
+	public RegistrationHandler(HandlerRegistry registry, RaceContext raceContext) {
 		super(new ArrayList<String>(), 5000, 1000);
 		this.registry = registry;
+		this.raceContext = raceContext;
 	}
 	
 	@Override
@@ -64,7 +67,7 @@ public class RegistrationHandler extends CountDownHandler {
 	private void initSuccessors() {
 		List<String> participants = ImmutableList.copyOf(getParticipants());
 		ScoreHandler scoreHandler = new ScoreHandler(participants);
-		RaceHandler raceHandler = new RaceHandler(participants, scoreHandler);
+		RaceHandler raceHandler = new RaceHandler(participants, raceContext, scoreHandler);
 		LaunchHandler launchHandler = new LaunchHandler(participants, raceHandler);
 		scoreHandler.setExpirationListener(new UnregisterListener(
 				ImmutableList.of(scoreHandler, raceHandler, launchHandler), registry));

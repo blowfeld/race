@@ -122,7 +122,8 @@ public class RaceProcessorTest {
 	
 	@Before
 	public void setupTrack() {
-		when(track.getStartGrid()).thenReturn(ImmutableList.of(point_0_0, point_1_0, point_2_0));
+		Iterable<? extends PointDouble> gridPoints = ImmutableList.of(point_0_0, point_1_0, point_2_0);
+		Mockito.<Iterable<? extends PointDouble>>when(track.getStartGrid()).thenReturn(gridPoints);
 	}
 	
 	@Before

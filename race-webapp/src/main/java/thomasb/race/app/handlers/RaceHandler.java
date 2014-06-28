@@ -17,11 +17,17 @@ public class RaceHandler implements RequestHandler {
 	private final ClockedRequestHandler clockedRequestHandler;
 	private final UUID id = UUID.randomUUID();
 	
-	public RaceHandler(List<String> participants, ScoreHandler scoreHandler) {
-		StepProcessor stepProcessor = new StepProcessor(participants, scoreHandler);
-		clockedRequestHandler = new ClockedRequestHandlerImp(participants, 50, 40, stepProcessor);
+	public RaceHandler(List<String> participants, RaceContext raceContext, ScoreHandler scoreHandler) {
+		RaceProcessor stepProcessor = new RaceProcessor(participants,
+				raceContext,
+				scoreHandler);
+		
+		this.clockedRequestHandler = new ClockedRequestHandlerImp(participants,
+				raceContext.getUpdateInterval(),
+				raceContext.getTimeout(),
+				stepProcessor);
 	}
-
+	
 	@Override
 	public void handle(HandlerContext context) throws ServletException, IOException {
 		handle(context.getRequest(), context.getResponse());
@@ -32,7 +38,7 @@ public class RaceHandler implements RequestHandler {
 			throws ServletException, IOException {
 		clockedRequestHandler.handle(request, response);
 	}
-
+	
 	@Override
 	public UUID getId() {
 		return id;

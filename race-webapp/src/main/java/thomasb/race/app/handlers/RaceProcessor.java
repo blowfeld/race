@@ -44,6 +44,17 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 	private final RaceRedirect redirect;
 	
 	RaceProcessor(List<String> participants,
+			RaceContext raceContext,
+			RequestHandler scoreHandler) {
+		this(participants,
+				raceContext.getTrack(),
+				raceContext.getEngine(),
+				raceContext.getConverter(),
+				scoreHandler,
+				raceContext.getMaxTime());
+	}
+	
+	RaceProcessor(List<String> participants,
 			RaceTrack track,
 			RaceEngine engine,
 			JsonConverter converter,
@@ -58,7 +69,7 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 	
 	@Override
 	public JsonStructure initalData(HttpServletRequest request) {
-		Iterator<PointDouble> startGrid = track.getStartGrid().iterator();
+		Iterator<? extends PointDouble> startGrid = track.getStartGrid().iterator();
 		JsonObjectBuilder responseBuilder = Json.createObjectBuilder();
 		
 		JsonObjectBuilder gridBuilder = Json.createObjectBuilder();
