@@ -49,7 +49,10 @@ clocking.events = function() {
 		var events = [];
 		
 		var schedule = function(newEvents) {
-			events.unshift(newEvents.sort(function(e1, e2) { return e2.getStart() - e1.getStart(); });
+			var startTimeDesc = function(e1, e2) {
+				return e2.getStart() - e1.getStart();
+			};
+			events.unshift.apply(events, newEvents.sort(startTimeDesc));
 		};
 		
 		var execute = function() {
