@@ -9,7 +9,8 @@ public enum ArrowControlEvent implements ControlEvent {
 	LEFT(0, -1),
 	RIGHT(0, 1),
 	UP(1, 0),
-	DOWN(-1, 0);
+	DOWN(-1, 0),
+	VOID(0, 0);
 	
 	private static Map<Integer, ArrowControlEvent> keyMap = ImmutableMap.of(
 		37, LEFT,
@@ -28,7 +29,8 @@ public enum ArrowControlEvent implements ControlEvent {
 	}
 	
 	public static ArrowControlEvent fromKey(int key) {
-		return keyMap.get(key);
+		return keyMap.containsKey(key) ?
+				keyMap.get(key) : VOID;
 	}
 	
 	@Override
