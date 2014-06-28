@@ -1,10 +1,14 @@
 package thomasb.race.app.handlers;
 
+import static thomasb.race.engine.PlayerStatus.ACTIVE;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -14,6 +18,7 @@ import javax.json.JsonObjectBuilder;
 import javax.json.JsonReader;
 import javax.json.JsonString;
 import javax.json.JsonStructure;
+import javax.json.JsonValue;
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -40,11 +45,24 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 	private static final String REDIRECT_PARAMETER = "redirect";
 	private static final String EVENT_DATA_PARAMETER = "eventData";
 	
+	private static final JsonObject INIT_LAPS = Json.createObjectBuilder()
+			.add(JsonConverter.LAP_COUNT, -1)
+			.add(JsonConverter.LAP_TIME, 0.0)
+		.build();;
+	private static final JsonObject INIT_CONTROL = Json.createObjectBuilder()
+			.add(JsonConverter.SPEED, 0)
+			.add(JsonConverter.STEERING, 0)
+		.build();
+	private static final JsonString INIT_STATUS = Json.createArrayBuilder()
+			.add(ACTIVE.name())
+		.build().getJsonString(0);
+	
 	private final RaceEngine engine;
 	private final JsonConverter converter;
 	private final RaceRedirect redirect;
 	private final JsonArray jsonParticipants;
 	private final JsonObject grid;
+	private final Map<String, JsonValue> startPositions;
 	
 	RaceProcessor(List<String> participants,
 			RaceContext raceContext,
@@ -73,25 +91,40 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 		}
 		this.jsonParticipants = participantArray.build();
 		
+		Map<String, JsonValue> startPositions = new HashMap<>();
 		Iterator<? extends PointDouble> startGrid = track.getStartGrid().iterator();
 		JsonObjectBuilder gridBuilder = Json.createObjectBuilder();
 		for (String participant : participants) {
-			gridBuilder.add(participant, converter.serialize(startGrid.next()));
+			PointDouble startPosition = startGrid.next();
+			startPositions.put(participant, createInitialState(startPosition, converter));
+			gridBuilder.add(participant, converter.serialize(startPosition));
 		}
+		this.startPositions = startPositions;
 		this.grid = gridBuilder.build();
+	}
+	
+	private static JsonValue createInitialState(PointDouble position, JsonConverter converter) {
+		return Json.createObjectBuilder()
+				.add(JsonConverter.POSITION, converter.serialize(position))
+				.add(JsonConverter.CONTROL, INIT_CONTROL)
+				.add(JsonConverter.LAPS, INIT_LAPS)
+				.add(JsonConverter.STATUS, INIT_STATUS)
+			.build();
 	}
 	
 	@Override
 	public JsonStructure initalData(HttpServletRequest request) {
 		JsonObjectBuilder responseBuilder = Json.createObjectBuilder();
 		
-		responseBuilder.add(ID_PARAMETER, request.getSession().getId())
+		String sessionId = request.getSession().getId();
+		responseBuilder.add(ID_PARAMETER, sessionId)
+				.add(STATE_PARAMETER, startPositions.get(sessionId))
 				.add(PARTICIPANTS_PARAMETER, jsonParticipants)
 				.add(GRID_PARAMETER, grid);
 		
 		return responseBuilder.build();
 	}
-	
+
 	@Override
 	public RaceData preprocess(AsyncContext request, int requestTime)
 			throws ServletException, IOException {
@@ -99,7 +132,6 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 
 		JsonReader dataParser = Json.createReader(new StringReader(data));
 		JsonObject dataObject = dataParser.readObject();
-		
 		
 		JsonString id = dataObject.getJsonString(ID_PARAMETER);
 		JsonObject jsonState = dataObject.getJsonObject(STATE_PARAMETER);
