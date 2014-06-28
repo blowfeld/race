@@ -2,10 +2,13 @@ package thomasb.race.app.handlers;
 
 import static org.hamcrest.Matchers.comparesEqualTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.doubleThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static thomasb.race.engine.PlayerStatus.ACTIVE;
+import static thomasb.race.engine.RaceMatchers.isCloseTo;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -13,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.json.Json;
-import javax.json.JsonObject;
+import javax.json.JsonString;
 import javax.json.JsonStructure;
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -45,7 +48,10 @@ import com.google.common.collect.ImmutableList;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RaceProcessorTest {
+	private static final double PRECISION = 1e-10;
 	private static final UUID HANDLER_ID = UUID.randomUUID();
+	private static final JsonString ID_1 = Json.createArrayBuilder().add("1").build().getJsonString(0);
+	private static final JsonString ID_2 = Json.createArrayBuilder().add("2").build().getJsonString(0);
 	
 	@Mock RaceTrack track;
 	@Mock RaceEngine engine;
@@ -70,8 +76,8 @@ public class RaceProcessorTest {
 	@Mock HttpServletResponse response;
 	@Mock AsyncContext asyncRequest;
 	
-	ClockedRequest<JsonObject> clockedRequest_1;
-	ClockedRequest<JsonObject> clockedRequest_2;
+	ClockedRequest<RaceData> clockedRequest_1;
+	ClockedRequest<RaceData> clockedRequest_2;
 	
 	private RaceProcessor processor;
 	
@@ -122,7 +128,6 @@ public class RaceProcessorTest {
 	@Before
 	public void setupEngine() {
 		when(path.getEndState()).thenReturn(endState);
-		when(path.getEndState()).thenReturn(endState);
 		Mockito.<List<? extends PathSegment>>when(path.getSegments())
 				.thenReturn(ImmutableList.of(segment_1, segment_2));
 		
@@ -131,12 +136,11 @@ public class RaceProcessorTest {
 				.thenReturn(path);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Before
 	public void setupRequest() {
 		String baseRequestDataString =
 				"{"
-						+ "\"id\" : \"%s\","
+						+ "\"id\" : \"1\","
 						+ "\"state\" : {"
 							+ "\"position\" : {"
 								+ "\"x\" : 0.0,"
@@ -152,48 +156,31 @@ public class RaceProcessorTest {
 								+ "\"steering\" : 90"
 							+ "}"
 						+ "},"
-						+ "%s"
+						+ "\"command\" : 37"
 				+ "}";
 		
-		String requestDataJson = String.format(baseRequestDataString, "1", "\"command\" : 37");
+		String requestDataJson = String.format(baseRequestDataString, "1");
 		when(request.getParameter(ClockedRequest.DATA_PARAMETER))
 				.thenReturn(requestDataJson);
 		
 		when(asyncRequest.getRequest()).thenReturn(request);
-		
-		String eventsString = 
-				"\"events\" : ["
-						+ "{"
-							+ "\"start\" : {\"x\" : 0.0, \"y\" : 0.0},"
-							+ "\"end\" : {\"x\" : 1.0, \"y\" : 0.0},"
-							+ "\"start_time\" : 1.0,"
-							+ "\"end_time\" : 1.5"
-						+ "},"
-						+ "{"
-							+ "\"start\" : {\"x\" : 1.0, \"y\" : 0.0},"
-							+ "\"end\" : {\"x\" : 2.0, \"y\" : 0.0},"
-							+ "\"start_time\" : 1.5,"
-							+ "\"end_time\" : 2.0"
-						+ "}"
-					+ "]";
-		
-		String clockedDataJson_1 = String.format(baseRequestDataString, "1", eventsString);
-		String clockedDataJson_2 = String.format(baseRequestDataString, "2", eventsString);
+	}
 	
+	@SuppressWarnings("unchecked")
+	@Before
+	public void setupClockedRequest() {
+		
 		clockedRequest_1 = mock(ClockedRequest.class);
 		clockedRequest_2 = mock(ClockedRequest.class);
 		
-		when(clockedRequest_1.getData()).thenReturn((JsonObject) jsonFrom(clockedDataJson_1));
-		when(clockedRequest_2.getData()).thenReturn((JsonObject) jsonFrom(clockedDataJson_2));
-	}
-	
-	@Before
-	public void setupScoreHandler() {
-		when(scoreHandler.getId()).thenReturn(HANDLER_ID);
+		when(clockedRequest_1.getData()).thenReturn(new RaceData(ID_1, path));
+		when(clockedRequest_2.getData()).thenReturn(new RaceData(ID_2, path));
 	}
 	
 	@Before
 	public void setupProcessor() {
+		when(scoreHandler.getId()).thenReturn(HANDLER_ID);
+		
 		List<String> participants = ImmutableList.of("1", "2");
 		
 		processor = new RaceProcessor(participants, track , engine, new RaceJsonConverter(), scoreHandler, 10);
@@ -215,43 +202,17 @@ public class RaceProcessorTest {
 	
 	@Test
 	public void testPreprocess() throws ServletException, IOException {
-		JsonStructure actual = processor.preprocess(asyncRequest, 1);
+		RaceData actual = processor.preprocess(asyncRequest, 1);
 		
-		String expected =
-				"{"
-					+ "\"id\" : \"1\","
-					+ "\"state\" : {"
-						+ "\"position\" : {"
-							+ "\"x\" : 2.0,"
-							+ "\"y\" : 0.0"
-						+ "},"
-						+ "\"status\" : \"ACTIVE\","
-						+ "\"laps\" : {"
-								+ "\"count\" : 1,"
-								+ "\"lapTime\" : 1.0"
-							+ "},"
-						+ "\"control\" : {"
-							+ "\"speed\" : 1,"
-							+ "\"steering\" : 90"
-						+ "}"
-					+ "},"
-					+ "\"events\" : ["
-						+ "{"
-							+ "\"start\" : {\"x\" : 0.0, \"y\" : 0.0},"
-							+ "\"end\" : {\"x\" : 1.0, \"y\" : 0.0},"
-							+ "\"start_time\" : 1.0,"
-							+ "\"end_time\" : 1.5"
-						+ "},"
-						+ "{"
-							+ "\"start\" : {\"x\" : 1.0, \"y\" : 0.0},"
-							+ "\"end\" : {\"x\" : 2.0, \"y\" : 0.0},"
-							+ "\"start_time\" : 1.5,"
-							+ "\"end_time\" : 2.0"
-						+ "}"
-					+ "]"
-				+ "}";
-		
-		assertEquals(jsonFrom(expected), actual);
+		assertEquals(ID_1, actual.getJsonId());
+		assertThat(actual.getPath().getEndState().getPosition(), isCloseTo(point_2_0, PRECISION));
+		assertEquals(actual.getPath().getEndState().getPlayerStatus(), ACTIVE);
+		assertEquals(actual.getPath().getEndState().getControlState().getSpeed(), 1);
+		assertEquals(actual.getPath().getEndState().getControlState().getSteering(), 90);
+		assertEquals(actual.getPath().getEndState().getLaps().getCount(), 1);
+		assertEquals(actual.getPath().getEndState().getLaps().getLapTime(), 1.0, PRECISION);
+		assertThat(actual.getPath().getSegments().get(0), isCloseTo(segment_1, PRECISION));
+		assertThat(actual.getPath().getSegments().get(1), isCloseTo(segment_2, PRECISION));
 	}
 	
 	@Test
@@ -261,7 +222,6 @@ public class RaceProcessorTest {
 		String expected = "{ \"serverTime\" : 5}";
 		
 		assertEquals(jsonFrom(expected), actual);
-		
 	}
 	
 	@Test
@@ -273,7 +233,7 @@ public class RaceProcessorTest {
 					+ "\"id\" : \"%s\","
 					+ "\"state\" : {"
 						+ "\"position\" : {"
-							+ "\"x\" : 0.0," // according to #setupRequests
+							+ "\"x\" : 2.0,"
 							+ "\"y\" : 0.0"
 						+ "},"
 						+ "\"status\" : \"ACTIVE\","
@@ -337,7 +297,7 @@ public class RaceProcessorTest {
 					+ "\"redirect\" : \"" + HANDLER_ID.toString() + "\","
 					+ "\"state\" : {"
 						+ "\"position\" : {"
-							+ "\"x\" : 0.0," // according to #setupRequests
+							+ "\"x\" : 2.0,"
 							+ "\"y\" : 0.0"
 						+ "},"
 						+ "\"status\" : \"ACTIVE\","

@@ -1,8 +1,5 @@
 package thomasb.race.app.handlers;
 
-import static thomasb.race.engine.PlayerStatus.FINISHED;
-import static thomasb.race.engine.PlayerStatus.TERMINATED;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -21,8 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import thomasb.race.app.json.JsonConverter;
 import thomasb.race.engine.ControlEvent;
+import thomasb.race.engine.PathSegment;
 import thomasb.race.engine.PlayerState;
-import thomasb.race.engine.PlayerStatus;
 import thomasb.race.engine.PointDouble;
 import thomasb.race.engine.RaceEngine;
 import thomasb.race.engine.RacePath;
@@ -31,9 +28,8 @@ import thomasb.web.clocking.ClockedRequest;
 import thomasb.web.clocking.ClockedRequestProcessor;
 import thomasb.web.handler.RequestHandler;
 
-final class RaceProcessor implements ClockedRequestProcessor<JsonObject> {
+final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 	private static final String GRID_PARAMETER = "grid";
-	private static final String EVENTS = "events";
 	private static final String ID_PARAMETER = "id";
 	private static final String CONTROL_PARAMETER = "command";
 	private static final String STATE_PARAMETER = "state";
@@ -45,8 +41,7 @@ final class RaceProcessor implements ClockedRequestProcessor<JsonObject> {
 	private final RaceTrack track;
 	private final JsonConverter converter;
 	private final List<String> participants;
-	private final RequestHandler scoreHandler;
-	private final int maxTime;
+	private final RaceRedirect redirect;
 	
 	RaceProcessor(List<String> participants,
 			RaceTrack track,
@@ -58,8 +53,7 @@ final class RaceProcessor implements ClockedRequestProcessor<JsonObject> {
 		this.track = track;
 		this.engine = engine;
 		this.converter = converter;
-		this.scoreHandler = scoreHandler;
-		this.maxTime = maxTime;
+		this.redirect = new RaceRedirect(scoreHandler, maxTime);
 	}
 	
 	@Override
@@ -78,12 +72,13 @@ final class RaceProcessor implements ClockedRequestProcessor<JsonObject> {
 	}
 	
 	@Override
-	public JsonObject preprocess(AsyncContext request, int requestTime)
+	public RaceData preprocess(AsyncContext request, int requestTime)
 			throws ServletException, IOException {
 		String data = request.getRequest().getParameter(ClockedRequest.DATA_PARAMETER);
 
 		JsonReader dataParser = Json.createReader(new StringReader(data));
 		JsonObject dataObject = dataParser.readObject();
+		
 		
 		JsonString id = dataObject.getJsonString(ID_PARAMETER);
 		JsonObject jsonState = dataObject.getJsonObject(STATE_PARAMETER);
@@ -93,12 +88,7 @@ final class RaceProcessor implements ClockedRequestProcessor<JsonObject> {
 		
 		RacePath path = engine.calculatePath(playerState.adjust(event), requestTime, 1.0);
 		
-		JsonObjectBuilder resultBuilder = Json.createObjectBuilder();
-		resultBuilder.add(ID_PARAMETER, id);
-		resultBuilder.add(STATE_PARAMETER, converter.serialize(path.getEndState()));
-		resultBuilder.add(EVENTS, converter.serialize(path.getSegments()));
-		
-		return resultBuilder.build();
+		return new RaceData(id, path);
 	}
 	
 	@Override
@@ -110,34 +100,29 @@ final class RaceProcessor implements ClockedRequestProcessor<JsonObject> {
 	}
 
 	@Override
-	public List<JsonStructure> process(List<? extends ClockedRequest<JsonObject>> requests) {
-		int inactiveCount = 0;
-		
+	public List<JsonStructure> process(List<? extends ClockedRequest<RaceData>> requests) {
 		JsonObjectBuilder eventDataBuilder = Json.createObjectBuilder();
-		for (ClockedRequest<JsonObject> request : requests) {
-			JsonObject responseData = request.getData();
-			eventDataBuilder.add(responseData.getString(ID_PARAMETER),
-					responseData.getJsonArray(EVENTS));
+		for (ClockedRequest<RaceData> request : requests) {
+			RaceData responseData = request.getData();
 			
-			JsonObject jsonState = responseData.getJsonObject(STATE_PARAMETER);
-			PlayerStatus status = PlayerStatus.valueOf(jsonState.getString(JsonConverter.STATUS));
-			if (status == FINISHED || status == TERMINATED) {
-				inactiveCount += 1;
-			}
+			List<? extends PathSegment> segments = responseData.getPath().getSegments();
+			eventDataBuilder.add(responseData.getId(), converter.serialize(segments));
 		}
 		
 		JsonObject eventData = eventDataBuilder.build();
 		
 		List<JsonStructure> result = new ArrayList<>();
-		for (ClockedRequest<JsonObject> request : requests) {
+		for (ClockedRequest<RaceData> request : requests) {
 			JsonObjectBuilder responseBuilder = Json.createObjectBuilder();
 			
-			JsonObject responseData = request.getData();
-			responseBuilder.add(ID_PARAMETER, responseData.get(ID_PARAMETER));
-			if (inactiveCount == participants.size() || request.getTime() > maxTime) {
-				responseBuilder.add(REDIRECT_PARAMETER, scoreHandler.getId().toString());
+			RaceData responseData = request.getData();
+			responseBuilder.add(ID_PARAMETER, responseData.getJsonId());
+			String redirectUrl = redirect.url(requests);
+			if (redirectUrl != null) {
+				responseBuilder.add(REDIRECT_PARAMETER, redirectUrl);
 			}
-			responseBuilder.add(STATE_PARAMETER, responseData.get(STATE_PARAMETER));
+			PlayerState endState = responseData.getPath().getEndState();
+			responseBuilder.add(STATE_PARAMETER, converter.serialize(endState));
 			responseBuilder.add(EVENT_DATA_PARAMETER, eventData);
 			
 			result.add(responseBuilder.build());

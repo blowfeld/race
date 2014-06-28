@@ -51,6 +51,14 @@
 			<artifactId>javax.json</artifactId>
 			<version>${project.json.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>thomasb.race</groupId>
+			<artifactId>race-engine</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	
 	<build>

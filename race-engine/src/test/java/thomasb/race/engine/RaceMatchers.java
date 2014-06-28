@@ -2,19 +2,19 @@ package thomasb.race.engine;
 
 public class RaceMatchers {
 	
-	static PointMatcher isCloseTo(PointDouble expected, double precision) {
+	public static PointMatcher isCloseTo(PointDouble expected, double precision) {
 		return new PointMatcher(expected, precision);
 	}
 	
-	static PathSegmentMatcher isCloseTo(PathSegment expected, double precision) {
+	public static PathSegmentMatcher isCloseTo(PathSegment expected, double precision) {
 		return new PathSegmentMatcher(expected, precision);
 	}
 	
-	static TrackSegmentMatcher isCloseTo(TrackSegment expected, double precision) {
+	public static TrackSegmentMatcher isCloseTo(TrackSegment expected, double precision) {
 		return new TrackSegmentMatcher(expected, precision);
 	}
 	
-	static RacePathMatcher isCloseTo(RacePath expected, double precision) {
+	public static RacePathMatcher isCloseTo(RacePath expected, double precision) {
 		return new RacePathMatcher(expected, precision);
 	}
 	
