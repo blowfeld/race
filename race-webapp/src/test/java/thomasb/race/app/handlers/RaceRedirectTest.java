@@ -51,13 +51,14 @@ public class RaceRedirectTest {
 		request_1 = mock(ClockedRequest.class);
 		request_2 = mock(ClockedRequest.class);
 		
-		state = mock(PlayerState.class);
-		
 		when(request_1.getTime()).thenReturn(time);
 		when(request_2.getTime()).thenReturn(time);
-		when(path.getEndState()).thenReturn(state);
+		
+		state = mock(PlayerState.class);
 		when(state.getPlayerStatus()).thenReturn(status);
+		when(path.getEndState()).thenReturn(state);
 		when(request_1.getData()).thenReturn(new RaceData(JSON_ID, path));
+		when(request_2.getData()).thenReturn(new RaceData(JSON_ID, path));
 	}
 	
 	@Test
@@ -72,8 +73,6 @@ public class RaceRedirectTest {
 	
 	@Test
 	public void urlIsNullIfNoRequests() {
-		setupRequest(15, FINISHED);
-		
 		RaceRedirect redirect = new RaceRedirect(handler, 10);
 		String actual = redirect.url(Collections.<ClockedRequest<RaceData>>emptyList());
 		
@@ -102,7 +101,7 @@ public class RaceRedirectTest {
 	
 	@Test
 	public void urlIfAllFinished() {
-		setupRequest(11, FINISHED);
+		setupRequest(1, FINISHED);
 		
 		RaceRedirect redirect = new RaceRedirect(handler, 10);
 		String actual = redirect.url(ImmutableList.of(request_1, request_2));
@@ -112,7 +111,7 @@ public class RaceRedirectTest {
 	
 	@Test
 	public void urlIfAllTerminated() {
-		setupRequest(11, TERMINATED);
+		setupRequest(1, TERMINATED);
 		
 		RaceRedirect redirect = new RaceRedirect(handler, 10);
 		String actual = redirect.url(ImmutableList.of(request_1, request_2));
