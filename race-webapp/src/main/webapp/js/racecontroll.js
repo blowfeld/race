@@ -65,9 +65,7 @@ race.controll = function() {
 				var events = eventData[playerId].map(eventParser);
 				var rescheduleToClient = reschedule(count, intervalStart, intervalEnd);
 				events = events.map(rescheduleToClient);
-				events = events.sort(function(e1, e2) { return e2.getStart() - e1.getStart(); });
 				raceModel.schedule(playerId, events);
-				
 			}
 		};
 		

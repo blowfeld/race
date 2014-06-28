@@ -48,8 +48,8 @@ clocking.events = function() {
 	var eventQueue = function(eventProcessor) {
 		var events = [];
 		
-		var schedule = function(newEvent) {
-			events.unshift(newEvent);
+		var schedule = function(newEvents) {
+			events.unshift(newEvents.sort(function(e1, e2) { return e2.getStart() - e1.getStart(); });
 		};
 		
 		var execute = function() {
