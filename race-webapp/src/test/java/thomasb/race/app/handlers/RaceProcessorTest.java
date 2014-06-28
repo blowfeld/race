@@ -74,9 +74,12 @@ public class RaceProcessorTest {
 	@Mock RequestHandler scoreHandler;
 	
 	@Mock HttpServletRequest initRequest;
-	@Mock HttpServletRequest request;
+	@Mock HttpServletRequest requestNoKey;
+	@Mock HttpServletRequest requestLeft;
+	@Mock AsyncContext asyncRequestNoKey;
+	@Mock AsyncContext asyncRequestLeft;
+	
 	@Mock HttpServletResponse response;
-	@Mock AsyncContext asyncRequest;
 	@Mock HttpSession session;
 	
 	ClockedRequest<RaceData> clockedRequest_1;
@@ -154,14 +157,18 @@ public class RaceProcessorTest {
 								+ "\"steering\" : 90"
 							+ "}"
 						+ "},"
-						+ "\"command\" : 37"
+						+ "\"command\" : %s"
 				+ "}";
 		
-		String requestDataJson = String.format(baseRequestDataString, "1");
-		when(request.getParameter(ClockedRequest.DATA_PARAMETER))
-				.thenReturn(requestDataJson);
+		String requestLeftDataJson = String.format(baseRequestDataString, 37);
+		String requestNoKeyDataJson = String.format(baseRequestDataString, 0);
+		when(requestLeft.getParameter(ClockedRequest.DATA_PARAMETER))
+				.thenReturn(requestLeftDataJson);
+		when(requestNoKey.getParameter(ClockedRequest.DATA_PARAMETER))
+				.thenReturn(requestNoKeyDataJson);
 		
-		when(asyncRequest.getRequest()).thenReturn(request);
+		when(asyncRequestNoKey.getRequest()).thenReturn(requestNoKey);
+		when(asyncRequestLeft.getRequest()).thenReturn(requestLeft);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -230,8 +237,9 @@ public class RaceProcessorTest {
 	
 	@Test
 	public void testPreprocess() throws ServletException, IOException {
-		RaceData actual = processor.preprocess(asyncRequest, 1);
+		RaceData actual = processor.preprocess(asyncRequestLeft, 1);
 		
+		// According to engine mock
 		assertEquals(ID_1, actual.getJsonId());
 		assertThat(actual.getPath().getEndState().getPosition(), isCloseTo(point_2_0, PRECISION));
 		assertEquals(actual.getPath().getEndState().getPlayerStatus(), ACTIVE);
@@ -244,10 +252,15 @@ public class RaceProcessorTest {
 	}
 	
 	@Test
+	public void testPreprocessNoKey() throws ServletException, IOException {
+		processor.preprocess(asyncRequestNoKey, 1);
+	}
+	
+	@Test
 	public void testTimeoutResponse() throws ServletException, IOException {
-		JsonStructure actual = processor.timeoutResponse(asyncRequest, 4, 5);
+		JsonStructure actual = processor.timeoutResponse(asyncRequestLeft, 4, 5);
 		
-		String expected = "{ \"serverTime\" : 5}";
+		String expected = "{ \"id\" : \"1\", \"serverTime\" : 5}";
 		
 		assertEquals(jsonFrom(expected), actual);
 	}

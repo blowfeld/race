@@ -15,7 +15,6 @@ import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
-import javax.json.JsonReader;
 import javax.json.JsonString;
 import javax.json.JsonStructure;
 import javax.json.JsonValue;
@@ -128,10 +127,7 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 	@Override
 	public RaceData preprocess(AsyncContext request, int requestTime)
 			throws ServletException, IOException {
-		String data = request.getRequest().getParameter(ClockedRequest.DATA_PARAMETER);
-
-		JsonReader dataParser = Json.createReader(new StringReader(data));
-		JsonObject dataObject = dataParser.readObject();
+		JsonObject dataObject = readRequestData(request);
 		
 		JsonString id = dataObject.getJsonString(ID_PARAMETER);
 		JsonObject jsonState = dataObject.getJsonObject(STATE_PARAMETER);
@@ -148,10 +144,17 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 	public JsonStructure timeoutResponse(AsyncContext request, int requestTime, int currentTime)
 			throws ServletException, IOException {
 		return Json.createObjectBuilder()
+				.add(ID_PARAMETER, readRequestData(request).getJsonString(ID_PARAMETER))
 				.add(SERVER_TIME, currentTime)
 			.build();
 	}
-
+	
+	private JsonObject readRequestData(AsyncContext request) {
+		String data = request.getRequest().getParameter(ClockedRequest.DATA_PARAMETER);
+		
+		return  Json.createReader(new StringReader(data)).readObject();
+	}
+	
 	@Override
 	public List<JsonStructure> process(List<? extends ClockedRequest<RaceData>> requests) {
 		JsonObjectBuilder eventDataBuilder = Json.createObjectBuilder();
