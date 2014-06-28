@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonReader;
@@ -29,6 +31,7 @@ import thomasb.web.clocking.ClockedRequestProcessor;
 import thomasb.web.handler.RequestHandler;
 
 final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
+	private static final String PARTICIPANTS_PARAMETER = "participants";
 	private static final String GRID_PARAMETER = "grid";
 	private static final String ID_PARAMETER = "id";
 	private static final String CONTROL_PARAMETER = "command";
@@ -38,10 +41,10 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 	private static final String EVENT_DATA_PARAMETER = "eventData";
 	
 	private final RaceEngine engine;
-	private final RaceTrack track;
 	private final JsonConverter converter;
-	private final List<String> participants;
 	private final RaceRedirect redirect;
+	private final JsonArray jsonParticipants;
+	private final JsonObject grid;
 	
 	RaceProcessor(List<String> participants,
 			RaceContext raceContext,
@@ -60,24 +63,31 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 			JsonConverter converter,
 			RequestHandler scoreHandler,
 			int maxTime) {
-		this.participants = participants;
-		this.track = track;
 		this.engine = engine;
 		this.converter = converter;
 		this.redirect = new RaceRedirect(scoreHandler, maxTime);
-	}
-	
-	@Override
-	public JsonStructure initalData(HttpServletRequest request) {
-		Iterator<? extends PointDouble> startGrid = track.getStartGrid().iterator();
-		JsonObjectBuilder responseBuilder = Json.createObjectBuilder();
 		
+		JsonArrayBuilder participantArray = Json.createArrayBuilder();
+		for (String participant : participants) {
+			participantArray.add(participant);
+		}
+		this.jsonParticipants = participantArray.build();
+		
+		Iterator<? extends PointDouble> startGrid = track.getStartGrid().iterator();
 		JsonObjectBuilder gridBuilder = Json.createObjectBuilder();
 		for (String participant : participants) {
 			gridBuilder.add(participant, converter.serialize(startGrid.next()));
 		}
+		this.grid = gridBuilder.build();
+	}
+	
+	@Override
+	public JsonStructure initalData(HttpServletRequest request) {
+		JsonObjectBuilder responseBuilder = Json.createObjectBuilder();
 		
-		responseBuilder.add(GRID_PARAMETER, gridBuilder);
+		responseBuilder.add(ID_PARAMETER, request.getSession().getId())
+				.add(PARTICIPANTS_PARAMETER, jsonParticipants)
+				.add(GRID_PARAMETER, grid);
 		
 		return responseBuilder.build();
 	}

@@ -22,6 +22,7 @@ import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -72,9 +73,11 @@ public class RaceProcessorTest {
 	
 	@Mock RequestHandler scoreHandler;
 	
+	@Mock HttpServletRequest initRequest;
 	@Mock HttpServletRequest request;
 	@Mock HttpServletResponse response;
 	@Mock AsyncContext asyncRequest;
+	@Mock HttpSession session;
 	
 	ClockedRequest<RaceData> clockedRequest_1;
 	ClockedRequest<RaceData> clockedRequest_2;
@@ -82,6 +85,17 @@ public class RaceProcessorTest {
 	private RaceProcessor processor;
 	
 	@Before
+	public void setup() {
+		setupPoints();
+		setupRequests();
+		setupClockedRequests();
+		setupStates();
+		setupSegments();
+		setupTrack();
+		setupEngine();
+		setupProcessor();
+	}
+	
 	public void setupPoints() {
 		when(point_0_0.getX()).thenReturn(0.0);
 		when(point_0_0.getY()).thenReturn(0.0);
@@ -93,7 +107,6 @@ public class RaceProcessorTest {
 		when(point_2_0.getY()).thenReturn(0.0);
 	}
 	
-	@Before
 	public void setupSegments() {
 		when(segment_1.getStart()).thenReturn(point_0_0);
 		when(segment_1.getEnd()).thenReturn(point_1_0);
@@ -106,7 +119,6 @@ public class RaceProcessorTest {
 		when(segment_2.getEndTime()).thenReturn(2.0);
 	}
 	
-	@Before
 	public void setupStates() {
 		when(controlState.getSpeed()).thenReturn(1);
 		when(controlState.getSteering()).thenReturn(90);
@@ -120,25 +132,10 @@ public class RaceProcessorTest {
 		when(endState.getPlayerStatus()).thenReturn(PlayerStatus.ACTIVE);
 	}
 	
-	@Before
-	public void setupTrack() {
-		Iterable<? extends PointDouble> gridPoints = ImmutableList.of(point_0_0, point_1_0, point_2_0);
-		Mockito.<Iterable<? extends PointDouble>>when(track.getStartGrid()).thenReturn(gridPoints);
-	}
-	
-	@Before
-	public void setupEngine() {
-		when(path.getEndState()).thenReturn(endState);
-		Mockito.<List<? extends PathSegment>>when(path.getSegments())
-				.thenReturn(ImmutableList.of(segment_1, segment_2));
+	public void setupRequests() {
+		when(session.getId()).thenReturn("1");
+		when(initRequest.getSession()).thenReturn(session);
 		
-		when(engine.calculatePath(any(PlayerState.class),
-				doubleThat(comparesEqualTo(1.0)), doubleThat(comparesEqualTo(1.0))))
-				.thenReturn(path);
-	}
-	
-	@Before
-	public void setupRequest() {
 		String baseRequestDataString =
 				"{"
 						+ "\"id\" : \"1\","
@@ -168,9 +165,7 @@ public class RaceProcessorTest {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Before
-	public void setupClockedRequest() {
-		
+	public void setupClockedRequests() {
 		clockedRequest_1 = mock(ClockedRequest.class);
 		clockedRequest_2 = mock(ClockedRequest.class);
 		
@@ -178,7 +173,21 @@ public class RaceProcessorTest {
 		when(clockedRequest_2.getData()).thenReturn(new RaceData(ID_2, path));
 	}
 	
-	@Before
+	public void setupTrack() {
+		Iterable<? extends PointDouble> gridPoints = ImmutableList.of(point_0_0, point_1_0, point_2_0);
+		Mockito.<Iterable<? extends PointDouble>>when(track.getStartGrid()).thenReturn(gridPoints);
+	}
+	
+	public void setupEngine() {
+		when(path.getEndState()).thenReturn(endState);
+		Mockito.<List<? extends PathSegment>>when(path.getSegments())
+				.thenReturn(ImmutableList.of(segment_1, segment_2));
+		
+		when(engine.calculatePath(any(PlayerState.class),
+				doubleThat(comparesEqualTo(1.0)), doubleThat(comparesEqualTo(1.0))))
+				.thenReturn(path);
+	}
+	
 	public void setupProcessor() {
 		when(scoreHandler.getId()).thenReturn(HANDLER_ID);
 		
@@ -189,13 +198,16 @@ public class RaceProcessorTest {
 	
 	@Test
 	public void testInitData() {
-		JsonStructure actual = processor.initalData(request);
+		JsonStructure actual = processor.initalData(initRequest);
 		
 		String expected =
-				"{ \"grid\" : {"
-						+ "\"1\" : {\"x\" : 0.0, \"y\" : 0.0},"
-						+ "\"2\" : {\"x\" : 1.0, \"y\" : 0.0}"
-					+ "}"
+				"{"
+					+ "\"id\" : \"1\","
+					+ "\"participants\" : [\"1\", \"2\"],"
+					+ "\"grid\" : {"
+							+ "\"1\" : {\"x\" : 0.0, \"y\" : 0.0},"
+							+ "\"2\" : {\"x\" : 1.0, \"y\" : 0.0}"
+						+ "}"
 				+ "}";
 		
 		assertEquals(jsonFrom(expected), actual);
