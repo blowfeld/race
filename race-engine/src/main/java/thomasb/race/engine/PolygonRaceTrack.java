@@ -2,58 +2,50 @@ package thomasb.race.engine;
 
 import java.util.List;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
-
 public class PolygonRaceTrack implements RaceTrack {
-	private final List<TrackPolygon> trackSections;
-	private final PointDouble finish1;
-	private final PointDouble finish2;
+	private final List<? extends TrackSection> trackSections;
+	private final List<? extends PointDouble> finish;
 	private final Iterable<PointDouble> gridPoints;
 	private final int maxLaps;
 	
-	public PolygonRaceTrack(List<TrackPolygon> sections,
-			PointDouble finish1, PointDouble finish2,
+	public PolygonRaceTrack(List<? extends TrackSection> sections,
+			List<? extends PointDouble> finish,
 			Iterable<PointDouble> gridPoints,
 			int maxLaps) {
-		this.finish1 = finish1;
-		this.finish2 = finish2;
+		this.finish = finish;
 		this.gridPoints = gridPoints;
 		this.maxLaps = maxLaps;
 		
 		checkSectionsDontIntersect(sections);
-		Builder<TrackPolygon> unique = ImmutableList.builder();
-		TrackPolygon previousTrackType = sections.get(0);
-		for (int i = 0; i < sections.size(); i++) {
-			if (!sections.get(i).getType().equals(previousTrackType)) {
-				unique.add(sections.get(i));
-			}
-		}
-		
-		this.trackSections = unique.build();
+		this.trackSections = sections;
 	}
 	
-	private void checkSectionsDontIntersect(List<TrackPolygon> sections) {
+	private void checkSectionsDontIntersect(List<? extends TrackSection> sections) {
 		// TODO check sections contain each other
 	}
-
-	@Override
-	public List<TrackSegment> segmentsFor(PointDouble startPoint, int direction) {
-		return new TrackSegmentCalculator(trackSections, finish1, finish2).segmentsFor(startPoint, direction);
-	}
 	
 	@Override
-	public Iterable<PointDouble> getStartGrid() {
+	public Iterable<? extends PointDouble> getStartGrid() {
 		return gridPoints;
 	}
 	
 	@Override
-	public List<PointDouble> getContour() {
+	public List<? extends PointDouble> getContour() {
 		return trackSections.get(0).getCorners();
 	}
 	
 	@Override
 	public int getMaxLaps() {
 		return maxLaps;
+	}
+
+	@Override
+	public List<? extends TrackSection> getSections() {
+		return trackSections;
+	}
+
+	@Override
+	public List<? extends PointDouble> getFinish() {
+		return finish;
 	}
 }

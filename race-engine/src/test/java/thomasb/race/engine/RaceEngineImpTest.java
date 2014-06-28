@@ -21,6 +21,7 @@ public class RaceEngineImpTest extends Test2D {
 	private static final double PRECISION = 1e-15;
 	
 	@Mock RaceTrack raceTrack;
+	@Mock TrackSegmentCalculator segementCalculator;
 
 	private RaceLap zeroLaps = new RaceLap(0, 0.0);
 	
@@ -40,7 +41,7 @@ public class RaceEngineImpTest extends Test2D {
 		TrackSegment asphaltVert3 = new RaceTrackSegment(
 				points[0][3] , points[0][4], 2, 0);
 		
-		when(raceTrack.segmentsFor(points[0][0], 0))
+		when(segementCalculator.segmentsFor(points[0][0], 0))
 			.thenReturn(ImmutableList.of(asphaltVert,
 					greenVert,
 					asphaltVert2,
@@ -52,13 +53,13 @@ public class RaceEngineImpTest extends Test2D {
 		TrackSegment wallHor = new RaceTrackSegment(
 				points[10][0] , points[10][0], 0, 0);
 		
-		when(raceTrack.segmentsFor(points[0][0], 90))
+		when(segementCalculator.segmentsFor(points[0][0], 90))
 			.thenReturn(ImmutableList.of(asphaltHor, wallHor));
 		
 		TrackSegment asphaltDiag = new RaceTrackSegment(
 				points[0][0] , points[2][2], 2, 0);
 		
-		when(raceTrack.segmentsFor(points[0][0], 45))
+		when(segementCalculator.segmentsFor(points[0][0], 45))
 			.thenReturn(ImmutableList.of(asphaltDiag));
 		
 		when(raceTrack.getMaxLaps()).thenReturn(1);
@@ -66,7 +67,7 @@ public class RaceEngineImpTest extends Test2D {
 	
 	@Before
 	public void setupEngine() {
-		engine = new RaceEngineImp(raceTrack);
+		engine = new RaceEngineImp(raceTrack, segementCalculator);
 	}
 	
 	@Test

@@ -11,10 +11,16 @@ import com.google.common.collect.Iterables;
 
 public class RaceEngineImp implements RaceEngine {
 	private final RaceTrack raceTrack;
+	private final TrackSegmentCalculator segmentCalculator;
 	private PathCalculator pathCalc;
 
 	public RaceEngineImp(RaceTrack raceTrack) {
+		this(raceTrack, new TrackSegmentCalculator(raceTrack));
+	}
+	
+	RaceEngineImp(RaceTrack raceTrack, TrackSegmentCalculator segmentCalculator) {
 		this.raceTrack = raceTrack;
+		this.segmentCalculator = segmentCalculator;
 	}
 	
 	@Override
@@ -24,7 +30,7 @@ public class RaceEngineImp implements RaceEngine {
 			return zeroLengthPath(state, startTime, duration);
 		}
 		
-		List<TrackSegment> trackSegments = raceTrack.segmentsFor(state.getPosition(), state.getControlState().getSteering());
+		List<TrackSegment> trackSegments = segmentCalculator.segmentsFor(state.getPosition(), state.getControlState().getSteering());
 		
 		pathCalc = new PathCalculator(trackSegments, state.getControlState(), startTime, startTime + duration);
 		pathCalc.calculate();

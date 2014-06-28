@@ -37,7 +37,7 @@ public class Mocks {
 		String description = String.format(
 				"TrackSegmentMock[start=%s, end=%s, maxSpeed=%s, isFinished=%s]",
 				start, end, maxSpeed, crossedFinish);
-
+		
 		TrackSegment segment = mock(TrackSegment.class);
 		when(segment.getStart()).thenReturn(start);
 		when(segment.getEnd()).thenReturn(end);

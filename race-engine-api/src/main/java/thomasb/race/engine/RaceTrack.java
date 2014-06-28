@@ -4,11 +4,13 @@ import java.util.List;
 
 public interface RaceTrack {
 	
-	List<TrackSegment> segmentsFor(PointDouble startPoint, int direction);
+	List<? extends TrackSection> getSections();
 	
-	Iterable<PointDouble> getStartGrid();
+	List<? extends PointDouble> getFinish();
 	
-	List<PointDouble> getContour();
+	Iterable<? extends PointDouble> getStartGrid();
+	
+	List<? extends PointDouble> getContour();
 	
 	int getMaxLaps();
 	

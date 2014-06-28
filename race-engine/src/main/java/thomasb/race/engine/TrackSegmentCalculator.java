@@ -14,8 +14,9 @@ import thomasb.race.engine.Ray.IntersectionType;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 
-final class TrackSegmentCalculator {
+class TrackSegmentCalculator {
 	private static final Comparator<BoundaryPoint> DISTANCE_COMPARATOR = new Comparator<BoundaryPoint>() {
 		@Override
 		public int compare(BoundaryPoint o1, BoundaryPoint o2) {
@@ -36,11 +37,24 @@ final class TrackSegmentCalculator {
 	private final PointDouble finish1;
 	private final PointDouble finish2;
 	
-	TrackSegmentCalculator(List<TrackPolygon> sections,
+	TrackSegmentCalculator(RaceTrack raceTrack) {
+		this(raceTrack.getSections(), raceTrack.getFinish().get(0), raceTrack.getFinish().get(1));
+	}
+			
+	TrackSegmentCalculator(List<? extends TrackSection> sections,
 			PointDouble finish1, PointDouble finish2) {
 		this.finish1 = finish1;
 		this.finish2 = finish2;
-		this.trackSections = sections;
+		
+		Builder<TrackPolygon> unique = ImmutableList.builder();
+		TrackSection previousTrackType = sections.get(0);
+		for (int i = 0; i < sections.size(); i++) {
+			if (!sections.get(i).getType().equals(previousTrackType)) {
+				unique.add(TrackPolygon.fromTrackSection(sections.get(i)));
+			}
+		}
+		
+		this.trackSections = unique.build();
 	}
 	
 	List<TrackSegment> segmentsFor(PointDouble startPoint, int direction) {

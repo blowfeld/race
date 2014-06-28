@@ -1,6 +1,6 @@
 package thomasb.race.engine;
 
-enum TrackType {
+enum TrackType implements SectionType {
 	ASPHALT(2), GREEN(1), WALL(0);
 	
 	private final int maxSpeed;
@@ -8,8 +8,9 @@ enum TrackType {
 	private TrackType(int maxSpeed) {
 		this.maxSpeed = maxSpeed;
 	}
-
-	int getMaxSpeed() {
+	
+	@Override
+	public int getMaxSpeed() {
 		return maxSpeed;
 	}
 }

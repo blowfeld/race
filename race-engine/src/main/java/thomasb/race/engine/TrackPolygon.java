@@ -15,7 +15,7 @@ import thomasb.race.engine.Ray.IntersectionType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
-final class TrackPolygon {
+final class TrackPolygon implements TrackSection {
 	private static final Comparator<Intersection> DISTANCE_COMPARATOR = new Comparator<Intersection>() {
 		@Override
 		public int compare(Intersection o1, Intersection o2) {
@@ -23,15 +23,23 @@ final class TrackPolygon {
 		}
 	};
 	
-	private final List<PointDouble> corners;
-	private final TrackType type;
+	private final List<? extends PointDouble> corners;
+	private final SectionType type;
 
-	public TrackPolygon(List<PointDouble> points, TrackType type) {
+	public TrackPolygon(List<? extends PointDouble> points, SectionType type) {
 		this.corners = points;
 		this.type = type;
 	}
 	
-	public List<Intersection> intersectionPoints(Ray ray) {
+	static TrackPolygon fromTrackSection(TrackSection section) {
+		if (section instanceof TrackPolygon) {
+			return (TrackPolygon) section;
+		}
+		
+		return new TrackPolygon(section.getCorners(), section.getType());
+	}
+	
+	List<Intersection> intersectionPoints(Ray ray) {
 		List<Intersection> intersectionPoints = new ArrayList<>();
 		PointDouble previousCorner = Iterables.getLast(corners);
 		for (PointDouble corner : corners) {
@@ -76,11 +84,11 @@ final class TrackPolygon {
 		return ImmutableList.copyOf(intersectionPoints);
 	}
 	
-	public boolean containsStartPoint(Ray ray) {
+	boolean containsStartPoint(Ray ray) {
 		return containsStartPoint(ray, intersectionPoints(ray));
 	}
 	
-	public boolean containsStartPoint(Ray ray, List<Intersection> intersectionPoints) {
+	boolean containsStartPoint(Ray ray, List<Intersection> intersectionPoints) {
 		if (!intersectionPoints.isEmpty() && intersectionPoints.get(0).getType() == IntersectionType.LINE_SEGMENT) {
 			return true;
 		}
@@ -109,11 +117,13 @@ final class TrackPolygon {
 		return boundaryCrossings % 2 == 1;
 	}
 	
-	public TrackType getType() {
+	@Override
+	public SectionType getType() {
 		return type;
 	}
 	
-	public List<PointDouble> getCorners() {
+	@Override
+	public List<? extends PointDouble> getCorners() {
 		return corners;
 	}
 }
