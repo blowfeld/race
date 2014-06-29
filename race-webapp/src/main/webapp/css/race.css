@@ -46,6 +46,24 @@ h2 {
 	border-bottom: 0.25em solid red;
 }
 
+svg {
+	stroke: black;
+}
+
+svg circle {
+	fill-opacity: 0.0
+}
+
+
+svg line {
+	stroke-width: 2;
+	stroke-linecap: round;
+}
+
+svg text {
+	font-size: 4pt;
+}
+
 #powered-by {
     position: absolute;
     z-index: -1;

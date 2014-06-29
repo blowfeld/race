@@ -41,10 +41,7 @@ race.model = function() {
 		};
 		
 		var schedule = function(id, events) {
-			for (var i = 0; i < events.length; i++) {
-				var event = events[i];
-				participants[id].schedule(event);
-			}
+			participants[id].schedule(events);
 		};
 		
 		var participantCount = function() {
