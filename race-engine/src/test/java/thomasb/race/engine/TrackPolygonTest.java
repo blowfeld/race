@@ -12,6 +12,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import thomasb.race.engine.Ray.Intersection;
 import thomasb.race.engine.Ray.IntersectionType;
@@ -19,8 +22,11 @@ import thomasb.race.engine.Ray.IntersectionType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TrackPolygonTest extends Test2D {
 	private static final double PRECISION = 1e-15;
+	
+	@Mock SectionType sectionType;
 	
 	private static final Comparator<Intersection> INTERSECTION_COMP = new Comparator<Intersection>() {
 		@Override
@@ -42,7 +48,7 @@ public class TrackPolygonTest extends Test2D {
 	public TrackPolygon setupPolygon(PointDouble... points) {
 		List<PointDouble> corners = ImmutableList.copyOf(points);
 		
-		return new TrackPolygon(corners, TrackType.ASPHALT);
+		return new TrackPolygon(corners, sectionType);
 	}
 	
 	@Test

@@ -21,19 +21,19 @@ public class TrackSegmentCalculatorTest extends Test2D {
 		raceTrack = new TrackSegmentCalculator(ImmutableList.of(
 				new TrackPolygon(ImmutableList.of(
 						points[8][12], points[8][8], points[12][8], points[12][12]),
-						TrackType.WALL),
+						TestSectionType.WALL),
 				new TrackPolygon(ImmutableList.of(
 						points[6][14], points[6][6], points[14][6], points[14][14]),
-						TrackType.GREEN),
+						TestSectionType.GREEN),
 				new TrackPolygon(ImmutableList.of(
 						points[4][16], points[4][4], points[16][4], points[16][16]),
-						TrackType.ASPHALT),
+						TestSectionType.ASPHALT),
 				new TrackPolygon(ImmutableList.of(
 						points[2][18], points[2][2], points[18][2], points[18][18]),
-						TrackType.GREEN),
+						TestSectionType.GREEN),
 				new TrackPolygon(ImmutableList.of(
 						points[0][20], points[0][0], points[20][0], points[20][20]),
-						TrackType.WALL)),
+						TestSectionType.WALL)),
 				points[2][10], points[8][10]);
 	}
 	
