@@ -20,6 +20,8 @@ import thomasb.race.engine.PlayerStatus;
 import thomasb.race.engine.PointDouble;
 import thomasb.race.engine.RaceLap;
 import thomasb.race.engine.RacePlayerState;
+import thomasb.race.engine.RaceTrack;
+import thomasb.race.engine.TrackSection;
 import thomasb.race.engine.VectorPoint;
 
 public class RaceJsonConverter implements JsonConverter {
@@ -89,6 +91,45 @@ public class RaceJsonConverter implements JsonConverter {
 		builder.add(SEGMENT_END, serialize(segment.getEnd()));
 		builder.add(SEGMENT_START_TIME, segment.getStartTime());
 		builder.add(SEGMENT_END_TIME, segment.getEndTime());
+		
+		return builder.build();
+	}
+	
+	@Override
+	public JsonValue serialize(RaceTrack track) {
+		JsonObjectBuilder builder = Json.createObjectBuilder();
+		
+		builder.add(TRACK_FINISH, serializePath(track.getFinish()));
+		builder.add(TRACK_SECTIONS, serializeSections(track.getSections()));
+		
+		return builder.build();
+	}
+	
+	private JsonValue serializePath(List<? extends PointDouble> path) {
+		JsonArrayBuilder builder = Json.createArrayBuilder();
+		
+		for (PointDouble corner : path) {
+			builder.add(serialize(corner));
+		}
+		
+		return builder.build();
+	}
+	
+	private JsonValue serializeSections(List<? extends TrackSection> sections) {
+		JsonArrayBuilder builder = Json.createArrayBuilder();
+		
+		for (TrackSection section : sections) {
+			builder.add(serialize(section));
+		}
+		
+		return builder.build();
+	}
+	
+	private JsonValue serialize(TrackSection section) {
+		JsonObjectBuilder builder = Json.createObjectBuilder();
+		
+		builder.add(SECTION_TYPE, section.getType().getMaxSpeed());
+		builder.add(TRACK_CONTOUR, serializePath(section.getCorners()));
 		
 		return builder.build();
 	}

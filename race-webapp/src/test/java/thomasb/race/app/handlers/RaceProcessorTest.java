@@ -42,6 +42,8 @@ import thomasb.race.engine.PointDouble;
 import thomasb.race.engine.RaceEngine;
 import thomasb.race.engine.RacePath;
 import thomasb.race.engine.RaceTrack;
+import thomasb.race.engine.SectionType;
+import thomasb.race.engine.TrackSection;
 import thomasb.web.clocking.ClockedRequest;
 import thomasb.web.handler.RequestHandler;
 
@@ -65,6 +67,9 @@ public class RaceProcessorTest {
 	@Mock PathSegment segment_2;
 
 	@Mock RacePath path;
+	
+	@Mock TrackSection trackSection;
+	@Mock SectionType trackType;
 	
 	@Mock ControlEvent event;
 	@Mock ControlState controlState;
@@ -181,8 +186,15 @@ public class RaceProcessorTest {
 	}
 	
 	public void setupTrack() {
+		when(trackType.getMaxSpeed()).thenReturn(2);
+		when(trackSection.getType()).thenReturn(trackType);
+		Mockito.<List<? extends PointDouble>>when(trackSection.getCorners()).thenReturn(ImmutableList.of(point_1_0, point_2_0));
+		
 		Iterable<? extends PointDouble> gridPoints = ImmutableList.of(point_0_0, point_1_0, point_2_0);
 		Mockito.<Iterable<? extends PointDouble>>when(track.getStartGrid()).thenReturn(gridPoints);
+		List<? extends TrackSection> section = ImmutableList.of(trackSection);
+		Mockito.<List<? extends TrackSection>>when(track.getSections()).thenReturn(section);
+		Mockito.<List<? extends PointDouble>>when(track.getFinish()).thenReturn(ImmutableList.of(point_0_0, point_1_0));
 	}
 	
 	public void setupEngine() {
@@ -229,7 +241,20 @@ public class RaceProcessorTest {
 					+ "\"grid\" : {"
 							+ "\"1\" : {\"x\" : 0.0, \"y\" : 0.0},"
 							+ "\"2\" : {\"x\" : 1.0, \"y\" : 0.0}"
-						+ "}"
+					+ "},"
+					+ "\"track\" : {"
+						+ "\"finish\" : ["
+							+ "{\"x\" : 0.0, \"y\" : 0.0},"
+							+ "{\"x\" : 1.0, \"y\" : 0.0}"
+						+ "],"
+						+ "\"sections\" : [{"
+							+ "\"type\" : 2,"
+							+ "\"contour\" : ["
+								+ "{\"x\" : 1.0, \"y\" : 0.0},"
+								+ "{\"x\" : 2.0, \"y\" : 0.0}"
+							+ "]"
+						+ "}]"
+					+ "}"
 				+ "}";
 		
 		assertEquals(jsonFrom(expected), actual);

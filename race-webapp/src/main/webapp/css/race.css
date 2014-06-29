@@ -46,20 +46,36 @@ h2 {
 	border-bottom: 0.25em solid red;
 }
 
-svg {
+#race {
 	stroke: black;
 }
 
-svg circle {
-	fill-opacity: 0.0
+#race path {
+	fill-opacity: 1.0;
+	fill-rule: nonzero;
 }
 
+#race path.section_type_0 {
+	fill: brown;
+}
 
-svg line {
+#race path.section_type_1 {
+	fill: green;
+}
+
+#race path.section_type_2 {
+	fill: grey;
+}
+
+#race circle {
+	fill-opacity: 0.0;
+}
+
+#race line {
 	stroke-width: 2;
 	stroke-linecap: round;
 }
 
-svg text {
+#race text {
 	font-size: 4pt;
 }

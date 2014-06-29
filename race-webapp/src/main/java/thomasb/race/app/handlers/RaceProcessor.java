@@ -43,6 +43,7 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 	private static final String SERVER_TIME = "serverTime";
 	private static final String REDIRECT_PARAMETER = "redirect";
 	private static final String EVENT_DATA_PARAMETER = "eventData";
+	private static final String TRACK_PARAMETER = "track";
 	
 	private static final JsonObject INIT_LAPS = Json.createObjectBuilder()
 			.add(JsonConverter.LAP_COUNT, -1)
@@ -62,6 +63,7 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 	private final JsonArray jsonParticipants;
 	private final JsonObject grid;
 	private final Map<String, JsonValue> startPositions;
+	private final JsonValue track;
 	
 	RaceProcessor(List<String> participants,
 			RaceContext raceContext,
@@ -100,6 +102,7 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 		}
 		this.startPositions = startPositions;
 		this.grid = gridBuilder.build();
+		this.track = converter.serialize(track);
 	}
 	
 	private static JsonValue createInitialState(PointDouble position, JsonConverter converter) {
@@ -119,7 +122,8 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 		responseBuilder.add(ID_PARAMETER, sessionId)
 				.add(STATE_PARAMETER, startPositions.get(sessionId))
 				.add(PARTICIPANTS_PARAMETER, jsonParticipants)
-				.add(GRID_PARAMETER, grid);
+				.add(GRID_PARAMETER, grid)
+				.add(TRACK_PARAMETER, track);
 		
 		return responseBuilder.build();
 	}

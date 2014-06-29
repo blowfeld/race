@@ -20,6 +20,40 @@ race.display = function() {
 		
 		var RADIUS = 10;
 		
+		var draw = function(sections, finish) {
+			sections = sections.reverse();
+			var graphics = document.getElementById(parent);
+			sections.map(drawPolygon).forEach(function(p) {
+				graphics.appendChild(p);
+			});
+			graphics.appendChild(drawLine(finish));
+		};
+		
+		var drawPolygon = function(section, id) {
+			var path = document.createElementNS(SVG_NS, "path");
+			
+			path.setAttribute('d', pathDefinition(section.contour, true));
+			path.setAttribute('class', 'section_type_' + section.type);
+			
+			return path;
+		}
+		
+		var drawLine = function(corners, id) {
+			var path = document.createElementNS(SVG_NS, "path");
+			
+			path.setAttribute('d', pathDefinition(corners, false));
+			path.setAttribute('class', 'finish');
+			
+			return path;
+		}
+		
+		var pathDefinition = function(corners, close) {
+			corners = corners.map(function(c) { return (10 * c.x) + ' ' + (10 * c.y) + ' '; });
+			corners.join('L');
+			
+			return 'M ' + corners + (close ? 'Z' : '');
+		}
+		
 		var add = function(id, position) {
 			var graphics = document.getElementById(parent);
 			var player = document.createElementNS(SVG_NS, "circle");
@@ -67,16 +101,23 @@ race.display = function() {
 		}
 		
 		var setLabel = function(label, start, end, time, duration) {
-			label.setAttribute("x", start.x * 10 + RADIUS);
-			label.setAttribute("y", start.y * 10 - RADIUS);
+			label.setAttribute('x', start.x * 10 + RADIUS);
+			label.setAttribute('y', start.y * 10 - RADIUS);
 			label.textContent = JSON.stringify([start, end, time, duration]);
 		}
 		
 		var blink = function(id, duration) {
-//			$('#player_' + id).effect("pulsate", {}, duration);
+			var player = document.getElementById('player_' + id);
+			var blink = document.createElementNS(SVG_NS, "animate");
+			blink.setAttribute('from', 'visible');
+			blink.setAttribute('to', 'hidden');
+			blink.setAttribute('dur', 0.05);
+			blink.setAttribute('repeatCount', 10);
+			setTimout(function() { player.removeChild(blink); },  10 * 0.05);
 		}
 		
 		return {
+			draw: draw,
 			add : add,
 			show : show,
 			blink : blink

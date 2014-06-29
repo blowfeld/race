@@ -22,6 +22,8 @@ race.controll = function() {
 			currentState = initialData.state;
 			console.log(JSON.stringify(currentState));
 			
+			display.draw(initialData.track.sections, initialData.track.finish);
+			
 			for (var i = 0; i < initialData.participants.length; i++) {
 				var participant = initialData.participants[i];
 				var gridPosition = initialData.grid[participant];

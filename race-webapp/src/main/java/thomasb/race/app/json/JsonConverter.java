@@ -10,6 +10,7 @@ import thomasb.race.engine.ControlEvent;
 import thomasb.race.engine.PathSegment;
 import thomasb.race.engine.PlayerState;
 import thomasb.race.engine.PointDouble;
+import thomasb.race.engine.RaceTrack;
 
 public interface JsonConverter {
 	static final String LAP_TIME = "lapTime";
@@ -26,15 +27,21 @@ public interface JsonConverter {
 	static final String CONTROL = "control";
 	static final String LAPS = "laps";
 	static final String STATUS = "status";
+	static final String TRACK_CONTOUR = "contour";
+	static final String TRACK_FINISH = "finish";
+	static final String TRACK_SECTIONS = "sections";
+	static final String SECTION_TYPE = "type";
 	
-	public JsonValue serialize(PlayerState state);
+	JsonValue serialize(PlayerState state);
 	
-	public JsonValue serialize(List<? extends PathSegment> path);
+	JsonValue serialize(List<? extends PathSegment> path);
 	
-	public JsonValue serialize(PointDouble next);
+	JsonValue serialize(PointDouble next);
+	
+	JsonValue serialize(RaceTrack track);
 	
 	
-	public PlayerState deserializePlayerState(JsonObject json);
+	PlayerState deserializePlayerState(JsonObject json);
 	
-	public ControlEvent deserializeControlEvent(JsonNumber json);
+	ControlEvent deserializeControlEvent(JsonNumber json);
 }
