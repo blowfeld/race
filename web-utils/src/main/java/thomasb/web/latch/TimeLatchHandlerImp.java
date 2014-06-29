@@ -1,5 +1,6 @@
 package thomasb.web.latch;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.max;
 
 import java.io.IOException;
@@ -25,8 +26,6 @@ public final class TimeLatchHandlerImp implements TimeLatchHandler {
 		}
 	};
 	
-	private static final int DEFAULT_RESOLUTION = 0;
-	
 	private final UUID id = UUID.randomUUID();
 	
 	private final ClockedExecutorThread clock;
@@ -36,11 +35,10 @@ public final class TimeLatchHandlerImp implements TimeLatchHandler {
 	private volatile int count;
 	private volatile boolean isExpired = false;
 	
-	public TimeLatchHandlerImp(int time) {
-		this(time, DEFAULT_RESOLUTION);
-	}
-	
 	public TimeLatchHandlerImp(int time, int resolution) {
+		checkArgument(resolution > 0, "Resolution must be larger than zero: %s", resolution);
+		checkArgument(time > 0, "Time must be larger than zero: %s", time);
+		
 		this.resolution = resolution;
 		this.duration = time / resolution;
 		this.clock = new ClockedExecutorThread(resolution, VOID_ACTION);
