@@ -63,12 +63,3 @@ svg line {
 svg text {
 	font-size: 4pt;
 }
-
-.message {
-    color: black;
-    font-weight: bold;
-    font-size: large;
-    text-align: center;
-    border: 0.5em solid red;
-    -moz-border-radius: 1em;
-    -webkit-border-radius: 1em;
