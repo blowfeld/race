@@ -21,8 +21,8 @@ var redirectLatch = function self(dispatchUrl,redirectUrl, waitAction, init) {
 	
 	
 	var redirectActions = function() {
-		var wait = function(remaining) {
-			waitAction(remaining);
+		var wait = function(remaining, response) {
+			waitAction(remaining, response);
 		};
 		
 		var redirect = function(response) {

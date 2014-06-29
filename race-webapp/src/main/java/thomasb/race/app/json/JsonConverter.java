@@ -7,6 +7,7 @@ import javax.json.JsonObject;
 import javax.json.JsonValue;
 
 import thomasb.race.engine.ControlEvent;
+import thomasb.race.engine.Lap;
 import thomasb.race.engine.PathSegment;
 import thomasb.race.engine.PlayerState;
 import thomasb.race.engine.PointDouble;
@@ -42,8 +43,12 @@ public interface JsonConverter {
 	
 	JsonValue serialize(RaceTrack track);
 	
-
+	JsonValue serialize(Lap laps);
+	
+	
 	PlayerState deserializePlayerState(JsonObject json);
 	
 	ControlEvent deserializeControlEvent(JsonNumber json);
+
+	Lap deserializeLaps(JsonObject jsonScore);
 }

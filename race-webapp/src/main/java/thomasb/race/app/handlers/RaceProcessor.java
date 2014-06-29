@@ -1,5 +1,6 @@
 package thomasb.race.app.handlers;
 
+import static java.lang.String.format;
 import static thomasb.race.engine.PlayerStatus.ACTIVE;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import thomasb.race.app.json.JsonConverter;
 import thomasb.race.engine.ControlEvent;
+import thomasb.race.engine.Lap;
 import thomasb.race.engine.PathSegment;
 import thomasb.race.engine.PlayerState;
 import thomasb.race.engine.PointDouble;
@@ -35,16 +37,17 @@ import thomasb.web.clocking.ClockedRequestProcessor;
 import thomasb.web.handler.RequestHandler;
 
 final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
-	private static final String PARTICIPANTS_PARAMETER = "participants";
-	private static final String GRID_PARAMETER = "grid";
-	private static final String ID_PARAMETER = "id";
-	private static final String CONTROL_PARAMETER = "command";
-	private static final String STATE_PARAMETER = "state";
-	private static final String SERVER_TIME = "serverTime";
-	private static final String REDIRECT_PARAMETER = "redirect";
-	private static final String EVENT_DATA_PARAMETER = "eventData";
-	private static final String TRACK_PARAMETER = "track";
-	private static final String COLOR_PARAMETER = "colors";
+	static final String PARTICIPANTS_PARAMETER = "participants";
+	static final String GRID_PARAMETER = "grid";
+	static final String ID_PARAMETER = "id";
+	static final String CONTROL_PARAMETER = "command";
+	static final String STATE_PARAMETER = "state";
+	static final String SERVER_TIME = "serverTime";
+	static final String REDIRECT_PARAMETER = "redirect";
+	static final String EVENT_DATA_PARAMETER = "eventData";
+	static final String TRACK_PARAMETER = "track";
+	static final String COLOR_PARAMETER = "colors";
+	static final String SCORE_PARAMETER = "laps";
 	
 	private static final JsonObject INIT_LAPS = Json.createObjectBuilder()
 			.add(JsonConverter.LAP_COUNT, -1)
@@ -185,10 +188,11 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 			RaceData responseData = request.getData();
 			responseBuilder.add(ID_PARAMETER, responseData.getJsonId());
 			String redirectUrl = redirect.url(requests);
-			if (redirectUrl != null) {
-				responseBuilder.add(REDIRECT_PARAMETER, redirectUrl);
-			}
 			PlayerState endState = responseData.getPath().getEndState();
+			if (redirectUrl != null) {
+				String urlWithScore = createUrlWithScore(redirectUrl, endState.getLaps());
+				responseBuilder.add(REDIRECT_PARAMETER, urlWithScore);
+			}
 			responseBuilder.add(STATE_PARAMETER, converter.serialize(endState));
 			responseBuilder.add(EVENT_DATA_PARAMETER, eventData);
 			
@@ -196,5 +200,11 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 		}
 		
 		return result;
+	}
+
+	private String createUrlWithScore(String redirectUrl, Lap laps) {
+		String scoreJson = converter.serialize(laps).toString();
+		
+		return format(redirectUrl + "?%s=%s", SCORE_PARAMETER, scoreJson);
 	}
 }

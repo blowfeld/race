@@ -364,7 +364,7 @@ public class RaceProcessorTest {
 		String expectedItem =
 				"{"
 					+ "\"id\" : \"%s\","
-					+ "\"redirect\" : \"" + HANDLER_ID.toString() + "\","
+					+ "\"redirect\" : \"" + HANDLER_ID.toString() + "?laps={\\\"count\\\":1,\\\"lapTime\\\":1.0}\","
 					+ "\"state\" : {"
 						+ "\"position\" : {"
 							+ "\"x\" : 2.0,"

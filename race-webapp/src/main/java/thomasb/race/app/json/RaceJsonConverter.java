@@ -62,7 +62,8 @@ public class RaceJsonConverter implements JsonConverter {
 		return builder.build();
 	}
 	
-	private JsonValue serialize(Lap laps) {
+	@Override
+	public JsonValue serialize(Lap laps) {
 		JsonObjectBuilder builder = Json.createObjectBuilder();
 		
 		builder.add(LAP_COUNT, laps.getCount());
@@ -149,14 +150,15 @@ public class RaceJsonConverter implements JsonConverter {
 		
 		return new RacePlayerState(position, control, laps, status);
 	}
-
-	private Lap deserializeLaps(JsonObject json) {
+	
+	@Override
+	public Lap deserializeLaps(JsonObject json) {
 		int count = json.getJsonNumber(LAP_COUNT).intValue();
 		double lapTime = json.getJsonNumber(LAP_TIME).doubleValue();
 		
 		return new RaceLap(count, lapTime);
 	}
-
+	
 	@Override
 	public ControlEvent deserializeControlEvent(JsonNumber json) {
 		return ArrowControlEvent.fromKey(json.intValue());

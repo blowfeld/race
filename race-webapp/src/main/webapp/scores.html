@@ -5,13 +5,18 @@
 <link rel="stylesheet" type="text/css" href="css/race.css">
 
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="js/latch/latches.js"></script>
 <script src="js/redirect.js"></script>
+<script src="js/scores.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
-		var setDisplay = function(displayValue) {
+		var setDisplay = function(displayValue, response) {
 			$('#remaining').text(displayValue);
+			if (response.laps) {
+				displayScores('scores', response.laps);
+			}
 		}
 		
 		redirectLatch('core', 'welcome.html', setDisplay).run();
@@ -25,9 +30,24 @@
 <body>
 	<h1>Scores</h1>
 
-	<h2>Next race in:</h2>
-	<div id='remaining'></div>seconds
-	
+	<table id="scores">
+		<thead>
+			<tr>
+				<th>Color</th>
+				<th>Name</th>
+				<th>Laps</th>
+				<th>Lap time</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+
+
+	<h1>Next race in:</h1>
+	<div id='remaining'></div>
+	seconds
+
 </body>
 
 </html>

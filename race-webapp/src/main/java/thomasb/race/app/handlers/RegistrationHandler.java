@@ -3,8 +3,10 @@ package thomasb.race.app.handlers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 import javax.json.JsonValue;
 import javax.servlet.ServletException;
@@ -41,7 +43,6 @@ public class RegistrationHandler extends CountDownHandler {
 		int rank = register(participant, name);
 		if (rank > 0) {
 			JsonValue color = raceContext.getConverter().serialize(PlayerColors.INSTANCE.get(rank));
-			System.err.println(color.toString());
 			context.setResponseParameter(COLOR_PARAMETER, color);
 		}
 		
@@ -84,7 +85,8 @@ public class RegistrationHandler extends CountDownHandler {
 	
 	private void initSuccessors() {
 		List<String> participants = ImmutableList.copyOf(getParticipants());
-		ScoreHandler scoreHandler = new ScoreHandler(names);
+		
+		ScoreHandler scoreHandler = new ScoreHandler(participants, names, raceContext.getConverter());
 		RaceHandler raceHandler = new RaceHandler(participants, raceContext, scoreHandler);
 		LaunchHandler launchHandler = new LaunchHandler(participants, raceHandler);
 		scoreHandler.setExpirationListener(new UnregisterListener(
