@@ -37,7 +37,12 @@ public class RaceEngineImp implements RaceEngine {
 		
 		List<PathSegment> pathSegments = pathCalc.pathSegments;
 
-		Lap lap = (pathCalc.laps > state.getLaps().getCount()) ? new RaceLap(pathCalc.laps, pathCalc.lapTime) : state.getLaps();
+		Lap lap = state.getLaps();
+		if (pathCalc.laps != 0) {
+			lap = new RaceLap(pathCalc.laps + lap.getCount(),
+					pathCalc.lapTime + lap.getLapTime());
+		}
+		
 		PlayerStatus status = pathCalc.laps >= raceTrack.getMaxLaps() ? PlayerStatus.FINISHED : pathCalc.getStatus();
 		RacePlayerState playerState = new RacePlayerState(pathCalc.endPosition, state.getControlState(), lap, status);
 		
@@ -103,17 +108,17 @@ public class RaceEngineImp implements RaceEngine {
 						endTime);
 			}
 			
-			int crossedFinish = segment.crossedFinish();
-			laps += crossedFinish;
-			
 			int speed = min(control.getSpeed(), segment.getMaxSpeed());
 			double maxDistance = speed * (endTime - segmentStartTime);
 			
 			double segmentLength = segment.length();
 			if (maxDistance >= segmentLength) {
 				double segmentEndTime = segmentStartTime + (segmentLength / speed);
+				
+				int crossedFinish = segment.crossedFinish();
 				if (crossedFinish > 0) {
 					lapTime = segmentEndTime;
+					laps += crossedFinish;
 				}
 				
 				return new RacePathSegment(segment.getStart(),
@@ -123,9 +128,6 @@ public class RaceEngineImp implements RaceEngine {
 			} else {
 				VectorPoint direction = VectorPoint.fromDirection(control.getSteering());
 				VectorPoint delta = direction.multiply(maxDistance);
-				if (crossedFinish > 0) {
-					lapTime = endTime;
-				}
 				
 				return new RacePathSegment(segment.getStart(),
 						VectorPoint.from(segment.getStart()).add(delta),
