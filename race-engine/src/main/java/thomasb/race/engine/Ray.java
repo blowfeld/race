@@ -20,12 +20,6 @@ class Ray {
 		this.rayVector = VectorPoint.fromDirection(direction);
 	}
 	
-	Ray(PointDouble startPoint, PointDouble secondPoint) {
-		this.startPoint = VectorPoint.from(startPoint);
-		VectorPoint directionVector = VectorPoint.from(startPoint).diff(startPoint);
-		this.rayVector = directionVector.multiply(1 / directionVector.norm());
-	}
-	
 	HalfPlane detectHalfPlane(PointDouble point) {
 		VectorPoint diff = VectorPoint.from(point).diff(startPoint);
 		
