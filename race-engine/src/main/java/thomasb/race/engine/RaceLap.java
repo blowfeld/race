@@ -27,7 +27,7 @@ public final class RaceLap implements Lap, Comparable<Lap> {
 		int countDiff = count - o.getCount();
 		
 		return countDiff == 0 ?
-				Double.compare(o.getLapTime(), lapTime) :
+				Double.compare(lapTime, o.getLapTime()) :
 				countDiff;
 	}
 	
