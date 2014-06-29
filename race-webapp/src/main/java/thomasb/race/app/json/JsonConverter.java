@@ -32,6 +32,8 @@ public interface JsonConverter {
 	static final String TRACK_SECTIONS = "sections";
 	static final String SECTION_TYPE = "type";
 	
+	JsonValue serialize(String string);
+	
 	JsonValue serialize(PlayerState state);
 	
 	JsonValue serialize(List<? extends PathSegment> path);
@@ -40,7 +42,7 @@ public interface JsonConverter {
 	
 	JsonValue serialize(RaceTrack track);
 	
-	
+
 	PlayerState deserializePlayerState(JsonObject json);
 	
 	ControlEvent deserializeControlEvent(JsonNumber json);

@@ -1,20 +1,27 @@
 package thomasb.race.app.handlers;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
+import javax.json.JsonValue;
 import javax.servlet.ServletException;
 
 import thomasb.web.handler.HandlerContext;
 import thomasb.web.handler.RequestHandler;
 
+import com.google.common.collect.ImmutableList;
+
 public class ScoreHandler extends CountDownHandler {
-	private ExpirationListener listener;
+	private static final String RANKING = "ranking";
 	
+	private final Map<String, String> participantNames;
+	
+	private ExpirationListener listener;
 	private volatile boolean launched = false;
 	
-	public ScoreHandler(List<String> participants) {
-		super(participants, 2000, 500);
+	public ScoreHandler(Map<String, String> participantNames) {
+		super(ImmutableList.copyOf(participantNames.keySet()), 2000, 500);
+		this.participantNames = participantNames;
 	}
 	
 	@Override
@@ -24,9 +31,15 @@ public class ScoreHandler extends CountDownHandler {
 			launch();
 		}
 		
+		System.err.println(participantNames);
+		context.setResponseParameter(RANKING, createRanking());
+		
 		super.handle(context);
 	}
-
+	
+	private JsonValue createRanking() {
+		return JsonValue.FALSE;
+	}
 	
 	@Override
 	protected void onExpire() {

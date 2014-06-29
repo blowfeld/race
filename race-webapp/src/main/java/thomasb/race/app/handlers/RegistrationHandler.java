@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import javax.json.JsonValue;
 import javax.servlet.ServletException;
 
 import thomasb.race.app.handlers.ScoreHandler.ExpirationListener;
@@ -13,11 +15,15 @@ import thomasb.web.handler.HandlerContext;
 import thomasb.web.handler.RequestHandler;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 
 public class RegistrationHandler extends CountDownHandler {
-	private final HandlerRegistry registry;
+	private static final String NAME_PARAMETER = "name";
+	private static final String COLOR_PARAMETER = "color";
 	
+	private final HandlerRegistry registry;
 	private final RaceContext raceContext;
+	private final Map<String, String> names = Maps.newHashMap();
 	
 	private RequestHandler successor;
 	
@@ -30,7 +36,15 @@ public class RegistrationHandler extends CountDownHandler {
 	@Override
 	public void handle(HandlerContext context) throws ServletException, IOException {
 		String participant = context.getRequest().getSession().getId();
-		register(participant);
+		String name = context.getRequest().getParameter(NAME_PARAMETER);
+		
+		int rank = register(participant, name);
+		if (rank > 0) {
+			JsonValue color = raceContext.getConverter().serialize(PlayerColors.INSTANCE.get(rank));
+			System.err.println(color.toString());
+			context.setResponseParameter(COLOR_PARAMETER, color);
+		}
+		
 		super.handle(context);
 	}
 
@@ -41,19 +55,23 @@ public class RegistrationHandler extends CountDownHandler {
 		}
 	}
 
-	private synchronized void register(String sessionId) {
+	private synchronized int register(String sessionId, String name) {
 		if (getParticipants().contains(sessionId)) {
-			return;
+			return -1;
 		}
 		
-		boolean added = getParticipants().add(sessionId);
-		if (added && getParticipants().size() == 2) {
+		getParticipants().add(sessionId);
+		names.put(sessionId, name);
+		
+		if (getParticipants().size() == 2) {
 			launch();
 		}
 		
-		if (added && getParticipants().size() > 1) {
+		if (getParticipants().size() > 1) {
 			reset();
 		}
+		
+		return getParticipants().size();
 	}
 	
 	protected synchronized RequestHandler getSuccessor() {
@@ -66,7 +84,7 @@ public class RegistrationHandler extends CountDownHandler {
 	
 	private void initSuccessors() {
 		List<String> participants = ImmutableList.copyOf(getParticipants());
-		ScoreHandler scoreHandler = new ScoreHandler(participants);
+		ScoreHandler scoreHandler = new ScoreHandler(names);
 		RaceHandler raceHandler = new RaceHandler(participants, raceContext, scoreHandler);
 		LaunchHandler launchHandler = new LaunchHandler(participants, raceHandler);
 		scoreHandler.setExpirationListener(new UnregisterListener(

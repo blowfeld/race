@@ -54,23 +54,20 @@ race.display = function() {
 			return 'M ' + corners + (close ? 'Z' : '');
 		}
 		
-		var add = function(id, position) {
+		var add = function(id, position, color) {
 			var graphics = document.getElementById(parent);
 			var player = document.createElementNS(SVG_NS, "circle");
 			
 			player.setAttribute('id', 'player_' + id);
 			setCircle(player, position);
+			player.setAttribute('stroke', color)
 			graphics.appendChild(player)
 			
 			var direction = document.createElementNS(SVG_NS, "line");
 			direction.setAttribute('id', 'player_state_' + id);
 			setDirection(direction, position, position);
+			direction.setAttribute('stroke', color)
 			graphics.appendChild(direction);
-			
-			var label = document.createElementNS(SVG_NS, "text");
-			label.setAttribute('id', 'player_label_' + id);
-			setLabel(label, position, position, 0, 0);
-			graphics.appendChild(label);
 		};
 		
 		var show = function(id, event, callback) {
@@ -80,11 +77,9 @@ race.display = function() {
 			
 			var player = document.getElementById('player_' + id);
 			var direction = document.getElementById('player_state_' + id);
-			var label = document.getElementById('player_label_' + id);
 			
 			setCircle(player, event.start);
 			setDirection(direction, event.start, event.end);
-			setLabel(label, event.start, event.end, event.startTime, event.getDuration());
 		};
 		
 		var setCircle = function(circle, position) {
@@ -100,20 +95,17 @@ race.display = function() {
 			direction.setAttribute('y2', end.y * 10);
 		}
 		
-		var setLabel = function(label, start, end, time, duration) {
-			label.setAttribute('x', start.x * 10 + RADIUS);
-			label.setAttribute('y', start.y * 10 - RADIUS);
-			label.textContent = JSON.stringify([start, end, time, duration]);
-		}
-		
 		var blink = function(id, duration) {
 			var player = document.getElementById('player_' + id);
 			var blink = document.createElementNS(SVG_NS, "animate");
+			
 			blink.setAttribute('from', 'visible');
 			blink.setAttribute('to', 'hidden');
 			blink.setAttribute('dur', 0.05);
 			blink.setAttribute('repeatCount', 10);
-			setTimout(function() { player.removeChild(blink); },  10 * 0.05);
+			
+			player.appendChild(blink);
+			setTimeout(function() { player.removeChild(blink); },  10 * 0.05);
 		}
 		
 		return {

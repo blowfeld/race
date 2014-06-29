@@ -1,12 +1,15 @@
-var redirectLatch = function self(dispatchUrl, redirectUrl, waitAction) {
+var redirectLatch = function self(dispatchUrl,redirectUrl, waitAction, init) {
 	var run = function() {
 		var handler = location.search.substring(1);
-		if (!handler) {
+		if (init || !handler) {
 			$.ajax({
 				url : dispatchUrl,
+				type : 'POST',
 				success : function(response) {
 					handler = response.handler;
+					init.callback(response);
 				},
+				data : init.data || '',
 				dataType : 'json',
 				async : false
 			});

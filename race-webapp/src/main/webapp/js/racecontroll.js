@@ -27,7 +27,8 @@ race.controll = function() {
 			for (var i = 0; i < initialData.participants.length; i++) {
 				var participant = initialData.participants[i];
 				var gridPosition = initialData.grid[participant];
-				display.add(participant, gridPosition);
+				var color = initialData.colors[participant];
+				display.add(participant, gridPosition, color);
 				
 				raceModel.addParticipant(participant, eventProcessor(display, participant));
 			}

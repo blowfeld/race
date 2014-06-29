@@ -25,6 +25,12 @@ import thomasb.race.engine.TrackSection;
 import thomasb.race.engine.VectorPoint;
 
 public class RaceJsonConverter implements JsonConverter {
+	
+	@Override
+	public JsonValue serialize(String string) {
+		return Json.createArrayBuilder().add(string).build().getJsonString(0);
+	}
+	
 	@Override
 	public JsonValue serialize(PointDouble state) {
 		JsonObjectBuilder builder = Json.createObjectBuilder();

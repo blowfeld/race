@@ -14,7 +14,14 @@
 			$('#remaining').text(displayValue);
 		}
 		
-		redirectLatch('core', 'launch.html', setDisplay).run();
+		var init = {
+			data : window.location.search.substr(1),
+			callback : function(response) {
+				$("#color").css("background-color", response.color);
+			}
+		};
+		
+		redirectLatch('core', 'launch.html', setDisplay, init).run();
 	});
  </script>
 
@@ -25,16 +32,17 @@
 <body>
 	<h1>Warm-up lap</h1>
 
-	<div class='message'>
-		Your opponents are joining the warm up lap!
+	<div class='message'>Your opponents are joining the warm up lap!
 	</div>
 
-	<div class='display'>
-		<h2>Assemble on the grid in:</h2>
-		<div id='remaining'></div>
-		seconds
+	<h2>Assemble on the grid in:</h2>
+	Your color is
+	<div id="color"
+		style="width: 50; height:10; border: 1px solid #000; display: inline-block;">
 	</div>
-
+	<p>
+	Remaining: <div id="remaining" style="display: inline-block; overflow:auto"></div> seconds
+	</p>
 </body>
 
 </html>

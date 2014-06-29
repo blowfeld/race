@@ -44,6 +44,7 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 	private static final String REDIRECT_PARAMETER = "redirect";
 	private static final String EVENT_DATA_PARAMETER = "eventData";
 	private static final String TRACK_PARAMETER = "track";
+	private static final String COLOR_PARAMETER = "colors";
 	
 	private static final JsonObject INIT_LAPS = Json.createObjectBuilder()
 			.add(JsonConverter.LAP_COUNT, -1)
@@ -64,6 +65,7 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 	private final JsonObject grid;
 	private final Map<String, JsonValue> startPositions;
 	private final JsonValue track;
+	private final JsonValue colors;
 	
 	RaceProcessor(List<String> participants,
 			RaceContext raceContext,
@@ -95,14 +97,18 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 		Map<String, JsonValue> startPositions = new HashMap<>();
 		Iterator<? extends PointDouble> startGrid = track.getStartGrid().iterator();
 		JsonObjectBuilder gridBuilder = Json.createObjectBuilder();
-		for (String participant : participants) {
+		JsonObjectBuilder colorBuilder = Json.createObjectBuilder();
+		for (int i = 0; i < participants.size(); i++) {
+			String participant = participants.get(i);
 			PointDouble startPosition = startGrid.next();
 			startPositions.put(participant, createInitialState(startPosition, converter));
 			gridBuilder.add(participant, converter.serialize(startPosition));
+			colorBuilder.add(participant, PlayerColors.INSTANCE.get(i));
 		}
 		this.startPositions = startPositions;
 		this.grid = gridBuilder.build();
 		this.track = converter.serialize(track);
+		this.colors = colorBuilder.build();
 	}
 	
 	private static JsonValue createInitialState(PointDouble position, JsonConverter converter) {
@@ -123,6 +129,7 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 				.add(STATE_PARAMETER, startPositions.get(sessionId))
 				.add(PARTICIPANTS_PARAMETER, jsonParticipants)
 				.add(GRID_PARAMETER, grid)
+				.add(COLOR_PARAMETER, colors)
 				.add(TRACK_PARAMETER, track);
 		
 		return responseBuilder.build();
