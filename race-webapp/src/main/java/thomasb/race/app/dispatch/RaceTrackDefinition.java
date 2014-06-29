@@ -7,7 +7,6 @@ import thomasb.race.engine.PointDouble;
 import thomasb.race.engine.RaceTrack;
 import thomasb.race.engine.TrackPolygon;
 import thomasb.race.engine.TrackSection;
-import thomasb.race.engine.TrackType;
 import thomasb.race.engine.VectorPoint;
 
 import com.google.common.collect.ImmutableList;

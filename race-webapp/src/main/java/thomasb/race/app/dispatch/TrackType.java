@@ -1,4 +1,6 @@
-package thomasb.race.engine;
+package thomasb.race.app.dispatch;
+
+import thomasb.race.engine.SectionType;
 
 public enum TrackType implements SectionType {
 	ASPHALT(2), GREEN(1), WALL(0);
