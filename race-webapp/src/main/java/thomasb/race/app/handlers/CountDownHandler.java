@@ -1,8 +1,9 @@
 package thomasb.race.app.handlers;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -19,9 +20,10 @@ public abstract class CountDownHandler implements RequestHandler {
 	private final UUID id = UUID.randomUUID();
 	private final List<String> participants;
 	private final TimeLatchHandler timeLatch;
+	private final Set<String> expirationSent = new HashSet<>();
 	
 	public CountDownHandler(List<String> participants, int duration, int interval) {
-		this.participants = new ArrayList<>(participants);
+		this.participants = participants;
 		this.timeLatch = new TimeLatchHandlerImp(duration, interval);
 	}
 	
@@ -38,7 +40,7 @@ public abstract class CountDownHandler implements RequestHandler {
 		String participant = context.getRequest().getSession().getId();
 		if (timeLatch.isExpired()) {
 			RedirectUtil.setHandler(context, id, getSuccessor());
-			participants.remove(participant);
+			expirationSent.add(participant);
 			onExpire();
 		} else {
 			RedirectUtil.setHandler(context, id, null);
@@ -71,6 +73,10 @@ public abstract class CountDownHandler implements RequestHandler {
 	
 	protected final List<String> getParticipants() {
 		return participants;
+	}
+	
+	protected final boolean allParticipantsClosed() {
+		return expirationSent.size() == participants.size();
 	}
 	
 	@Override

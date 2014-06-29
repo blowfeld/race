@@ -3,10 +3,8 @@ package thomasb.race.app.handlers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 
 import javax.json.JsonValue;
 import javax.servlet.ServletException;
@@ -51,7 +49,7 @@ public class RegistrationHandler extends CountDownHandler {
 
 	@Override
 	protected void onExpire() {
-		if (getParticipants().isEmpty()) {
+		if (allParticipantsClosed()) {
 			registry.remove(this);
 		}
 	}

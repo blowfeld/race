@@ -44,6 +44,7 @@ public class ScoreHandler extends CountDownHandler {
 	
 	private ExpirationListener listener;
 	private volatile boolean launched = false;
+
 	
 	public ScoreHandler(List<String> participants, Map<String, String> participantNames, JsonConverter converter) {
 		super(participants, 60000, 500);
@@ -93,7 +94,7 @@ public class ScoreHandler extends CountDownHandler {
 	
 	@Override
 	protected void onExpire() {
-		if (getParticipants().isEmpty()) {
+		if (allParticipantsClosed()) {
 			listener.expire();
 		}
 	}
