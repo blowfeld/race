@@ -24,7 +24,7 @@ public final class RaceLap implements Lap, Comparable<Lap> {
 
 	@Override
 	public int compareTo(Lap o) {
-		int countDiff = count - o.getCount();
+		int countDiff = o.getCount() - count;
 		
 		return countDiff == 0 ?
 				Double.compare(lapTime, o.getLapTime()) :
