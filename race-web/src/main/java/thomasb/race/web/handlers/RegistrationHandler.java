@@ -32,7 +32,7 @@ public class RegistrationHandler extends CountDownHandler {
 	public RegistrationHandler(HandlerRegistry registry,
 			RaceContext raceContext,
 			Path scoresFile) {
-		super(new ArrayList<String>(), 5000, 1000);
+		super(new ArrayList<String>(), 5000, 1000, raceContext.getHandlers());
 		this.registry = registry;
 		this.raceContext = raceContext;
 		this.scoresFile = scoresFile;
@@ -92,6 +92,7 @@ public class RegistrationHandler extends CountDownHandler {
 		ScoreHandler scoreHandler = new ScoreHandler(participants,
 				names,
 				raceContext.getConverter(),
+				raceContext.getHandlers(),
 				scoresFile);
 		
 		RaceHandler raceHandler = new RaceHandler(participants,
@@ -99,7 +100,8 @@ public class RegistrationHandler extends CountDownHandler {
 				scoreHandler);
 		
 		LaunchHandler launchHandler = new LaunchHandler(participants,
-				raceHandler);
+				raceHandler,
+				raceContext.getHandlers());
 		
 		scoreHandler.setExpirationListener(new UnregisterListener(
 				ImmutableList.of(scoreHandler, raceHandler, launchHandler),

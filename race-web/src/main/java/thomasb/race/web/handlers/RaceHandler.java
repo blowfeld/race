@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import thomasb.web.clocking.ClockedRequestHandler;
-import thomasb.web.clocking.ClockedRequestHandlerImp;
 import thomasb.web.handler.HandlerContext;
 import thomasb.web.handler.RequestHandler;
 
@@ -22,7 +21,7 @@ public class RaceHandler implements RequestHandler {
 				raceContext,
 				scoreHandler);
 		
-		this.clockedRequestHandler = new ClockedRequestHandlerImp(participants,
+		this.clockedRequestHandler = raceContext.getHandlers().clockedRequestHandler(participants,
 				raceContext.getUpdateInterval(),
 				raceContext.getTimeout(),
 				stepProcessor);

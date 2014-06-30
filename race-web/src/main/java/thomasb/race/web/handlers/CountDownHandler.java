@@ -16,27 +16,28 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import thomasb.web.dispatch.JsonHandlerContext;
 import thomasb.web.handler.HandlerContext;
+import thomasb.web.handler.Handlers;
 import thomasb.web.handler.RequestHandler;
 import thomasb.web.latch.TimeLatchHandler;
-import thomasb.web.latch.TimeLatchHandlerImp;
 
 public abstract class CountDownHandler implements RequestHandler {
 	private final UUID id = UUID.randomUUID();
 	private final List<String> participants;
 	private final TimeLatchHandler timeLatch;
 	private final Set<String> expirationSent = newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+	private final Handlers handlers;
 	
-	public CountDownHandler(List<String> participants, int duration, int interval) {
+	public CountDownHandler(List<String> participants, int duration, int interval, Handlers handlers) {
+		this.handlers = handlers;
 		this.participants = new ArrayList<>(participants);
-		this.timeLatch = new TimeLatchHandlerImp(duration, interval);
+		this.timeLatch = handlers.timeLatchHandler(duration, interval);
 	}
 	
 	@Override
 	public final void handle(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		handle(new JsonHandlerContext(request, response));
+		handle(handlers.context(request, response));
 	}
 	
 	@Override

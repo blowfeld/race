@@ -3,6 +3,7 @@ package thomasb.race.web.handlers;
 import thomasb.race.engine.RaceEngine;
 import thomasb.race.engine.RaceTrack;
 import thomasb.race.web.json.JsonConverter;
+import thomasb.web.handler.Handlers;
 
 public final class RaceContext {
 	private final RaceTrack track;
@@ -11,16 +12,19 @@ public final class RaceContext {
 	private final int maxTime;
 	private final int updateInterval;
 	private final int timeout;
+	private final Handlers handlers;
 	
 	public RaceContext(RaceTrack track,
 			RaceEngine engine,
 			JsonConverter converter,
+			Handlers handlers,
 			int maxTime,
 			int updateInterval,
 			int timeout) {
 		this.track = track;
 		this.engine = engine;
 		this.converter = converter;
+		this.handlers = handlers;
 		this.maxTime = maxTime;
 		this.updateInterval = updateInterval;
 		this.timeout = timeout;
@@ -36,6 +40,10 @@ public final class RaceContext {
 	
 	JsonConverter getConverter() {
 		return converter;
+	}
+	
+	Handlers getHandlers() {
+		return handlers;
 	}
 	
 	int getMaxTime() {
