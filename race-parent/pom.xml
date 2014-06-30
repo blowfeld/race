@@ -20,7 +20,6 @@
 		<module>../web-utils-api</module>
 		<module>../web-utils</module>
 		<module>../web-utils-js</module>
-		<module>../race-testpages</module>
 	</modules>
 
 	<properties>
