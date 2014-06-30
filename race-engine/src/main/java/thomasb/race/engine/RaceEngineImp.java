@@ -26,7 +26,8 @@ public class RaceEngineImp implements RaceEngine {
 	@Override
 	public RacePath calculatePath(PlayerState state, double startTime, double duration) {
 		if (state.getControlState().getSpeed() == 0 ||
-				state.getPlayerStatus() == PlayerStatus.FINISHED) {
+				state.getPlayerStatus() == PlayerStatus.FINISHED ||
+				state.getPlayerStatus() == PlayerStatus.TERMINATED) {
 			return zeroLengthPath(state, startTime, duration);
 		}
 		
@@ -43,7 +44,7 @@ public class RaceEngineImp implements RaceEngine {
 					pathCalc.lapTime + lap.getLapTime());
 		}
 		
-		PlayerStatus status = pathCalc.laps >= raceTrack.getMaxLaps() ? PlayerStatus.FINISHED : pathCalc.getStatus();
+		PlayerStatus status = lap.getCount() >= raceTrack.getMaxLaps() ? PlayerStatus.FINISHED : pathCalc.getStatus();
 		RacePlayerState playerState = new RacePlayerState(pathCalc.endPosition, state.getControlState(), lap, status);
 		
 		return new RacePathImp(playerState, pathSegments);
