@@ -30,11 +30,6 @@ public class PolygonRaceTrack implements RaceTrack {
 	}
 	
 	@Override
-	public List<? extends PointDouble> getContour() {
-		return trackSections.get(0).getCorners();
-	}
-	
-	@Override
 	public int getMaxLaps() {
 		return maxLaps;
 	}

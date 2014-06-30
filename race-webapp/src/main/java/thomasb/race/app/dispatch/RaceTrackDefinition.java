@@ -71,11 +71,6 @@ public enum RaceTrackDefinition implements RaceTrack {
 	}
 	
 	@Override
-	public List<? extends PointDouble> getContour() {
-		return CONTOUR;
-	}
-	
-	@Override
 	public int getMaxLaps() {
 		return 3;
 	}
