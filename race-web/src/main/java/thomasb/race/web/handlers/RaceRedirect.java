@@ -11,7 +11,7 @@ import thomasb.web.handler.RequestHandler;
 final class RaceRedirect {
 	private final String handlerId;
 	private final int maxTime;
-
+	
 	RaceRedirect(RequestHandler handler, int maxTime) {
 		this.maxTime = maxTime;
 		this.handlerId = handler.getId().toString();
@@ -32,8 +32,6 @@ final class RaceRedirect {
 				return null;
 			}
 		}
-		
-		
 		
 		return handlerId;
 	}

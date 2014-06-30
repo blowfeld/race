@@ -37,6 +37,13 @@
 			<artifactId>guava</artifactId>
 			<version>${project.guava.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.json</artifactId>
+			<version>${project.json.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 </project>
