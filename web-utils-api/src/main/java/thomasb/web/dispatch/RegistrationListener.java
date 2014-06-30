@@ -12,6 +12,7 @@ public final class RegistrationListener implements HandlerRegistry {
 		this.registry = new WeakReference<>(registry);
 	}
 	
+	@Override
 	public RequestHandler putIfAbsent(UUID handlerId, RequestHandler handler) {
 		return registry.get().putIfAbsent(handlerId, handler);
 	}
