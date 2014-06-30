@@ -15,6 +15,7 @@
 	<modules>
 		<module>../race-engine</module>
 		<module>../race-engine-api</module>
+		<module>../race-web</module>
 		<module>../race-webapp</module>
 		<module>../web-utils-api</module>
 		<module>../web-utils</module>
