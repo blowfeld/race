@@ -29,16 +29,16 @@ public class RaceEngineImpTest extends Test2D {
 
 	@Before
 	public void setupTrack() {
-		TrackSegment asphaltVert = new TrackSegment(
+		TrackSegment asphaltVert = new RaceTrackSegment(
 				points[0][0] , points[0][1], 2, 0);
 		
-		TrackSegment greenVert = new TrackSegment(
+		TrackSegment greenVert = new RaceTrackSegment(
 				points[0][1] , points[0][2], 1, 0);
 		
-		TrackSegment asphaltVert2 = new TrackSegment(
+		TrackSegment asphaltVert2 = new RaceTrackSegment(
 				points[0][2] , points[0][3], 2, 1);
 		
-		TrackSegment asphaltVert3 = new TrackSegment(
+		TrackSegment asphaltVert3 = new RaceTrackSegment(
 				points[0][3] , points[0][4], 2, 0);
 		
 		when(segementCalculator.segmentsFor(points[0][0], 0))
@@ -47,16 +47,16 @@ public class RaceEngineImpTest extends Test2D {
 					asphaltVert2,
 					asphaltVert3));
 		
-		TrackSegment asphaltHor = new TrackSegment(
+		TrackSegment asphaltHor = new RaceTrackSegment(
 				points[0][0] , points[10][0], 2, 0);
 		
-		TrackSegment wallHor = new TrackSegment(
+		TrackSegment wallHor = new RaceTrackSegment(
 				points[10][0] , points[10][0], 0, 0);
 		
 		when(segementCalculator.segmentsFor(points[0][0], 90))
 			.thenReturn(ImmutableList.of(asphaltHor, wallHor));
 		
-		TrackSegment asphaltDiag = new TrackSegment(
+		TrackSegment asphaltDiag = new RaceTrackSegment(
 				points[0][0] , points[2][2], 2, 0);
 		
 		when(segementCalculator.segmentsFor(points[0][0], 45))

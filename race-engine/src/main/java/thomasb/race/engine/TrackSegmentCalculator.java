@@ -112,13 +112,13 @@ class TrackSegmentCalculator {
 			int finish = startDistance <= finishDistance  && finishDistance <= intersection.distance() ?
 					crossedFinished : 0;
 			
-			TrackSegment trackSegment;
+			RaceTrackSegment trackSegment;
 			if (finish > 0) {
-				segments.add(new TrackSegment(segmentStart, finishIntersection.getIntersectionStart(), maxSpeed, finish));
-				segments.add(new TrackSegment(finishIntersection.getIntersectionStart(), segmentEnd, maxSpeed, 0));
+				segments.add(new RaceTrackSegment(segmentStart, finishIntersection.getIntersectionStart(), maxSpeed, finish));
+				segments.add(new RaceTrackSegment(finishIntersection.getIntersectionStart(), segmentEnd, maxSpeed, 0));
 				
 			} else {
-				trackSegment = new TrackSegment(segmentStart, segmentEnd, maxSpeed, finish);
+				trackSegment = new RaceTrackSegment(segmentStart, segmentEnd, maxSpeed, finish);
 				segments.add(trackSegment);
 			}
 			

@@ -83,7 +83,7 @@ public class RaceEngineImp implements RaceEngine {
 			Builder<PathSegment> segments = ImmutableList.builder();
 			Iterator<TrackSegment> segmentItr = trackSegments.iterator();
 			while (segmentItr.hasNext() && segmentStartTime < endTime) {
-				TrackSegment segment = segmentItr.next();
+				RaceTrackSegment segment = RaceTrackSegment.from(segmentItr.next());
 				
 				RacePathSegment pathSegment = calculatePathSegment(segment, segmentStartTime);
 				segments.add(pathSegment);
@@ -98,7 +98,7 @@ public class RaceEngineImp implements RaceEngine {
 			}
 		}
 		
-		private RacePathSegment calculatePathSegment(TrackSegment segment, double segmentStartTime) {
+		private RacePathSegment calculatePathSegment(RaceTrackSegment segment, double segmentStartTime) {
 			if (segment.getMaxSpeed() == 0) {
 				terminating = true;
 				
