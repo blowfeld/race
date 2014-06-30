@@ -35,7 +35,7 @@ mvn clean install
 ```Shell
 mvn clean test
 ```
-Will run the unit tests in all modules.
+will run the unit tests in all modules.
 
 The (...somewhat non-existing) javascript unit tests can (or better could) be run ..somehow.
 
