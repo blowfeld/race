@@ -23,6 +23,7 @@ import thomasb.race.engine.RacePlayerState;
 import thomasb.race.engine.RaceTrack;
 import thomasb.race.engine.TrackSection;
 import thomasb.race.engine.VectorPoint;
+import thomasb.race.web.json.JsonConverter;
 
 public class RaceJsonConverter implements JsonConverter {
 	

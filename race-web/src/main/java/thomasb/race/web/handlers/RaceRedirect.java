@@ -1,4 +1,4 @@
-package thomasb.race.app.handlers;
+package thomasb.race.web.handlers;
 
 import java.util.List;
 

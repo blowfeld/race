@@ -6,10 +6,10 @@ import java.nio.file.Paths;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
-import thomasb.race.app.handlers.RaceContext;
-import thomasb.race.app.handlers.RegistrationHandler;
 import thomasb.race.app.json.RaceJsonConverter;
 import thomasb.race.engine.RaceEngineImp;
+import thomasb.race.web.handlers.RaceContext;
+import thomasb.race.web.handlers.RegistrationHandler;
 import thomasb.web.dispatch.DispatchServlet;
 import thomasb.web.dispatch.RegistrationListener;
 import thomasb.web.handler.RequestHandler;

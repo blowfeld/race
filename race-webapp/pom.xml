@@ -18,18 +18,24 @@
 	<dependencies>
 		<dependency>
 			<groupId>thomasb.race</groupId>
+			<artifactId>race-web</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>thomasb.race</groupId>
 			<artifactId>race-engine-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
-		<!-- Temporary:  -->
 		<dependency>
 			<groupId>thomasb.race</groupId>
 			<artifactId>race-engine</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- /Temporary  -->
-		
+		<dependency>
+			<groupId>thomasb.race</groupId>
+			<artifactId>web-utils-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>thomasb.race</groupId>
 			<artifactId>web-utils</artifactId>

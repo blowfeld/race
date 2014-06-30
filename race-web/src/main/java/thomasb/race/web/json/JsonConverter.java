@@ -1,4 +1,4 @@
-package thomasb.race.app.json;
+package thomasb.race.web.json;
 
 import java.util.List;
 

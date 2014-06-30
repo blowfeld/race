@@ -1,4 +1,4 @@
-package thomasb.race.app.handlers;
+package thomasb.race.web.handlers;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.json.JsonValue;
 import javax.servlet.ServletException;
 
-import thomasb.race.app.handlers.ScoreHandler.ExpirationListener;
+import thomasb.race.web.handlers.ScoreHandler.ExpirationListener;
 import thomasb.web.dispatch.HandlerRegistry;
 import thomasb.web.handler.HandlerContext;
 import thomasb.web.handler.RequestHandler;

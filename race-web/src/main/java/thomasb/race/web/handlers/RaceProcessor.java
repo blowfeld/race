@@ -1,4 +1,4 @@
-package thomasb.race.app.handlers;
+package thomasb.race.web.handlers;
 
 import static java.lang.String.format;
 import static thomasb.race.engine.PlayerStatus.ACTIVE;
@@ -23,7 +23,6 @@ import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import thomasb.race.app.json.JsonConverter;
 import thomasb.race.engine.ControlEvent;
 import thomasb.race.engine.Lap;
 import thomasb.race.engine.PathSegment;
@@ -32,6 +31,7 @@ import thomasb.race.engine.PointDouble;
 import thomasb.race.engine.RaceEngine;
 import thomasb.race.engine.RacePath;
 import thomasb.race.engine.RaceTrack;
+import thomasb.race.web.json.JsonConverter;
 import thomasb.web.clocking.ClockedRequest;
 import thomasb.web.clocking.ClockedRequestProcessor;
 import thomasb.web.handler.RequestHandler;

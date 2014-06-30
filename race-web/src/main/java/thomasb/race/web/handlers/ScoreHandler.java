@@ -1,10 +1,10 @@
-package thomasb.race.app.handlers;
+package thomasb.race.web.handlers;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static java.nio.file.StandardOpenOption.APPEND;
-import static thomasb.race.app.handlers.RaceProcessor.COLOR_PARAMETER;
-import static thomasb.race.app.handlers.RaceProcessor.ID_PARAMETER;
-import static thomasb.race.app.handlers.RaceProcessor.SCORE_PARAMETER;
+import static thomasb.race.web.handlers.RaceProcessor.COLOR_PARAMETER;
+import static thomasb.race.web.handlers.RaceProcessor.ID_PARAMETER;
+import static thomasb.race.web.handlers.RaceProcessor.SCORE_PARAMETER;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -25,8 +25,8 @@ import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
 import javax.servlet.ServletException;
 
-import thomasb.race.app.json.JsonConverter;
 import thomasb.race.engine.Lap;
+import thomasb.race.web.json.JsonConverter;
 import thomasb.web.handler.HandlerContext;
 import thomasb.web.handler.RequestHandler;
 

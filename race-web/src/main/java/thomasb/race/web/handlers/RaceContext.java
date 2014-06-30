@@ -1,8 +1,8 @@
-package thomasb.race.app.handlers;
+package thomasb.race.web.handlers;
 
-import thomasb.race.app.json.JsonConverter;
 import thomasb.race.engine.RaceEngine;
 import thomasb.race.engine.RaceTrack;
+import thomasb.race.web.json.JsonConverter;
 
 public final class RaceContext {
 	private final RaceTrack track;
