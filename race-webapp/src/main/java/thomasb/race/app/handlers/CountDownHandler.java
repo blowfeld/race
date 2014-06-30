@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.json.Json;
+import javax.json.JsonValue;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,14 +45,25 @@ public abstract class CountDownHandler implements RequestHandler {
 		
 		String participant = context.getRequest().getSession().getId();
 		if (timeLatch.isExpired()) {
-			RedirectUtil.setHandler(context, id, getSuccessor());
+			setHandler(context, id, getSuccessor());
 			expirationSent.add(participant);
 			onExpire();
 		} else {
-			RedirectUtil.setHandler(context, id, null);
+			setHandler(context, id, null);
 		}
 		
 		context.writeResponse();
+	}
+	
+	private void setHandler(HandlerContext context, UUID current, RequestHandler successor) {
+		JsonValue currentId = jsonStringOf(current);
+		JsonValue redirectId = successor != null ? jsonStringOf(successor.getId()) : JsonValue.NULL;
+		context.setResponseParameter("handler", currentId);
+		context.setResponseParameter("redirect", redirectId);
+	}
+	
+	private JsonValue jsonStringOf(UUID uuid) {
+		return Json.createArrayBuilder().add(uuid.toString()).build().get(0);
 	}
 	
 	protected abstract RequestHandler getSuccessor();
