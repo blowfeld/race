@@ -21,13 +21,14 @@ public enum ArrowControlEvent implements ControlEvent {
 		40, DOWN);
 	
 	private static final int STEERING = 15;
+	private static final int SPEED = 10;
 	
 	private final int speedChange;
 	private final int steeringChange;
 	
 	private ArrowControlEvent(int speedChange, int steeringChange) {
-		this.speedChange = speedChange;
-		this.steeringChange = steeringChange;
+		this.speedChange = speedChange * SPEED;
+		this.steeringChange = steeringChange * STEERING;
 	}
 	
 	public static ArrowControlEvent fromKey(int key) {
@@ -42,6 +43,6 @@ public enum ArrowControlEvent implements ControlEvent {
 	
 	@Override
 	public int steeringChange() {
-		return steeringChange * STEERING;
+		return steeringChange;
 	}
 }

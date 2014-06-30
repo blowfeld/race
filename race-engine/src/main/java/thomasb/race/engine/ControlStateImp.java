@@ -7,13 +7,13 @@ import static java.util.Objects.hash;
 
 public final class ControlStateImp implements ControlState {
 	private static final int SPEED_MIN = 0;
-	private static final int SPEED_MAX = 2;
+	private static final int SPEED_MAX = 20;
 	
 	private final int speed;
 	private final int steering;
 	
 	public ControlStateImp(int speed, int steering) {
-		checkArgument(0 <= speed && speed <= 2, "Speed must be in [0, 2]");
+		checkArgument(0 <= speed && speed <= 20, "Speed must be in [0, 20]");
 		checkArgument(0 <= steering && steering < 360, "Speed must be in [0, 360)");
 		
 		this.speed = speed;

@@ -14,42 +14,42 @@ import com.google.common.collect.ImmutableList;
 public enum RaceTrackDefinition implements RaceTrack {
 	INSTANCE;
 	
-	private static final List<VectorPoint> FINISH = ImmutableList.of(new VectorPoint(2.0, 10.0),
-			new VectorPoint(8.0, 10.0));
+	private static final List<VectorPoint> FINISH = ImmutableList.of(new VectorPoint(20, 100),
+			new VectorPoint(80, 100));
 	
 	private static final List<VectorPoint> CONTOUR = ImmutableList.of(
 			new VectorPoint(0, 0),
-			new VectorPoint(20, 0),
-			new VectorPoint(20, 20),
-			new VectorPoint(0, 20)
+			new VectorPoint(200, 0),
+			new VectorPoint(200, 200),
+			new VectorPoint(0, 200)
 		);
 	
 	private static final List<VectorPoint> OUTER_WALL = ImmutableList.of(
-			new VectorPoint(2, 2),
-			new VectorPoint(18, 2),
-			new VectorPoint(18, 18),
-			new VectorPoint(2, 18)
+			new VectorPoint(20, 20),
+			new VectorPoint(180, 20),
+			new VectorPoint(180, 180),
+			new VectorPoint(20, 180)
 		);
 	
 	private static final List<VectorPoint> OUTER_GREEN = ImmutableList.of(
-			new VectorPoint(4, 4),
-			new VectorPoint(16, 4),
-			new VectorPoint(16, 16),
-			new VectorPoint(4, 16)
+			new VectorPoint(40, 40),
+			new VectorPoint(160, 40),
+			new VectorPoint(160, 160),
+			new VectorPoint(40, 160)
 		);
 	
 	private static final List<VectorPoint> INNER_GREEN = ImmutableList.of(
-			new VectorPoint(6, 6),
-			new VectorPoint(14, 6),
-			new VectorPoint(14, 14),
-			new VectorPoint(6, 14)
+			new VectorPoint(60, 60),
+			new VectorPoint(140, 60),
+			new VectorPoint(140, 140),
+			new VectorPoint(60, 140)
 		);
 	
 	private static final List<VectorPoint> INNER_WALL = ImmutableList.of(
-			new VectorPoint(8, 8),
-			new VectorPoint(12, 8),
-			new VectorPoint(12, 12),
-			new VectorPoint(8, 12)
+			new VectorPoint(80, 80),
+			new VectorPoint(120, 80),
+			new VectorPoint(120, 120),
+			new VectorPoint(80, 120)
 		);
 	
 	private static final List<TrackPolygon> TRACK_SECTIONS = ImmutableList.of(
@@ -90,19 +90,19 @@ public enum RaceTrackDefinition implements RaceTrack {
 		
 		@Override
 		public boolean hasNext() {
-			return yOffset(count) > 4.0;
+			return yOffset(count) > 40;
 		}
 		
 		@Override
 		public VectorPoint next() {
-			VectorPoint gridPoint = new VectorPoint(5.0, yOffset(count));
+			VectorPoint gridPoint = new VectorPoint(50, yOffset(count));
 			count += 1;
 			
 			return gridPoint;
 		}
 		
 		private double yOffset(int count) {
-			return 9.9 - count / 2.0;
+			return 99.0 - 5 * count;
 		}
 		
 		@Override

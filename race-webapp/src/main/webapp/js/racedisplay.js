@@ -48,7 +48,7 @@ race.display = function() {
 		}
 		
 		var pathDefinition = function(corners, close) {
-			corners = corners.map(function(c) { return (10 * c.x) + ' ' + (10 * c.y) + ' '; });
+			corners = corners.map(function(c) { return (c.x) + ' ' + (c.y) + ' '; });
 			corners.join('L');
 			
 			return 'M ' + corners + (close ? 'Z' : '');
@@ -83,16 +83,16 @@ race.display = function() {
 		};
 		
 		var setCircle = function(circle, position) {
-			circle.setAttribute('cx', position.x * 10);
-			circle.setAttribute('cy', position.y * 10);
+			circle.setAttribute('cx', position.x);
+			circle.setAttribute('cy', position.y);
 			circle.setAttribute('r', RADIUS);
 		}
 		
 		var setDirection = function(direction, start, end) {
-			direction.setAttribute('x1', start.x * 10);
-			direction.setAttribute('y1', start.y * 10);
-			direction.setAttribute('x2', end.x * 10);
-			direction.setAttribute('y2', end.y * 10);
+			direction.setAttribute('x1', start.x);
+			direction.setAttribute('y1', start.y);
+			direction.setAttribute('x2', end.x);
+			direction.setAttribute('y2', end.y);
 		}
 		
 		var blink = function(id, duration) {

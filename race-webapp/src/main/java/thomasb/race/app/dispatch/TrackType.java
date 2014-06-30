@@ -3,7 +3,7 @@ package thomasb.race.app.dispatch;
 import thomasb.race.engine.SectionType;
 
 public enum TrackType implements SectionType {
-	ASPHALT(2), GREEN(1), WALL(0);
+	ASPHALT(20), GREEN(10), WALL(0);
 	
 	private final int maxSpeed;
 

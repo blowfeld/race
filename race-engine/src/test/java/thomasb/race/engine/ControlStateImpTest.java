@@ -73,12 +73,12 @@ public class ControlStateImpTest {
 	}
 	
 	@Test
-	public void speedAtMostTwo() {
-		ControlEvent controlEvent = Mocks.controlEvent(3, 0);
+	public void speedAtMostTwenty() {
+		ControlEvent controlEvent = Mocks.controlEvent(30, 0);
 		
 		ControlState actual = zeroState.adjust(controlEvent);
 		
-		assertEquals(new ControlStateImp(2, 0), actual);
+		assertEquals(new ControlStateImp(20, 0), actual);
 	}
 
 	@Test
