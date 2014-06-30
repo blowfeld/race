@@ -1,4 +1,4 @@
-package thomasb.web.dispatch;
+package thomasb.race.web.dispatch;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;

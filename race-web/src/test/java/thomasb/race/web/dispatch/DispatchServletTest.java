@@ -1,4 +1,4 @@
-package thomasb.web.dispatch;
+package thomasb.race.web.dispatch;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Maps.newHashMap;
@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import thomasb.race.web.dispatch.DispatchServlet;
 import thomasb.web.handler.RequestHandler;
 
 import com.google.common.collect.ImmutableListMultimap;

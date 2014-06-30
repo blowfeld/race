@@ -9,10 +9,10 @@ import javax.servlet.ServletException;
 import thomasb.race.app.handlers.WebUtilHandlers;
 import thomasb.race.app.json.RaceJsonConverter;
 import thomasb.race.engine.RaceEngineImp;
+import thomasb.race.web.dispatch.DispatchServlet;
+import thomasb.race.web.dispatch.RegistrationListener;
 import thomasb.race.web.handlers.RaceContext;
 import thomasb.race.web.handlers.RegistrationHandler;
-import thomasb.web.dispatch.DispatchServlet;
-import thomasb.web.dispatch.RegistrationListener;
 import thomasb.web.handler.RequestHandler;
 
 

@@ -1,4 +1,4 @@
-package thomasb.web.dispatch;
+package thomasb.race.web.dispatch;
 
 import java.lang.ref.WeakReference;
 import java.util.UUID;

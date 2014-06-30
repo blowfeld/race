@@ -10,8 +10,8 @@ import java.util.Map;
 import javax.json.JsonValue;
 import javax.servlet.ServletException;
 
+import thomasb.race.web.dispatch.HandlerRegistry;
 import thomasb.race.web.handlers.ScoreHandler.ExpirationListener;
-import thomasb.web.dispatch.HandlerRegistry;
 import thomasb.web.handler.HandlerContext;
 import thomasb.web.handler.RequestHandler;
 
