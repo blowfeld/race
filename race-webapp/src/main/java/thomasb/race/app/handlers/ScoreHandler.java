@@ -1,11 +1,15 @@
 package thomasb.race.app.handlers;
 
+import static com.google.common.base.Charsets.UTF_8;
+import static java.nio.file.StandardOpenOption.APPEND;
 import static thomasb.race.app.handlers.RaceProcessor.COLOR_PARAMETER;
 import static thomasb.race.app.handlers.RaceProcessor.ID_PARAMETER;
 import static thomasb.race.app.handlers.RaceProcessor.SCORE_PARAMETER;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +30,8 @@ import thomasb.race.engine.Lap;
 import thomasb.web.handler.HandlerContext;
 import thomasb.web.handler.RequestHandler;
 
+import com.google.common.collect.ImmutableList;
+
 public class ScoreHandler extends CountDownHandler {
 	private static final Comparator<Entry<String, Lap>> SCORE_COMPARATOR = new Comparator<Map.Entry<String,Lap>>() {
 		@Override
@@ -39,17 +45,21 @@ public class ScoreHandler extends CountDownHandler {
 	
 	private final Map<String, String> participantNames;
 	private final Map<String, Lap> participantScores = new HashMap<>();
-	
 	private final JsonConverter converter;
+	private final Path scoresFile;
 	
 	private ExpirationListener listener;
+	private boolean scoresWritten;
 	private volatile boolean launched = false;
-
 	
-	public ScoreHandler(List<String> participants, Map<String, String> participantNames, JsonConverter converter) {
-		super(participants, 60000, 500);
+	public ScoreHandler(List<String> participants,
+			Map<String, String> participantNames,
+			JsonConverter converter,
+			Path scoresFile) {
+		super(participants, 20000, 500);
 		this.participantNames = participantNames;
 		this.converter = converter;
+		this.scoresFile = scoresFile;
 	}
 	
 	@Override
@@ -59,18 +69,21 @@ public class ScoreHandler extends CountDownHandler {
 			launch();
 		}
 		
-		String participant = context.getRequest().getSession().getId();
-		synchronized (participantScores) {
-			if (!participantScores.containsKey(participant)) {
-				String rawScore = context.getRequest().getParameter(SCORE_PARAMETER);
-				JsonObject jsonScore = Json.createReader(new StringReader(rawScore)).readObject();
-				participantScores.put(participant, converter.deserializeLaps(jsonScore));
-			}
-		}
-		
-		context.setResponseParameter(SCORE_PARAMETER, createRanking());
+		handleScores(context);
 		
 		super.handle(context);
+	}
+
+	private synchronized void handleScores(HandlerContext context) {
+		String participant = context.getRequest().getSession().getId();
+		if (!participantScores.containsKey(participant)) {
+			String rawScore = context.getRequest().getParameter(SCORE_PARAMETER);
+			JsonObject jsonScore = Json.createReader(new StringReader(rawScore)).readObject();
+			participantScores.put(participant, converter.deserializeLaps(jsonScore));
+		}
+		
+		JsonValue scores = createRanking();
+		context.setResponseParameter(SCORE_PARAMETER, scores);
 	}
 	
 	private JsonValue createRanking() {
@@ -94,8 +107,23 @@ public class ScoreHandler extends CountDownHandler {
 	
 	@Override
 	protected void onExpire() {
+		writeScores();
 		if (allParticipantsClosed()) {
 			listener.expire();
+		}
+	}
+	
+	private synchronized void writeScores() {
+		if (scoresWritten) {
+			return;
+		}
+		scoresWritten = true;
+		
+		String scoreString = createRanking().toString();
+		try {
+			Files.write(scoresFile, ImmutableList.of(scoreString), UTF_8, APPEND);
+		} catch (IOException e) {
+			new RuntimeException("Error writing score file: " + scoresFile.toString(), e);
 		}
 	}
 	

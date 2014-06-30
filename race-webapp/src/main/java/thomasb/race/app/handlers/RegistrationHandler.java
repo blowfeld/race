@@ -1,6 +1,7 @@
 package thomasb.race.app.handlers;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,13 +25,17 @@ public class RegistrationHandler extends CountDownHandler {
 	private final HandlerRegistry registry;
 	private final RaceContext raceContext;
 	private final Map<String, String> names = Maps.newHashMap();
+	private final Path scoresFile;
 	
 	private RequestHandler successor;
 	
-	public RegistrationHandler(HandlerRegistry registry, RaceContext raceContext) {
+	public RegistrationHandler(HandlerRegistry registry,
+			RaceContext raceContext,
+			Path scoresFile) {
 		super(new ArrayList<String>(), 5000, 1000);
 		this.registry = registry;
 		this.raceContext = raceContext;
+		this.scoresFile = scoresFile;
 	}
 	
 	@Override
@@ -50,7 +55,7 @@ public class RegistrationHandler extends CountDownHandler {
 	@Override
 	protected void onExpire() {
 		if (allParticipantsClosed()) {
-			registry.remove(this);
+			registry.remove(getId());
 		}
 	}
 
@@ -59,7 +64,7 @@ public class RegistrationHandler extends CountDownHandler {
 			return -1;
 		}
 		
-		getParticipants().add(sessionId);
+		addParticipant(sessionId);
 		names.put(sessionId, name);
 		
 		if (getParticipants().size() == 2) {
@@ -84,11 +89,21 @@ public class RegistrationHandler extends CountDownHandler {
 	private void initSuccessors() {
 		List<String> participants = ImmutableList.copyOf(getParticipants());
 		
-		ScoreHandler scoreHandler = new ScoreHandler(participants, names, raceContext.getConverter());
-		RaceHandler raceHandler = new RaceHandler(participants, raceContext, scoreHandler);
-		LaunchHandler launchHandler = new LaunchHandler(participants, raceHandler);
+		ScoreHandler scoreHandler = new ScoreHandler(participants,
+				names,
+				raceContext.getConverter(),
+				scoresFile);
+		
+		RaceHandler raceHandler = new RaceHandler(participants,
+				raceContext,
+				scoreHandler);
+		
+		LaunchHandler launchHandler = new LaunchHandler(participants,
+				raceHandler);
+		
 		scoreHandler.setExpirationListener(new UnregisterListener(
-				ImmutableList.of(scoreHandler, raceHandler, launchHandler), registry));
+				ImmutableList.of(scoreHandler, raceHandler, launchHandler),
+				registry));
 		
 		successor = launchHandler;
 		

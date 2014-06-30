@@ -1,5 +1,11 @@
 package thomasb.race.app.dispatch;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+
 import thomasb.race.app.handlers.RaceContext;
 import thomasb.race.app.handlers.RegistrationHandler;
 import thomasb.race.app.json.RaceJsonConverter;
@@ -14,13 +20,19 @@ public class RaceDispatcherServlet extends DispatchServlet {
 	
 	private RegistrationHandler current;
 	
+	private Path scoresFile;
+	
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		String scoresFileName = config.getInitParameter("scores_file");
+		scoresFile = Paths.get(scoresFileName);
+	}
+	
 	@Override
 	protected synchronized RequestHandler assignHandler(String id) {
-		if (current != null && current.closed() && current.contains(id)) {
-			return current;
-		}
-		
-		if (current == null || (current.closed() && !current.contains(id))) {
+		if (current == null ||
+				(current.closed() && !current.contains(id)) ||
+				!getRegistry().containsKey(current.getId())) {
 			RegistrationListener registrationListener = new RegistrationListener(getRegistry());
 			
 			RaceContext raceContext = new RaceContext(RaceTrackDefinition.INSTANCE,
@@ -29,7 +41,9 @@ public class RaceDispatcherServlet extends DispatchServlet {
 					15 * 60 * 1000,
 					1000,
 					200);
-			current = new RegistrationHandler(registrationListener, raceContext );
+			current = new RegistrationHandler(registrationListener,
+					raceContext,
+					scoresFile);
 		}
 		
 		return current;

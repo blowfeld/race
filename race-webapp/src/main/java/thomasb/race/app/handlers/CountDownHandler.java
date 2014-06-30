@@ -1,10 +1,14 @@
 package thomasb.race.app.handlers;
 
+import static java.util.Collections.newSetFromMap;
+
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,10 +24,10 @@ public abstract class CountDownHandler implements RequestHandler {
 	private final UUID id = UUID.randomUUID();
 	private final List<String> participants;
 	private final TimeLatchHandler timeLatch;
-	private final Set<String> expirationSent = new HashSet<>();
+	private final Set<String> expirationSent = newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 	
 	public CountDownHandler(List<String> participants, int duration, int interval) {
-		this.participants = participants;
+		this.participants = new ArrayList<>(participants);
 		this.timeLatch = new TimeLatchHandlerImp(duration, interval);
 	}
 	
@@ -71,8 +75,12 @@ public abstract class CountDownHandler implements RequestHandler {
 		timeLatch.resetClock();
 	}
 	
+	protected final boolean addParticipant(String participant) {
+		return participants.add(participant);
+	}
+	
 	protected final List<String> getParticipants() {
-		return participants;
+		return Collections.unmodifiableList(participants);
 	}
 	
 	protected final boolean allParticipantsClosed() {

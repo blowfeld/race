@@ -3,10 +3,14 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-    <display-name>Race Web Application</display-name>
+	<display-name>Race Web Application</display-name>
 	<servlet>
 		<servlet-name>dispatch</servlet-name>
 		<servlet-class>thomasb.race.app.dispatch.RaceDispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>scores_file</param-name>
+			<param-value>/tmp/scores.json</param-value>
+		</init-param>
 		<async-supported>true</async-supported>
 	</servlet>
 	<servlet-mapping>
