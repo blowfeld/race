@@ -17,8 +17,7 @@ public interface ControlState {
 	/**
 	 * Returns the current speed of the player.
 	 * 
-	 * @return the current speed. The returned value is between 0 and 2
-	 * 			(inclusive)
+	 * @return the current speed.
 	 */
 	int getSpeed();
 	
@@ -27,7 +26,7 @@ public interface ControlState {
 	 * according to the values in the specified {@link ControlEvent}.
 	 * @param event a {@code ControlEvent} containing changes to the state
 	 * 
-	 * @return a {@code ControlState} instance with udpated speed and steering
+	 * @return a {@code ControlState} instance with updated speed and steering
 	 */
 	ControlState adjust(ControlEvent event);
 	
