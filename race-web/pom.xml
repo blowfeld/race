@@ -32,12 +32,10 @@
 			<version>${project.servlet-api.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${project.guava.version}</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
