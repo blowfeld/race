@@ -3,11 +3,11 @@ package thomasb.race.engine;
 import static java.lang.Math.sqrt;
 import static java.util.Objects.hash;
 
-final class RaceTrackSegment extends AbstractSegment implements TrackSegment {
+final class TrackSegment extends AbstractSegment {
 	private final int maxSpeed;
 	private final int finish;
 
-	RaceTrackSegment(PointDouble start,
+	TrackSegment(PointDouble start,
 			PointDouble end,
 			int maxSpeed,
 			int crossedFinish) {
@@ -16,24 +16,11 @@ final class RaceTrackSegment extends AbstractSegment implements TrackSegment {
 		this.finish = crossedFinish;
 	}
 
-	static RaceTrackSegment from(TrackSegment segment) {
-		if (segment instanceof RaceTrackSegment) {
-			return (RaceTrackSegment) segment;
-		}
-		
-		return new RaceTrackSegment(segment.getStart(),
-				segment.getEnd(),
-				segment.getMaxSpeed(),
-				segment.crossedFinish());
-	}
-	
-	@Override
-	public int getMaxSpeed() {
+	int getMaxSpeed() {
 		return maxSpeed;
 	}
 
-	@Override
-	public int crossedFinish() {
+	int crossedFinish() {
 		return finish;
 	}
 	

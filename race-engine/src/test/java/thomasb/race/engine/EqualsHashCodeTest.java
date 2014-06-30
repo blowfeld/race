@@ -24,7 +24,7 @@ public class EqualsHashCodeTest {
 				{RaceLap.class, true},
 				{RacePlayerState.class, true},
 				{RacePathSegment.class, true},
-				{RaceTrackSegment.class, true}});
+				{TrackSegment.class, true}});
 	}
 	
 	public EqualsHashCodeTest(Class<?> clazz, boolean expected) {
