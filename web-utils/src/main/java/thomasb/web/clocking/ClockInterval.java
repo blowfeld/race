@@ -9,7 +9,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-final class ClockInterval implements ClockedExecutor.Interval {
+final class ClockInterval implements ClockedExecutorThread.Interval {
 	private final int count;
 	private final int duration;
 	private final CountDownLatch latch;

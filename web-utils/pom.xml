@@ -41,6 +41,7 @@
 			<artifactId>jcip-annotations</artifactId>
 			<version>${project.jcip-annotations.version}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.json</artifactId>

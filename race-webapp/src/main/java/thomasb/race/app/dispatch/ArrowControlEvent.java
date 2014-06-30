@@ -1,6 +1,8 @@
-package thomasb.race.engine;
+package thomasb.race.app.dispatch;
 
 import java.util.Map;
+
+import thomasb.race.engine.ControlEvent;
 
 import com.google.common.collect.ImmutableMap;
 

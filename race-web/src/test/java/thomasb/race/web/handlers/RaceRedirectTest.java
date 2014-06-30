@@ -23,8 +23,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import thomasb.race.engine.PlayerState;
 import thomasb.race.engine.PlayerStatus;
 import thomasb.race.engine.RacePath;
-import thomasb.race.web.handlers.RaceData;
-import thomasb.race.web.handlers.RaceRedirect;
 import thomasb.web.clocking.ClockedRequest;
 import thomasb.web.handler.RequestHandler;
 

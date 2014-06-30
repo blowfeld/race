@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
+import thomasb.race.app.handlers.WebUtilHandlers;
 import thomasb.race.app.json.RaceJsonConverter;
 import thomasb.race.engine.RaceEngineImp;
 import thomasb.race.web.handlers.RaceContext;
@@ -37,7 +38,8 @@ public class RaceDispatcherServlet extends DispatchServlet {
 			
 			RaceContext raceContext = new RaceContext(RaceTrackDefinition.INSTANCE,
 					new RaceEngineImp(RaceTrackDefinition.INSTANCE),
-					new RaceJsonConverter(),
+					RaceJsonConverter.INSTANCE,
+					WebUtilHandlers.INSTANCE,
 					15 * 60 * 1000,
 					1000,
 					200);

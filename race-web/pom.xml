@@ -32,11 +32,11 @@
 			<version>${project.servlet-api.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
 		<dependency>
-			<groupId>thomasb.race</groupId>
-			<artifactId>race-engine</artifactId>
-			<version>${project.version}</version>
-			<type>test-jar</type>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${project.guava.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

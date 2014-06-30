@@ -9,7 +9,7 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
 
-import thomasb.race.engine.ArrowControlEvent;
+import thomasb.race.app.dispatch.ArrowControlEvent;
 import thomasb.race.engine.ControlEvent;
 import thomasb.race.engine.ControlState;
 import thomasb.race.engine.ControlStateImp;
@@ -25,7 +25,8 @@ import thomasb.race.engine.TrackSection;
 import thomasb.race.engine.VectorPoint;
 import thomasb.race.web.json.JsonConverter;
 
-public class RaceJsonConverter implements JsonConverter {
+public enum RaceJsonConverter implements JsonConverter {
+	INSTANCE;
 	
 	@Override
 	public JsonValue serialize(String string) {

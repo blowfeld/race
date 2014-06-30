@@ -1,9 +1,8 @@
 package thomasb.web.clocking;
 
 import java.util.concurrent.CountDownLatch;
-import thomasb.web.clocking.ClockInterval;
 
-public final class ClockedExecutorThread extends Thread implements ClockedExecutor {
+public final class ClockedExecutorThread extends Thread {
 	private final Runnable action;
 	private final CountDownLatch startLatch;
 
@@ -62,5 +61,9 @@ public final class ClockedExecutorThread extends Thread implements ClockedExecut
 	
 	public int getIntervalCount() {
 		return clockInterval.getCount();
+	}
+	
+	public interface Interval {
+		void finish();
 	}
 }
