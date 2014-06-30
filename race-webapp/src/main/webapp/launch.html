@@ -4,13 +4,16 @@
 <head>
 <link rel="stylesheet" type="text/css" href="css/race.css">
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="js/latch/latches.js"></script>
 <script src="js/redirect.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
 		var setDisplay = function(displayValue) {
-			$('#remaining').text(displayValue);
+			var display = $('#remaining');
+			display.text((displayValue / 1000) + " sec");
+			display.css("width", (displayValue / 3000 * 70) + "%");
 		}
 		
 		redirectLatch('core', 'race.html', setDisplay).run();
@@ -25,8 +28,8 @@
 	<h1>Launch</h1>
 
 	<h2>Prepare for launch!</h2>
-	<div id='remaining'></div>seconds
-	
+	<div id='remaining' class='center countdown_bar'></div>
+
 
 </body>
 

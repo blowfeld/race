@@ -11,7 +11,7 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		var setDisplay = function(displayValue) {
-			$('#remaining').text(displayValue);
+			$('#remaining').text(displayValue / 1000);
 		}
 		
 		var init = {
@@ -36,13 +36,18 @@
 	</div>
 
 	<h2>Assemble on the grid in:</h2>
-	Your color is
-	<div id="color"
-		style="width: 50; height:10; border: 1px solid #000; display: inline-block;">
+	<div class="center">
+		Your color is
+		<div id="color"
+			style="width: 50; height: 10; border: 1px solid #000; display: inline-block;">
+		</div>
 	</div>
-	<p>
-	Remaining: <div id="remaining" style="display: inline-block; overflow:auto"></div> seconds
-	</p>
+
+	<h2 class='countdown'>Remaining:</h2>
+	<div class="center">
+		<div id="remaining" style="display: inline-block;"></div>
+		seconds
+	</div>
 </body>
 
 </html>

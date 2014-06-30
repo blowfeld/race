@@ -107,7 +107,7 @@ public enum RaceTrackDefinition implements RaceTrack {
 		}
 		
 		private double yOffset(int count) {
-			return 9.9 - count / 10.0;
+			return 9.9 - count / 4.0;
 		}
 		
 		@Override

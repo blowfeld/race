@@ -57,7 +57,7 @@ clocking.events = function() {
 		
 		var execute = function() {
 			if (events.length === 0) {
-				setTimeout(execute, 0);
+				setTimeout(execute, 5);
 				return;
 			}
 			

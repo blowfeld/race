@@ -7,7 +7,8 @@
 -->
 <link rel="stylesheet" type="text/c ss" href="css/race.css">
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="js/clocking/clocks.js"></script>
 <script src="js/clocking/events.js"></script>
 <script src="js/racedisplay.js"></script>
@@ -23,9 +24,13 @@
 
 	<h2>Race:</h2>
 	<svg xmlns="http://www.w3.org/2000/svg"
-        xmlns:xlink="http://www.w3.org/1999/xlink"
-        id='race' width='210' height='210'></svg>
-
-
+		xmlns:xlink="http://www.w3.org/1999/xlink"
+		class="center"
+		width='210' height='210'>
+ 			<g transform="translate(0,210)">
+				<g id='race' transform="scale(1,-1)">
+				</g>
+			</g>
+        </svg>
 </body>
 </html>
