@@ -19,15 +19,29 @@ import thomasb.web.handler.RequestHandler;
 public class RaceDispatcherServlet extends DispatchServlet {
 	private static final long serialVersionUID = 1L;
 	
+	private static final int LAUNCH_INTERVAL = 3000;
+	
 	private RegistrationHandler current;
 	
 	private Path scoresFile;
+	private int maxTime;
+	private int updateInterval;
+	private int timeoutInterval;
+	private int registrationInterval;
+	private int scoresInterval;
+	private int countdownResolution;
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 		String scoresFileName = config.getInitParameter("scores_file");
 		scoresFile = Paths.get(scoresFileName);
+		maxTime = Integer.valueOf(config.getInitParameter("max_time_sec"));
+		updateInterval = Integer.valueOf(config.getInitParameter("update_interval_ms"));
+		timeoutInterval = Integer.valueOf(config.getInitParameter("timeout_interval_ms"));
+		registrationInterval = Integer.valueOf(config.getInitParameter("registration_interval_ms"));
+		scoresInterval = Integer.valueOf(config.getInitParameter("scores_interval_ms"));
+		countdownResolution = Integer.valueOf(config.getInitParameter("countdown_resolution_ms"));
 	}
 	
 	@Override
@@ -41,12 +55,15 @@ public class RaceDispatcherServlet extends DispatchServlet {
 					new RaceEngineImp(RaceTrackDefinition.INSTANCE),
 					RaceJsonConverter.INSTANCE,
 					WebUtilHandlers.INSTANCE,
-					15 * 60 * 1000,
-					1000,
-					200);
-			current = new RegistrationHandler(registrationListener,
-					raceContext,
-					scoresFile);
+					scoresFile,
+					maxTime,
+					updateInterval,
+					timeoutInterval,
+					registrationInterval,
+					LAUNCH_INTERVAL,
+					scoresInterval,
+					countdownResolution);
+			current = new RegistrationHandler(registrationListener, raceContext);
 		}
 		
 		return current;

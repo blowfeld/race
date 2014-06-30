@@ -1,9 +1,8 @@
 package thomasb.race.web.handlers;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -25,17 +24,17 @@ public class RegistrationHandler extends CountDownHandler {
 	private final HandlerRegistry registry;
 	private final RaceContext raceContext;
 	private final Map<String, String> names = Maps.newHashMap();
-	private final Path scoresFile;
 	
 	private RequestHandler successor;
 	
 	public RegistrationHandler(HandlerRegistry registry,
-			RaceContext raceContext,
-			Path scoresFile) {
-		super(new ArrayList<String>(), 5000, 1000, raceContext.getHandlers());
+			RaceContext raceContext) {
+		super(Collections.<String>emptyList(),
+				raceContext.getRegistrationInterval(),
+				raceContext.getCountdownResolution(),
+				raceContext.getHandlers());
 		this.registry = registry;
 		this.raceContext = raceContext;
-		this.scoresFile = scoresFile;
 	}
 	
 	@Override
@@ -91,9 +90,7 @@ public class RegistrationHandler extends CountDownHandler {
 		
 		ScoreHandler scoreHandler = new ScoreHandler(participants,
 				names,
-				raceContext.getConverter(),
-				raceContext.getHandlers(),
-				scoresFile);
+				raceContext);
 		
 		RaceHandler raceHandler = new RaceHandler(participants,
 				raceContext,
@@ -101,7 +98,7 @@ public class RegistrationHandler extends CountDownHandler {
 		
 		LaunchHandler launchHandler = new LaunchHandler(participants,
 				raceHandler,
-				raceContext.getHandlers());
+				raceContext);
 		
 		scoreHandler.setExpirationListener(new UnregisterListener(
 				ImmutableList.of(scoreHandler, raceHandler, launchHandler),

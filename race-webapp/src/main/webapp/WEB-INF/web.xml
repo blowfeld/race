@@ -7,11 +7,35 @@
 	<servlet>
 		<servlet-name>dispatch</servlet-name>
 		<servlet-class>thomasb.race.app.dispatch.RaceDispatcherServlet</servlet-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>scores_file</param-name>
 			<param-value>/tmp/scores.json</param-value>
 		</init-param>
-		<async-supported>true</async-supported>
+		<init-param>
+			<param-name>max_time_sec</param-name>
+			<param-value>900</param-value>
+		</init-param>
+		<init-param>
+			<param-name>update_interval_ms</param-name>
+			<param-value>1000</param-value>
+		</init-param>
+		<init-param>
+			<param-name>timeout_interval_ms</param-name>
+			<param-value>200</param-value>
+		</init-param>
+		<init-param>
+			<param-name>registration_interval_ms</param-name>
+			<param-value>10000</param-value>
+		</init-param>
+		<init-param>
+			<param-name>scores_interval_ms</param-name>
+			<param-value>30000</param-value>
+		</init-param>
+		<init-param>
+			<param-name>countdown_resolution_ms</param-name>
+			<param-value>1000</param-value>
+		</init-param>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>dispatch</servlet-name>

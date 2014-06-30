@@ -6,7 +6,6 @@ import java.util.List;
 import javax.servlet.ServletException;
 
 import thomasb.web.handler.HandlerContext;
-import thomasb.web.handler.Handlers;
 import thomasb.web.handler.RequestHandler;
 
 public class LaunchHandler extends CountDownHandler {
@@ -14,8 +13,8 @@ public class LaunchHandler extends CountDownHandler {
 	
 	private volatile boolean launched = false;
 	
-	public LaunchHandler(List<String> participants, RaceHandler raceHandler, Handlers handlers) {
-		super(participants, 2000, 500, handlers);
+	public LaunchHandler(List<String> participants, RaceHandler raceHandler, RaceContext context) {
+		super(participants, context.getLaunchInterval(), context.getCountdownResolution(), context.getHandlers());
 		this.raceHandler = raceHandler;
 	}
 

@@ -212,7 +212,7 @@ public class RaceProcessorTest {
 		
 		List<String> participants = ImmutableList.of("1", "2");
 		
-		processor = new RaceProcessor(participants, track , engine, RaceJsonConverter.INSTANCE, scoreHandler, 10);
+		processor = new RaceProcessor(participants, track , engine, RaceJsonConverter.INSTANCE, scoreHandler, 10, 5);
 	}
 	
 	@Test

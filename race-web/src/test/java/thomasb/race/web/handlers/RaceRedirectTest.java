@@ -65,7 +65,7 @@ public class RaceRedirectTest {
 	public void urlIsNullWhenActiveInTime() {
 		setupRequest(1, ACTIVE);
 		
-		RaceRedirect redirect = new RaceRedirect(handler, 10);
+		RaceRedirect redirect = new RaceRedirect(handler, 10, 5);
 		String actual = redirect.url(ImmutableList.of(request_1, request_2));
 		
 		assertNull(actual);
@@ -73,7 +73,7 @@ public class RaceRedirectTest {
 	
 	@Test
 	public void urlIsNullIfNoRequests() {
-		RaceRedirect redirect = new RaceRedirect(handler, 10);
+		RaceRedirect redirect = new RaceRedirect(handler, 10, 5);
 		String actual = redirect.url(Collections.<ClockedRequest<RaceData>>emptyList());
 		
 		assertNull(actual);
@@ -83,7 +83,7 @@ public class RaceRedirectTest {
 	public void urlIsNullAtMaxTime() {
 		setupRequest(10, ACTIVE);
 		
-		RaceRedirect redirect = new RaceRedirect(handler, 10);
+		RaceRedirect redirect = new RaceRedirect(handler, 10, 5);
 		String actual = redirect.url(ImmutableList.of(request_1, request_2));
 		
 		assertNull(actual);
@@ -93,7 +93,7 @@ public class RaceRedirectTest {
 	public void urlIfGreaterMaxTime() {
 		setupRequest(11, ACTIVE);
 		
-		RaceRedirect redirect = new RaceRedirect(handler, 10);
+		RaceRedirect redirect = new RaceRedirect(handler, 10, 5);
 		String actual = redirect.url(ImmutableList.of(request_1, request_2));
 		
 		assertEquals(HANDLER_ID.toString(), actual);
@@ -103,7 +103,7 @@ public class RaceRedirectTest {
 	public void urlIfAllFinished() {
 		setupRequest(1, FINISHED);
 		
-		RaceRedirect redirect = new RaceRedirect(handler, 10);
+		RaceRedirect redirect = new RaceRedirect(handler, 10, 5);
 		String actual = redirect.url(ImmutableList.of(request_1, request_2));
 		
 		assertEquals(HANDLER_ID.toString(), actual);
@@ -113,7 +113,7 @@ public class RaceRedirectTest {
 	public void urlIfAllTerminated() {
 		setupRequest(1, TERMINATED);
 		
-		RaceRedirect redirect = new RaceRedirect(handler, 10);
+		RaceRedirect redirect = new RaceRedirect(handler, 10, 5);
 		String actual = redirect.url(ImmutableList.of(request_1, request_2));
 		
 		assertEquals(HANDLER_ID.toString(), actual);

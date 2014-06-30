@@ -78,7 +78,8 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 				raceContext.getEngine(),
 				raceContext.getConverter(),
 				scoreHandler,
-				raceContext.getMaxTime());
+				raceContext.getMaxCount(),
+				raceContext.getMaxCountAfterWinner());
 	}
 	
 	RaceProcessor(List<String> participants,
@@ -86,10 +87,11 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 			RaceEngine engine,
 			JsonConverter converter,
 			RequestHandler scoreHandler,
-			int maxTime) {
+			int maxCount,
+			int maxCountAfterWinner) {
 		this.engine = engine;
 		this.converter = converter;
-		this.redirect = new RaceRedirect(scoreHandler, maxTime);
+		this.redirect = new RaceRedirect(scoreHandler, maxCount, maxCountAfterWinner);
 		
 		JsonArrayBuilder participantArray = Json.createArrayBuilder();
 		for (String participant : participants) {

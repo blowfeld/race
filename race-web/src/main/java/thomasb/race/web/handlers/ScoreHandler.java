@@ -28,7 +28,6 @@ import javax.servlet.ServletException;
 import thomasb.race.engine.Lap;
 import thomasb.race.web.json.JsonConverter;
 import thomasb.web.handler.HandlerContext;
-import thomasb.web.handler.Handlers;
 import thomasb.web.handler.RequestHandler;
 
 import com.google.common.collect.ImmutableList;
@@ -55,13 +54,11 @@ public class ScoreHandler extends CountDownHandler {
 	
 	public ScoreHandler(List<String> participants,
 			Map<String, String> participantNames,
-			JsonConverter converter,
-			Handlers handlers,
-			Path scoresFile) {
-		super(participants, 20000, 500, handlers);
+			RaceContext context) {
+		super(participants, context.getScoreInterval(), context.getCountdownResolution(), context.getHandlers());
 		this.participantNames = participantNames;
-		this.converter = converter;
-		this.scoresFile = scoresFile;
+		this.converter = context.getConverter();
+		this.scoresFile = context.getScoresFile();
 	}
 	
 	@Override
