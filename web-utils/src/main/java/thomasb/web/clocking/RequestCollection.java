@@ -86,8 +86,8 @@ final class RequestCollection<T> {
 		PrintWriter responseWriter = response.getWriter();
 		
 		JsonObjectBuilder responseObject = Json.createObjectBuilder();
-		responseObject.add(ClockedRequest.TIME_PARAMETER, request.getTime());
-		responseObject.add(ClockedRequest.DATA_PARAMETER, data);
+		responseObject.add(ClockedRequestHandler.TIME_PARAMETER, request.getTime());
+		responseObject.add(ClockedRequestHandler.DATA_PARAMETER, data);
 		responseWriter.write(responseObject.build().toString());
 	}
 	

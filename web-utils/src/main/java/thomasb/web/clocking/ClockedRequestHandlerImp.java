@@ -14,20 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import thomasb.web.handler.HandlerContext;
 
-/**
- * A {@code ClockedRequestHandler} synchronizes between request of its participants.
- * 
- * The participants are supposed to send requests in fixed time intervals. For
- * each time interval the responses to the participants are delayed until the
- * request of the last participant arrives or a timeout limit is reached.
- * 
- * Participants must specify the count of the intended time interval in their
- * request and must not send a request to the succeeding interval before they
- * received the response from the server or a given timeout is reached.
- */
 public final class ClockedRequestHandlerImp implements ClockedRequestHandler {
-	public static final String TIME_PARAMETER = ClockedRequest.TIME_PARAMETER;
-	
 	private final UUID id = UUID.randomUUID();
 	
 	private final ClockedSubmission<?> clockedSubmission;
@@ -88,9 +75,9 @@ public final class ClockedRequestHandlerImp implements ClockedRequestHandler {
 	private void writeInitialData(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		JsonGenerator responseGenerator = Json.createGenerator(response.getWriter());
 		responseGenerator.writeStartObject()
-				.write("interval", interval)
-				.write("timeout", timeout)
-				.write("data", requestProcessor.initalData(request))
+				.write(INTERVAL_PARAMETER, interval)
+				.write(TIMEOUT_PARAMETER, timeout)
+				.write(DATA_PARAMETER, requestProcessor.initalData(request))
 			.writeEnd()
 		.close();
 	}

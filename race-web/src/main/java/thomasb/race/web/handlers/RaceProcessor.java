@@ -33,6 +33,7 @@ import thomasb.race.engine.RacePath;
 import thomasb.race.engine.RaceTrack;
 import thomasb.race.web.json.JsonConverter;
 import thomasb.web.clocking.ClockedRequest;
+import thomasb.web.clocking.ClockedRequestHandler;
 import thomasb.web.clocking.ClockedRequestProcessor;
 import thomasb.web.handler.RequestHandler;
 
@@ -166,7 +167,7 @@ final class RaceProcessor implements ClockedRequestProcessor<RaceData> {
 	}
 	
 	private JsonObject readRequestData(AsyncContext request) {
-		String data = request.getRequest().getParameter(ClockedRequest.DATA_PARAMETER);
+		String data = request.getRequest().getParameter(ClockedRequestHandler.DATA_PARAMETER);
 		
 		return  Json.createReader(new StringReader(data)).readObject();
 	}

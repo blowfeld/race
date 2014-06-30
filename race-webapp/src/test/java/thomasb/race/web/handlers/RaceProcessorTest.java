@@ -45,6 +45,7 @@ import thomasb.race.engine.RaceTrack;
 import thomasb.race.engine.SectionType;
 import thomasb.race.engine.TrackSection;
 import thomasb.web.clocking.ClockedRequest;
+import thomasb.web.clocking.ClockedRequestHandler;
 import thomasb.web.handler.RequestHandler;
 
 import com.google.common.collect.ImmutableList;
@@ -167,9 +168,9 @@ public class RaceProcessorTest {
 		
 		String requestLeftDataJson = String.format(baseRequestDataString, 37);
 		String requestNoKeyDataJson = String.format(baseRequestDataString, 0);
-		when(requestLeft.getParameter(ClockedRequest.DATA_PARAMETER))
+		when(requestLeft.getParameter(ClockedRequestHandler.DATA_PARAMETER))
 				.thenReturn(requestLeftDataJson);
-		when(requestNoKey.getParameter(ClockedRequest.DATA_PARAMETER))
+		when(requestNoKey.getParameter(ClockedRequestHandler.DATA_PARAMETER))
 				.thenReturn(requestNoKeyDataJson);
 		
 		when(asyncRequestNoKey.getRequest()).thenReturn(requestNoKey);
