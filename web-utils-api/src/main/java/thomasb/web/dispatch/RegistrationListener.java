@@ -22,8 +22,8 @@ public final class RegistrationListener implements HandlerRegistry {
 	}
 	
 	@Override
-	public RequestHandler remove(Object handler) {
-		return registry.get().remove(handler);
+	public RequestHandler remove(Object handlerId) {
+		return registry.get().remove(handlerId);
 	}
 
 	@Override
