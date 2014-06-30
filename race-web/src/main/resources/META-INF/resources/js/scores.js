@@ -16,8 +16,6 @@ var displayScores = function(parent, scores) {
 	var colorDiv = function(color) {
 		var div = $('<div>');
 		
-		console.log(color);
-		
 		div.attr('class', 'color_rect');
 		div.css('background-color', color);
 		
