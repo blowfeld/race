@@ -41,5 +41,5 @@ will run the unit tests in all modules.
 The (...somewhat non-existing) javascript unit tests can (or better could) be run from the according test pages in the src/test/resources folders.
 
 ###Deployment
-The war archive created can be deployed to a servlet container of your choice. The servlet container must, however, support asynchronouos servlets.
+The war archive created can be deployed to a servlet container of your choice. The servlet container must, however, support asynchronouos servlets. In addition, a file for persisting the scores must be created in the location specified in the web.xml of the war. To change the location, currently the war needs to be reuilt.
 The start page of the applciation can be reached throght ROOT/welcome.html, where ROOT is the root url setup for the sevlet container. 
