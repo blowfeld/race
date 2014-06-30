@@ -14,7 +14,7 @@ For synchronized operations, for each clock time interval the server collects re
 Data transfered with these requests is expected to be in JSON format. For countdown timers the response will be a JSON object that holds the remaining time in the 'remaining' property, and the timer is done when the remaining time is -1. For synchronized requests the JSON request and response hold the time interval in the 'time_count' property, and additional data in the 'data' property.
 
 ###Server api (race-web module)
-Non-static requests to the server api are handled by a dispatch servlet, which dispatches the request based on a specified handler id. The handler id is provided by the server, either by a call to the dispatch servlet or encoded in the resource url.
+Non-static requests to the server api are handled by a dispatch servlet, which dispatches the request based on a specified handler id. The handler id is provided by the server and must be appended to the servlet path. The dispatch servlet creates the necessary handler instances on demand and registers them. The handlers need to deregister themselfs after they do not expect further requests from the clients (this unfortunately currently does not happen in certain cases..).
 
 ###Game logic (race-engine modules)
 For the race game itself a race track consisting of several track sections can be specified by defining the outer boundary of each section with an associated type (that currently corresponds to its maximum speed). Additionally a finish line, start grid positions and a maximum number of laps must be specified. The logic expects the current state of the player, containing it's current position and direction, as well as it's game status (active, finished or terminated). Based on the given state it calculates the resulting track sections for a given time interval. Thereby a track section consists of a start and end point with the associated start and end time. Additionally it calculates the resulting end state of the player.
@@ -25,6 +25,7 @@ The algorithm used is the following:
 - Determine all intersections points of the ray with the sides of the race track polygon
 - Order the intersection points by the distance from the starting point
 - Iterate through the ordered interesection points, keeping track of the section type
+- calculate the end point for the given duration and return the appropriate path segments from the start to the end point
 
 ###Build information
 The project is setup with maven (maven.apache.org) and creates a war archive to be deployed to a servlet container. The command
@@ -37,7 +38,7 @@ mvn clean test
 ```
 will run the unit tests in all modules.
 
-The (...somewhat non-existing) javascript unit tests can (or better could) be run ..somehow.
+The (...somewhat non-existing) javascript unit tests can (or better could) be run from the according test pages in the src/test/resources folders.
 
 ###Deployment
 The war archive created can be deployed to a servlet container of your choice. The servlet container must, however, support asynchronouos servlets.
