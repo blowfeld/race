@@ -20,7 +20,7 @@ clocking.clocks = function() {
 					throw new Error("timeout was larger than interval: " + timeout + " > " + interval);
 				}
 				
-				setTimeout(function() { tick(0); }, interval);
+				setTimeout(function() { tick(0); }, 0);
 			}
 			
 			dao.fetchInitial(initActions);

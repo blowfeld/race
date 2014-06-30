@@ -7,6 +7,7 @@ clocking.latches = function() {
 		var intervalId;
 		
 		var start = function(count) {
+			checkRemaining();
 			intervalId = setInterval(checkRemaining, interval);
 		};
 		
