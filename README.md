@@ -38,7 +38,7 @@ mvn clean test
 ```
 will run the unit tests in all modules.
 
-The (...somewhat non-existing) javascript unit tests can (or better could) be run ..somehow.
+The (...somewhat non-existing) javascript unit tests can (or better could) be run from the according test pages in the src/test/resources folders.
 
 ###Deployment
 The war archive created can be deployed to a servlet container of your choice. The servlet container must, however, support asynchronouos servlets.
