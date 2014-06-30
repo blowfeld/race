@@ -42,7 +42,7 @@ public enum RaceJsonConverter implements JsonConverter {
 		
 		return builder.build();
 	}
-
+	
 	@Override
 	public JsonValue serialize(PlayerState state) {
 		JsonObjectBuilder builder = Json.createObjectBuilder();
@@ -92,7 +92,7 @@ public enum RaceJsonConverter implements JsonConverter {
 		
 		return builder.build();
 	}
-
+	
 	private JsonValue serialize(PathSegment segment) {
 		JsonObjectBuilder builder = Json.createObjectBuilder();
 		
