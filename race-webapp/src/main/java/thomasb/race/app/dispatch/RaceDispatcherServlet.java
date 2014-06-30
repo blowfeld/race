@@ -25,6 +25,7 @@ public class RaceDispatcherServlet extends DispatchServlet {
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
 		String scoresFileName = config.getInitParameter("scores_file");
 		scoresFile = Paths.get(scoresFileName);
 	}
