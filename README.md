@@ -42,4 +42,10 @@ The (...somewhat non-existing) javascript unit tests can (or better could) be ru
 
 ###Deployment
 The war archive created can be deployed to a servlet container of your choice. The servlet container must, however, support asynchronouos servlets. In addition, a file for persisting the scores must be created in the location specified in the web.xml of the war. To change the location, currently the war needs to be reuilt.
-The start page of the applciation can be reached throght ROOT/welcome.html, where ROOT is the root url setup for the sevlet container. 
+The start page of the applciation can be reached throght ROOT/welcome.html, where ROOT is the root url setup for the sevlet container.
+
+For testing purposes
+```Shell
+mvn jetty:run
+```
+from the race-webapp folder provides probably the fastes way to run the application and the start page will be reachable through 'localhost:8080/welcome.html'.
