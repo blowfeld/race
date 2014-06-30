@@ -17,8 +17,6 @@ import thomasb.web.dispatch.JsonHandlerContext;
 import thomasb.web.handler.HandlerContext;
 
 public final class TimeLatchHandlerImp implements TimeLatchHandler {
-	public static final String REMAINING_PARAMETER = "remaining";
-	
 	private static final Runnable VOID_ACTION = new Runnable() {
 		@Override
 		public void run() {
